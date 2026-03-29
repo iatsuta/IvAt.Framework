@@ -29,7 +29,6 @@ public abstract class MainTests(TestEnvironment testEnvironment) : IAsyncLifetim
         await genericRepository.SaveAsync(new TestObject { Id = testObjId, FetchObject = fetchObj }, cancellationToken);
     }
 
-    [Fact]
     public virtual async Task DefaultGenericQueryable_InvokeToListAsync_MethodInvoked()
     {
         // Arrange

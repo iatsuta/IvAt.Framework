@@ -1,5 +1,4 @@
-﻿using CommonFramework;
-using CommonFramework.Auth;
+﻿using CommonFramework.Auth;
 
 using SecuritySystem.Credential;
 using SecuritySystem.ExternalSystem.Management;
@@ -11,20 +10,19 @@ public class UserCredentialManager(
     ICurrentUser currentUser,
     IPrincipalManagementService principalManagementService,
     IRootPrincipalSourceService rootPrincipalSourceService,
-    IUserNameResolver credentialNameResolver,
-    IPrincipalDataSecurityIdentityManager securityIdentityManager,
-    IDefaultCancellationTokenSource? defaultCancellationTokenSource = null)
+    ISyncUserNameResolver userNameResolver,
+    IPrincipalDataSecurityIdentityManager securityIdentityManager)
 {
     private readonly IPrincipalSourceService principalSourceService = rootPrincipalSourceService.ForPrincipal(principalManagementService.PrincipalType);
 
     public UserCredentialManager ReplaceCurrentUser(UserCredential userCredential)
     {
         return new UserCredentialManager(
-            new FixedCurrentUser(defaultCancellationTokenSource.RunSync(ct => credentialNameResolver.GetUserNameAsync(userCredential, ct))),
+            new FixedCurrentUser(userNameResolver.GetUserName(userCredential)),
             principalManagementService,
             rootPrincipalSourceService,
-            credentialNameResolver,
-            securityIdentityManager, defaultCancellationTokenSource);
+            userNameResolver,
+            securityIdentityManager);
     }
 
     public async Task<SecurityIdentity> CreatePrincipalAsync(CancellationToken cancellationToken = default)

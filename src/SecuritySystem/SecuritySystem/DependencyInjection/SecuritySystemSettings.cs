@@ -407,6 +407,7 @@ public class SecuritySystemBuilder : ISecuritySystemBuilder, IServiceInitializer
             .AddScoped(typeof(IPermissionLoader<,>), typeof(PermissionLoader<,>))
 
             .AddScoped<IUserNameResolver, UserNameResolver>()
+            .AddScoped<ISyncUserNameResolver, SyncUserNameResolver>()
 
             .AddSingleton(typeof(IManagedPrincipalHeaderConverterFactory<>), typeof(ManagedPrincipalHeaderConverterFactory<>))
             .AddSingleton(typeof(IManagedPrincipalHeaderConverter<>), typeof(ManagedPrincipalHeaderConverter<>))
