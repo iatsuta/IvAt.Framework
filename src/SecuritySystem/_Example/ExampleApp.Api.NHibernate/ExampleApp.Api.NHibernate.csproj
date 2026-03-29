@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>ExampleApp.Api</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ExampleApp.Api\ExampleApp.Api.csproj" />
+    <ProjectReference Include="..\ExampleApp.Infrastructure.NHibernate\ExampleApp.Infrastructure.NHibernate.csproj" />
+  </ItemGroup>
+
+</Project>

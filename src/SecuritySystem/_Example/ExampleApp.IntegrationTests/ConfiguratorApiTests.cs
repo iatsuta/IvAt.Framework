@@ -1,0 +1,46 @@
+﻿using SecuritySystem;
+using SecuritySystem.ExternalSystem.Management;
+
+namespace ExampleApp.IntegrationTests;
+
+public abstract class ConfiguratorApiTests(IServiceProvider rootServiceProvider) : TestBase(rootServiceProvider)
+{
+    [Fact]
+    public async Task GetLinkedPrincipalsAsync_ReturnsAllPrincipalsLinkedToRole()
+    {
+        // Arrange
+        var securityRole = SecurityRole.Administrator;
+
+        var additionalAdmin = nameof(GetLinkedPrincipalsAsync_ReturnsAllPrincipalsLinkedToRole);
+
+        await this.AuthManager.For(additionalAdmin).AddRoleAsync(securityRole, this.CancellationToken);
+
+        var expectedResults = new[] { additionalAdmin, this.AuthManager.RootUserName }.OrderBy(v => v);
+
+        // Act
+        var principalNames = await this.GetEvaluator<IRootPrincipalSourceService>()
+            .EvaluateAsync(
+                TestingScopeMode.Read,
+                async service => await service.GetLinkedPrincipalsAsync([securityRole]).ToListAsync(this.CancellationToken));
+
+        // Assert
+        principalNames.OrderBy(v => v).Should().BeEquivalentTo(expectedResults);
+    }
+
+    [Fact]
+    public async Task GetPrincipalsAsync_ReturnsRootUserForRootPrincipal()
+    {
+        // Arrange
+
+        // Act
+        var result = await this.GetEvaluator<IRootPrincipalSourceService>().EvaluateAsync(TestingScopeMode.Read, async service =>
+        {
+            return await service
+                .GetPrincipalsAsync(this.AuthManager.RootUserName, 100).Select(ph => ph.Name)
+                .ToListAsync(this.CancellationToken);
+        });
+
+        // Assert
+        result.Should().BeEquivalentTo(this.AuthManager.RootUserName);
+    }
+}

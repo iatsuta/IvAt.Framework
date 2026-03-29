@@ -1,0 +1,6 @@
+﻿namespace SecuritySystem.Services;
+
+public interface IPermissionLoader<in TPrincipal, out TPermission>
+{
+    IAsyncEnumerable<TPermission> LoadAsync(TPrincipal principal);
+}

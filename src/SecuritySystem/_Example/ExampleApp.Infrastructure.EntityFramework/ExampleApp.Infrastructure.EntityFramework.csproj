@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <RootNamespace>ExampleApp.Infrastructure</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Proxies" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\GenericQueryable\GenericQueryable.EntityFramework\GenericQueryable.EntityFramework.csproj" />
+    <ProjectReference Include="..\ExampleApp.Infrastructure\ExampleApp.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

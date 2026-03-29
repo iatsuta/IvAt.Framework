@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\SecuritySystem.Abstractions\SecuritySystem.Abstractions.csproj" />
+    <ProjectReference Include="..\ExampleApp.Domain\ExampleApp.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,87 @@
+name: Build and Run Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - run: git config --global core.autocrlf true
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      
+      - name: Restore dependencies
+        working-directory: ./src
+        run: |
+          dotnet restore IvAt.Framework.slnx
+
+      - name: Build solution
+        working-directory: ./src
+        run: |
+          dotnet build IvAt.Framework.slnx --no-restore --verbosity minimal
+          
+      - name: CommonFramework Unit tests
+        working-directory: ./src/CommonFramework
+        run: |
+          dotnet test CommonFramework.Tests --no-build --verbosity normal
+
+      - name: CommonFramework Di unit tests
+        working-directory: ./src/CommonFramework
+        run: |
+          dotnet test CommonFramework.DependencyInjection.Tests --no-build --verbosity normal
+
+      - name: CommonFramework IdentitySource unit tests
+        working-directory: ./src/CommonFramework
+        run: |
+          dotnet test CommonFramework.IdentitySource.Tests --no-build --verbosity normal
+
+      - name: CommonFramework VisualIdentitySource unit tests
+        working-directory: ./src/CommonFramework
+        run: |
+          dotnet test CommonFramework.VisualIdentitySource.Tests --no-build --verbosity normal
+          
+      - name: GenericQueryable Unit tests
+        run: |
+          dotnet test src/GenericQueryable/GenericQueryable.UnitTests --no-build --verbosity normal
+          
+      - name: GenericQueryable NHibernate Integration Tests
+        run: |
+          dotnet test --blame src/GenericQueryable/GenericQueryable.IntegrationTests.NHibernate --no-build --verbosity normal
+          
+      - name: GenericQueryable EntityFramework Integration Tests
+        run: |
+          dotnet test --blame src/GenericQueryable/GenericQueryable.IntegrationTests.EntityFramework --no-build --verbosity normal
+          
+      - name: HierarchicalExpand Unit tests
+        run: |
+          dotnet test src/HierarchicalExpand/HierarchicalExpand.Tests --no-build --verbosity normal
+          
+      - name: HierarchicalExpand NHibernate Integration Tests
+        run: |
+          dotnet test --blame src/HierarchicalExpand/HierarchicalExpand.IntegrationTests.NHibernate --no-build --verbosity normal
+          
+      - name: HierarchicalExpand EntityFramework Integration Tests
+        run: |
+          dotnet test --blame src/HierarchicalExpand/HierarchicalExpand.IntegrationTests.EntityFramework --no-build --verbosity normal
+          
+      - name: SecuritySystem Unit tests
+        run: |
+          dotnet test src/SecuritySystem/SecuritySystem.DiTests --no-build --verbosity normal
+          
+      - name: SecuritySystem NHibernate Integration Tests
+        run: |
+          dotnet test --blame src/SecuritySystem/_Example/ExampleApp.IntegrationTests.NHibernate --no-build --verbosity normal
+
+      - name: SecuritySystem EntityFramework Integration Tests
+        run: |
+          dotnet test --blame src/SecuritySystem/_Example/ExampleApp.IntegrationTests.EntityFramework --no-build --verbosity normal

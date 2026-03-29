@@ -1,0 +1,13 @@
+﻿using System.Linq.Expressions;
+
+namespace CommonFramework.ExpressionComparers;
+
+public class MemberInitComparer(ExpressionComparer rootComparer) : ExpressionComparer<MemberInitExpression>
+{
+	private readonly MemberBindingComparer memberBindingComparer = new (rootComparer);
+
+	protected override bool PureEquals(MemberInitExpression x, MemberInitExpression y)
+    {
+        return rootComparer.Equals(x.NewExpression, y.NewExpression) && x.Bindings.SequenceEqual(y.Bindings, memberBindingComparer);
+    }
+}

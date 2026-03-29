@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>IvAt.HierarchicalExpand.Abstractions</PackageId>
+    <RootNamespace>HierarchicalExpand</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\CommonFramework\CommonFramework\CommonFramework.csproj" />
+  </ItemGroup>
+
+</Project>
