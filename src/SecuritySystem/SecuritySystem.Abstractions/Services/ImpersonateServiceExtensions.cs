@@ -1,4 +1,6 @@
-﻿using SecuritySystem.Credential;
+﻿using CommonFramework;
+
+using SecuritySystem.Credential;
 
 namespace SecuritySystem.Services;
 
@@ -9,10 +11,5 @@ public static class ImpersonateServiceExtensions
         UserCredential customUserCredential,
         Func<Task> action) =>
         impersonateService.WithImpersonateAsync(
-            customUserCredential,
-            async () =>
-            {
-                await action();
-                return default(object);
-            });
+            customUserCredential, action.ToDefaultTask());
 }
