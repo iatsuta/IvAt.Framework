@@ -1,4 +1,6 @@
-﻿using SecuritySystem.Credential;
+﻿using CommonFramework;
+
+using SecuritySystem.Credential;
 
 namespace SecuritySystem.Testing;
 
@@ -10,12 +12,7 @@ public static class TestingEvaluatorExtensions
             testingEvaluator.EvaluateAsync(mode, null, evaluate);
 
         public Task EvaluateAsync(TestingScopeMode mode, UserCredential? userCredential, Func<TService, Task> evaluate) =>
-            testingEvaluator.EvaluateAsync(mode, userCredential, async service =>
-            {
-                await evaluate(service);
-
-                return default(object);
-            });
+            testingEvaluator.EvaluateAsync(mode, userCredential, evaluate.ToDefaultTask());
 
 
         public Task<TResult> EvaluateAsync<TResult>(TestingScopeMode mode, Func<TService, Task<TResult>> evaluate) =>

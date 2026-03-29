@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using CommonFramework;
+
+using Microsoft.Extensions.DependencyInjection;
 
 namespace HierarchicalExpand.IntegrationTests.Environment;
 
@@ -7,12 +9,7 @@ public class ScopeEvaluator(IServiceProvider rootServiceProvider)
     public Task EvaluateAsync(Func<IServiceProvider, Task> action) => this.EvaluateAsync<IServiceProvider>(action);
 
     public Task EvaluateAsync<TService>(Func<TService, Task> action)
-        where TService : notnull => this.EvaluateAsync<TService, object?>(async service =>
-    {
-        await action(service);
-
-        return null;
-    });
+        where TService : notnull => this.EvaluateAsync(action.ToDefaultTask());
 
     public Task<TResult> EvaluateAsync<TResult>(Func<IServiceProvider, Task<TResult>> func) => this.EvaluateAsync<IServiceProvider, TResult>(func);
 
