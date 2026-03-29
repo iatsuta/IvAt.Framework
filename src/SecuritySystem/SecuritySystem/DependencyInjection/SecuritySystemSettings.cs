@@ -52,7 +52,7 @@ public class SecuritySystemBuilder : ISecuritySystemBuilder, IServiceInitializer
 
     private Action<IServiceCollection> registerRawCurrentUserAction = sc => sc.AddKeyedScoped<ICurrentUser, RawCurrentUser>(ICurrentUser.RawKey);
 
-    private Action<IServiceCollection> registerDefaultCurrentUserAction = sc => sc.AddKeyedSingleton<ICurrentUser>(ICurrentUser.RawKey, FixedCurrentUser.CurrentMachine);
+    private Action<IServiceCollection> registerDefaultCurrentUserAction = sc => sc.AddKeyedSingleton<ICurrentUser>(ICurrentUser.DefaultKey, FixedCurrentUser.CurrentMachine);
 
     private Action<IServiceCollection>? registerGenericRepositoryAction;
 
