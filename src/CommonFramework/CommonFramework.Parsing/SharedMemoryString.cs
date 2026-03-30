@@ -1,7 +1,6 @@
 ﻿namespace CommonFramework.Parsing;
 
-public readonly record struct SharedMemoryString(ReadOnlyMemory<char> Chars)
-    : IParingInput<SharedMemoryString>
+public readonly record struct SharedMemoryString(ReadOnlyMemory<char> Chars) : IComparable<SharedMemoryString>
 {
     public ReadOnlySpan<char> Span => this.Chars.Span;
 
@@ -11,12 +10,12 @@ public readonly record struct SharedMemoryString(ReadOnlyMemory<char> Chars)
 
     public ValueTuple<SharedMemoryString, SharedMemoryString> Split(int index)
     {
-        return (this.Slice(0, index), this.Slice(index));
+        return (this[..index], this[index..]);
     }
 
     public SharedMemoryString Slice(int start)
     {
-        return new SharedMemoryString(this.Chars.Slice(start));
+        return new SharedMemoryString(this.Chars[start..]);
     }
 
     public SharedMemoryString Slice(int start, int length)
@@ -41,7 +40,7 @@ public readonly record struct SharedMemoryString(ReadOnlyMemory<char> Chars)
 
     public override string ToString()
     {
-        return this.ToString(false);
+        return this.ToString(true);
     }
 
     public string ToString(bool fullString)
@@ -54,23 +53,26 @@ public readonly record struct SharedMemoryString(ReadOnlyMemory<char> Chars)
         return new string(this.Chars.Span[.. Math.Min(this.Length, charLimit)]);
     }
 
-    private string GetDebuggerDisplay()
+    public override int GetHashCode()
     {
-        return this.ToString(1000);
+        return this.Length.GetHashCode();
     }
 
-    public static implicit operator SharedMemoryString(string value)
+    public bool Equals(SharedMemoryString? other)
     {
-        return new SharedMemoryString(value.AsMemory());
+        return other is not null && this.Equals(other.Value, StringComparison.Ordinal);
     }
 
-    public static implicit operator ReadOnlySpan<char>(SharedMemoryString value)
-    {
-        return value.Chars.Span;
-    }
+    public int CompareTo(SharedMemoryString other) => this.Length.CompareTo(other.Length);
 
-    public static int CompareInfo(SharedMemoryString input1, SharedMemoryString input2)
-    {
-        return input2.Length.CompareTo(input1.Length);
-    }
+    public bool Equals(SharedMemoryString pattern, StringComparison stringComparison) => this.Chars.Span.Equals(pattern.Chars.Span, stringComparison);
+
+
+    public static implicit operator string(SharedMemoryString value) => value.ToString();
+
+    public static implicit operator SharedMemoryString(string value) => new(value.AsMemory());
+
+    public static implicit operator ReadOnlySpan<char>(SharedMemoryString value) => value.Chars.Span;
+
+    public static SharedMemoryString Empty { get; } = string.Empty;
 }

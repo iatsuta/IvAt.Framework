@@ -2,76 +2,67 @@
 
 public static class ParserCombinatorExtensions
 {
-    public static Parser<TInput, TValue> Or<TInput, TValue>(
-            this Parser<TInput, TValue> parser1,
-            Parser<TInput, TValue> parser2) where TInput : IParingInput<TInput>
+    extension<TInput, TValue>(Parser<TInput, TValue> parser)
     {
-        return input =>
+        public Parser<TInput, TValue> Or(Func<Parser<TInput, TValue>> otherParser)
         {
-            var res1 = parser1(input);
-
-            if (res1.HasError)
+            return input =>
             {
-                var res2 = parser2(input);
+                var result = parser(input);
 
-                if (res2.HasError)
+                return result.HasError ? otherParser().Invoke(input) : result;
+            };
+        }
+
+        public Parser<TInput, TValue> Or(Parser<TInput, TValue> otherParser)
+        {
+            return input =>
+            {
+                var res1 = parser(input);
+
+                if (res1.HasError)
                 {
-                    if (TInput.CompareInfo(res2.Rest, res1.Rest) >= 0)
+                    var res2 = otherParser(input);
+
+                    if (res2.HasError)
                     {
-                        return res2;
+                        if (Comparer<TInput>.Default.Compare(res1.Rest, res2.Rest) <= 0)
+                        {
+                            return res1;
+                        }
+                        else
+                        {
+                            return res2;
+                        }
                     }
                     else
                     {
-                        return res1;
+                        return res2;
                     }
                 }
                 else
                 {
-                    return res2;
+                    return res1;
                 }
-            }
-            else
-            {
-                return res1;
-            }
-        };
+            };
+        }
+
+        public Parser<TInput, TNextValue> Pipe<TNextValue>(Parser<TInput, Func<TValue, TNextValue>> otherParser) =>
+            from v in parser
+            from f in otherParser
+            select f(v);
+
+        public Parser<TInput, object> Box() =>
+            from v in parser
+            select (object)v;
+
+        public ParserTableRow<TInput, TValue> ToRow(Func<TValue> getDefaultValue) => new(parser, getDefaultValue);
     }
 
-    public static Parser<TInput, Func<TArg, TResultValue>> Compose<TInput, TArg, TValue, TResultValue>(this Parser<TInput, Func<TArg, TValue>> p1, Parser<TInput, Func<TValue, TResultValue>> p2)
-    {
-        if (p1 == null) throw new ArgumentNullException(nameof(p1));
-        if (p2 == null) throw new ArgumentNullException(nameof(p2));
-
-        return from f1 in p1
-               from f2 in p2
-               select new Func<TArg, TResultValue>(v => f2(f1(v)));
-    }
-
-
-    public static Parser<TInput, TValue> Pipe<TInput, TArg, TValue>(this Parser<TInput, TArg> p1, Parser<TInput, Func<TArg, TValue>> p2)
-    {
-        if (p1 == null) throw new ArgumentNullException(nameof(p1));
-        if (p2 == null) throw new ArgumentNullException(nameof(p2));
-
-        return from v in p1
-               from f in p2
-               select f(v);
-    }
-
-    public static Parser<TInput, object> Box<TInput, TValue>(this Parser<TInput, TValue> parser)
-    {
-        if (parser == null) throw new ArgumentNullException(nameof(parser));
-
-        return from v in parser
-               select (object)v;
-    }
-
-
-    public static ParserTableRow<TInput, TValue> ToRow<TInput, TValue>(this Parser<TInput, TValue> parser, Func<TValue> getDefaultValue)
-    {
-        if (parser == null) throw new ArgumentNullException(nameof(parser));
-        if (getDefaultValue == null) throw new ArgumentNullException(nameof(getDefaultValue));
-
-        return new ParserTableRow<TInput, TValue>(parser, getDefaultValue);
-    }
+    public static Parser<TInput, Func<TArg, TResultValue>> Compose<TInput, TArg, TValue, TResultValue>(
+        this Parser<TInput, Func<TArg, TValue>> parser,
+        Parser<TInput, Func<TValue, TResultValue>> otherParser) =>
+        from f1 in parser
+        from f2 in otherParser
+        select new Func<TArg, TResultValue>(v => f2(f1(v)));
 }

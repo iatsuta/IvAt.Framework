@@ -55,7 +55,10 @@
     <Project Path="HierarchicalExpand/HierarchicalExpand.Tests/HierarchicalExpand.Tests.csproj" />
   </Folder>
   <Folder Name="/OData/">
-    <Project Path="OData/OData.QueryLanguage/OData.QueryLanguage.csproj" />
+    <Project Path="OData/OData.Abstractions/OData.Abstractions.csproj" />
+    <Project Path="OData/OData.Domain/OData.Domain.csproj" />
+    <Project Path="OData/OData.RawDomain/OData.RawDomain.csproj" />
+    <Project Path="OData/OData.Runtime/OData.Runtime.csproj" />
   </Folder>
 
   <Folder Name="/SecuritySystem/">

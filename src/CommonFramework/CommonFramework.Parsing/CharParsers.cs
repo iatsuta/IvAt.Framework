@@ -1,12 +1,16 @@
-﻿namespace CommonFramework.Parsing;
+﻿using System.Collections.Immutable;
+using System.Globalization;
+using System.Numerics;
 
-public class CharParsers : CharParsers<SharedMemoryString>
+namespace CommonFramework.Parsing;
+
+public class CharParsers(CultureInfo culture) : CharParsers<SharedMemoryString>(culture)
 {
     public override Parser<SharedMemoryString, char> AnyChar
     {
         get
         {
-            return input => input.IsEmpty ? input.ToError<char>() : input.Slice(1).ToSuccess(input.Span[0]);
+            return input => input.IsEmpty ? input.ToError<char>() : input[1..].ToSuccess(input.Span[0]);
         }
     }
 
@@ -57,13 +61,35 @@ public class CharParsers : CharParsers<SharedMemoryString>
             return input.Split(index);
         };
     }
+
+
+    public override Parser<SharedMemoryString, SharedMemoryString> TakeTo(SharedMemoryString endToken)
+    {
+        return input =>
+        {
+            var index = 0;
+
+            while (index < input.Length - endToken.Length)
+            {
+                if (input.Slice(index, endToken.Length).Equals(endToken))
+                {
+                    return input.Split(index);
+                }
+                else
+                {
+                    index++;
+                }
+            }
+
+            return input.ToError();
+        };
+    }
 }
 
 
-public abstract class CharParsers<TInput> : Parsers<TInput>
-    where TInput : IParingInput<TInput>
+public abstract class CharParsers<TInput>(CultureInfo culture) : Parsers<TInput>
 {
-    protected virtual IReadOnlySet<char> SpaceChars { get; } = new[] { ' ' }.ToHashSet();
+    protected virtual ImmutableHashSet<char> SpaceChars { get; } = [' '];
 
     protected virtual bool IsWordChar(char c, bool isBodyChar = true)
     {
@@ -73,80 +99,55 @@ public abstract class CharParsers<TInput> : Parsers<TInput>
     public abstract Parser<TInput, char> AnyChar { get; }
 
 
-    public virtual Parser<TInput, SharedMemoryString> Spaces => this.TakeWhile(this.SpaceChars.Contains);
+    public Parser<TInput, SharedMemoryString> Spaces => this.TakeWhile(this.SpaceChars.Contains);
 
-    public virtual Parser<TInput, SharedMemoryString> Spaces1 => this.TakeWhile1(this.SpaceChars.Contains);
+    public Parser<TInput, SharedMemoryString> Spaces1 => this.TakeWhile1(this.SpaceChars.Contains);
 
+    public Parser<TInput, TValue> BetweenBrackets<TValue>(Parser<TInput, TValue> parser) => this.BetweenBrackets(parser, '(', ')');
 
-    public Parser<TInput, TValue> BetweenBrackets<TValue>(Parser<TInput, TValue> parser)
-    {
-        return this.BetweenBrackets(parser, '(', ')');
-    }
+    public Parser<TInput, TValue> BetweenBrackets<TValue>(Parser<TInput, TValue> parser, char startBracket, char endBracket) =>
+        this.Between(parser, this.PreSpaces(this.Char(startBracket)), this.PreSpaces(this.Char(endBracket)));
 
-    public Parser<TInput, TValue> BetweenBrackets<TValue>(Parser<TInput, TValue> parser, char startBracket, char endBracket)
-    {
-        return this.Between(parser, this.PreSpaces(this.Char(startBracket)), this.PreSpaces(this.Char(endBracket)));
-    }
+    public Parser<TInput, TValue> BetweenSpaces<TValue>(Parser<TInput, TValue> parser) => this.Between(parser, this.Spaces, this.Spaces);
 
-    public Parser<TInput, TValue> BetweenSpaces<TValue>(Parser<TInput, TValue> parser)
-    {
-        return this.Between(parser, this.Spaces, this.Spaces);
-    }
+    public Parser<TInput, TValue> PreSpaces<TValue>(Parser<TInput, TValue> parser) => this.Pre(parser, this.Spaces);
 
-    public Parser<TInput, TValue> PreSpaces<TValue>(Parser<TInput, TValue> parser)
-    {
-        return this.Pre(parser, this.Spaces);
-    }
+    public Parser<TInput, TValue> PostSpaces<TValue>(Parser<TInput, TValue> parser) => this.Post(parser, this.Spaces);
 
-    public Parser<TInput, TValue> PostSpaces<TValue>(Parser<TInput, TValue> parser)
-    {
-        return this.Post(parser, this.Spaces);
-    }
+    public Parser<TInput, ImmutableArray<TValue>> SepBy<TValue>(Parser<TInput, TValue> parser, char separator) =>
+        this.SepBy(parser, this.BetweenSpaces(this.Char(separator)));
+
+    public Parser<TInput, ImmutableArray<TValue>> SepBy1<TValue>(Parser<TInput, TValue> parser, char separator) =>
+        this.SepBy1(parser, this.BetweenSpaces(this.Char(separator)));
 
 
-    public Parser<TInput, TValue[]> SepBy<TValue>(Parser<TInput, TValue> parser, char separator)
-    {
-        return this.SepBy(parser, this.BetweenSpaces(this.Char(separator)));
-    }
+    public Parser<TInput, char> Char(char ch) =>
 
-    public Parser<TInput, TValue[]> SepBy1<TValue>(Parser<TInput, TValue> parser, char separator)
-    {
-        return this.SepBy1(parser, this.BetweenSpaces(this.Char(separator)));
-    }
+        from c in this.AnyChar
 
+        where c == ch
 
+        select c;
 
-    public Parser<TInput, char> Char(char ch)
-    {
-        return from c in this.AnyChar
-               where c == ch
-               select c;
-    }
+    public Parser<TInput, char> Char(params char[] chars) =>
 
-    public Parser<TInput, char> Char(params char[] chars)
-    {
-        return from c in this.AnyChar
-               where chars.Contains(c)
-               select c;
-    }
+        from c in this.AnyChar
 
-    public Parser<TInput, bool> TryChar(char ch)
-    {
-        var c1 = from _ in this.Char(ch)
-                 select true;
+        where chars.Contains(c)
 
-        var c2 = from _ in this.Return(ch)
-                 select false;
+        select c;
 
-        return c1.Or(c2);
-    }
+    public Parser<TInput, bool> TryChar(char ch) => this.Char(ch).Select(_ => true).Or(Return(false));
 
-    public Parser<TInput, char> CharIgnoreCase(char ch)
-    {
-        return from c in this.AnyChar
-               where char.ToLower(c) == char.ToLower(ch)
-               select c;
-    }
+    public Parser<TInput, bool> TryString(SharedMemoryString text) => this.String(text).Select(_ => true).Or(Return(false));
+
+    public Parser<TInput, char> CharIgnoreCase(char ch) =>
+
+        from c in this.AnyChar
+
+        where char.ToLower(c) == char.ToLower(ch)
+
+        select c;
 
     public Parser<TInput, SharedMemoryString> Variable => this.TakeWhile1((c, index) => this.IsWordChar(c, index != 0));
 
@@ -154,69 +155,40 @@ public abstract class CharParsers<TInput> : Parsers<TInput>
 
     public Parser<TInput, SharedMemoryString> Word1 => this.TakeWhile1(c => this.IsWordChar(c));
 
+    public Parser<TInput, char> Digit => this.Char(char.IsDigit);
 
     public Parser<TInput, SharedMemoryString> Digits => this.TakeWhile(char.IsDigit);
 
     public Parser<TInput, SharedMemoryString> Digits1 => this.TakeWhile1(char.IsDigit);
 
-    public Parser<TInput, char> Char(Func<char, bool> predicate)
+    public Parser<TInput, char> Char(Func<char, bool> predicate) => this.AnyChar.Where(predicate);
+
+    public Parser<TInput, SharedMemoryString> String(SharedMemoryString pattern) =>
+
+        from str in this.TakeText(pattern.Length)
+
+        where str == pattern
+
+        select str;
+
+    public Parser<TInput, SharedMemoryString> StringIgnoreCase(SharedMemoryString pattern) =>
+
+        from str in this.TakeText(pattern.Length)
+
+        where str.Equals(pattern, StringComparison.OrdinalIgnoreCase)
+
+        select str;
+
+    public Parser<TInput, SharedMemoryString> TakeInBracket(SharedMemoryString startBracket, SharedMemoryString endBracket)
     {
-        return this.AnyChar.Where(predicate);
+        return
+
+            from _ in this.StringIgnoreCase(startBracket)
+
+            from result in this.TakeTo(endBracket)
+
+            select result;
     }
-
-    //public Parser<TInput, SharedMemoryString> String(string pattern)
-    //{
-    //    if (pattern == null) throw new ArgumentNullException(nameof(pattern));
-
-    //    return from str in this.TakeText(pattern.Length)
-
-    //           where str == pattern
-
-    //           select str;
-    //}
-
-
-    //public Parser<TInput, SharedMemoryString> StringIgnoreCase(string pattern)
-    //{
-    //    if (pattern == null) throw new ArgumentNullException(nameof(pattern));
-
-    //    return from str in this.TakeText(pattern.Length)
-
-    //           where str.Equals(pattern, StringComparison.CurrentCultureIgnoreCase)
-
-    //           select str;
-    //}
-
-    //public virtual Parser<TInput, SharedMemoryString> TakeTo(string endToken)
-    //{
-    //    if (endToken == null) throw new ArgumentNullException(nameof(endToken));
-
-    //    var successParser = from _ in this.StringIgnoreCase(endToken)
-
-    //                        select "";
-
-    //    var nextParser = from c in this.AnyChar
-
-    //                     from next in this.TakeTo(endToken)
-
-    //                     select c + next;
-
-    //    return successParser.Or(nextParser);
-    //}
-
-
-
-    //public Parser<TInput, SharedMemoryString> TakeInBracket(string startBracket, string endBracket)
-    //{
-    //    if (startBracket == null) throw new ArgumentNullException(nameof(startBracket));
-    //    if (endBracket == null) throw new ArgumentNullException(nameof(endBracket));
-
-    //    return from _ in this.StringIgnoreCase(startBracket)
-
-    //           from result in this.TakeTo(endBracket)
-
-    //           select result;
-    //}
 
 
     public abstract Parser<TInput, SharedMemoryString> TakeWhile(Func<char, int, bool> predicate);
@@ -233,21 +205,23 @@ public abstract class CharParsers<TInput> : Parsers<TInput>
     {
         return from v in this.TakeWhile(c => c != '\r' && c != '\n')
 
-               from _ in this.TryEndLine()
+            from _ in this.TryEndLine()
 
-               select v;
+            select v;
     }
 
     public Parser<TInput, bool> TryEndLine()
     {
         return from v1 in this.TryChar('\r')
-               from v2 in this.TryChar('\n')
 
-               select v1 || v2;
+            from v2 in this.TryChar('\n')
+
+            select v1 || v2;
     }
 
     public abstract Parser<TInput, SharedMemoryString> TakeText(int charCount);
 
+    public abstract Parser<TInput, SharedMemoryString> TakeTo(SharedMemoryString endToken);
 
     public Parser<TInput, Guid> GuidParser
     {
@@ -255,10 +229,9 @@ public abstract class CharParsers<TInput> : Parsers<TInput>
         {
             var guidParser = from text in this.TakeText(36)
 
-                             from result in this.CatchParser(() => Guid.Parse(text))
+                from result in this.CatchParser(() => Guid.Parse(text))
 
-                             select result;
-
+                select result;
 
             var withBrackets = this.Between(guidParser, this.Char('{'), this.Char('}'));
 
@@ -267,29 +240,37 @@ public abstract class CharParsers<TInput> : Parsers<TInput>
         }
     }
 
-
-    protected Parser<TInput, TResult> GetSignDigitsParser<TResult>(Func<string, TResult> parseFunc)
+    public Parser<TInput, TNumber> GetNumberParser<TNumber>()
+        where TNumber : IUnaryNegationOperators<TNumber, TNumber>, ISpanParsable<TNumber>
     {
-        if (parseFunc == null) throw new ArgumentNullException(nameof(parseFunc));
+        return
 
-        return from isNegate in this.TryChar('-')
-               from value in this.Digits1
-               from result in this.CatchParser(() => parseFunc((isNegate ? "-" : string.Empty) + value))
-               select result;
+            from isNegate in this.TryString(culture.NumberFormat.NegativeSign)
+
+            from digits in this.Digits1
+
+            from preResult in this.MaybeParser(() => Maybe.Maybe.OfCondition(TNumber.TryParse(digits, culture, out var result), () => result))
+
+            select isNegate ? -preResult : preResult;
     }
 
-    public Parser<TInput, short> Int16Parser
-    {
-        get { return this.GetSignDigitsParser(short.Parse); }
-    }
+    public Parser<TInput, short> Int16Parser => this.GetNumberParser<short>();
 
-    public Parser<TInput, int> Int32Parser
-    {
-        get { return this.GetSignDigitsParser(int.Parse); }
-    }
+    public Parser<TInput, int> Int32Parser => this.GetNumberParser<int>();
 
-    public Parser<TInput, long> Int64Parser
-    {
-        get { return this.GetSignDigitsParser(long.Parse); }
-    }
+    public Parser<TInput, long> Int64Parser => this.GetNumberParser<long>();
+
+    public Parser<TInput, bool> BooleanParser =>
+
+        (this.StringIgnoreCase(bool.TrueString).Select(_ => true))
+
+        .Or(() => this.StringIgnoreCase(bool.FalseString).Select(_ => false));
+
+    public Parser<TInput, TValue> FromDictionary<TKey, TValue, TParseKeyResult>(IReadOnlyDictionary<TKey, TValue> dictionary,
+        Func<TKey, Parser<TInput, TParseKeyResult>> getKeyParser)
+
+        where TKey : notnull =>
+
+        dictionary.Aggregate(this.Fault<TValue>(), (state, pair) => state.Or(() => from _ in getKeyParser(pair.Key)
+            select pair.Value));
 }

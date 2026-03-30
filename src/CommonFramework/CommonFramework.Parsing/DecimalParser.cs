@@ -2,7 +2,7 @@
 
 namespace CommonFramework.Parsing;
 
-public class DecimalParser(CultureInfo culture) : CharParsers
+public class DecimalParser(CultureInfo culture) : CharParsers(culture)
 {
     private readonly string separator = culture.NumberFormat.NumberDecimalSeparator;
 
