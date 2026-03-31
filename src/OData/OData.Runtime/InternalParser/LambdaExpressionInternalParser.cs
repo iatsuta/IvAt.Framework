@@ -171,7 +171,7 @@ public class LambdaExpressionInternalParser(
 
         from dateStr in this.TakeTo("'")
 
-        from res in this.CatchParser(() => DateTime.Parse(dateStr))
+        from res in this.SpanParser<DateTime>(dateStr)
 
         select (Expression)new DateTimeConstantExpression(res);
 

@@ -69,11 +69,13 @@ public class CharParsers(CultureInfo culture) : CharParsers<SharedMemoryString>(
         {
             var index = 0;
 
-            while (index < input.Length - endToken.Length)
+            while (index <= input.Length - endToken.Length)
             {
                 if (input.Slice(index, endToken.Length).Equals(endToken))
                 {
-                    return input.Split(index);
+                    var preResult = input.Split(index);
+
+                    return preResult with { Item2 = preResult.Item2.Split(endToken.Length).Item2 };
                 }
                 else
                 {
@@ -227,9 +229,11 @@ public abstract class CharParsers<TInput>(CultureInfo culture) : Parsers<TInput>
     {
         get
         {
-            var guidParser = from text in this.TakeText(36)
+            var guidParser =
 
-                from result in this.CatchParser(() => Guid.Parse(text))
+                from text in this.TakeText(36)
+
+                from result in this.SpanParser<Guid>(text)
 
                 select result;
 
@@ -239,9 +243,14 @@ public abstract class CharParsers<TInput>(CultureInfo culture) : Parsers<TInput>
             return withBrackets.Or(guidParser);
         }
     }
+    protected Parser<TInput, TValue> SpanParser<TValue>(SharedMemoryString str)
+        where TValue : struct, ISpanParsable<TValue>
+    {
+        return this.MaybeParser(() => Maybe.Maybe.OfCondition(TValue.TryParse(str, culture, out var result), () => result));
+    }
 
     public Parser<TInput, TNumber> GetNumberParser<TNumber>()
-        where TNumber : IUnaryNegationOperators<TNumber, TNumber>, ISpanParsable<TNumber>
+        where TNumber : struct, IUnaryNegationOperators<TNumber, TNumber>, ISpanParsable<TNumber>
     {
         return
 
@@ -249,7 +258,7 @@ public abstract class CharParsers<TInput>(CultureInfo culture) : Parsers<TInput>
 
             from digits in this.Digits1
 
-            from preResult in this.MaybeParser(() => Maybe.Maybe.OfCondition(TNumber.TryParse(digits, culture, out var result), () => result))
+            from preResult in this.SpanParser<TNumber>(digits)
 
             select isNegate ? -preResult : preResult;
     }
