@@ -1,7 +1,12 @@
 ﻿namespace CommonFramework.Parsing;
 
-public readonly record struct SharedMemoryString(ReadOnlyMemory<char> Chars) : IComparable<SharedMemoryString>
+public record SharedMemoryString(ReadOnlyMemory<char> Chars) : IComparable<SharedMemoryString>
 {
+    public SharedMemoryString(string value)
+        : this(value.AsMemory())
+    {
+    }
+
     public ReadOnlySpan<char> Span => this.Chars.Span;
 
     public bool IsEmpty => this.Chars.IsEmpty;
@@ -58,19 +63,19 @@ public readonly record struct SharedMemoryString(ReadOnlyMemory<char> Chars) : I
         return this.Length.GetHashCode();
     }
 
-    public bool Equals(SharedMemoryString? other)
+    public virtual bool Equals(SharedMemoryString? other)
     {
-        return other is not null && this.Equals(other.Value, StringComparison.Ordinal);
+        return other is not null && this.Equals(other, StringComparison.Ordinal);
     }
 
-    public int CompareTo(SharedMemoryString other) => this.Length.CompareTo(other.Length);
+    public int CompareTo(SharedMemoryString? other) => this.Length.CompareTo(other?.Length);
 
     public bool Equals(SharedMemoryString pattern, StringComparison stringComparison) => this.Chars.Span.Equals(pattern.Chars.Span, stringComparison);
 
 
     public static implicit operator string(SharedMemoryString value) => value.ToString();
 
-    public static implicit operator SharedMemoryString(string value) => new(value.AsMemory());
+    public static implicit operator SharedMemoryString(string value) => new(value);
 
     public static implicit operator ReadOnlySpan<char>(SharedMemoryString value) => value.Chars.Span;
 

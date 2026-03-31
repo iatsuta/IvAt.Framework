@@ -2,20 +2,23 @@
 
 public static class ParserExtensions
 {
-    public static TValue Parse<TInput, TValue>(this Parser<TInput, TValue> parser, TInput value) =>
-        parser.Parse(value, unparsedRest => new Exception($"Can't parse: {unparsedRest}"));
-
-    public static TValue Parse<TInput, TValue>(this Parser<TInput, TValue> parser, TInput value, Func<TInput, Exception> getUnparsedRestException)
+    extension<TInput, TValue>(Parser<TInput, TValue> parser)
     {
-        var parsingResult = parser(value);
+        public TValue Parse(TInput value) =>
+            parser.Parse(value, unparsedRest => new Exception($"Can't parse: {unparsedRest}"));
 
-        if (parsingResult.HasError)
+        public TValue Parse(TInput value, Func<TInput, Exception> getUnparsedRestException)
         {
-            throw getUnparsedRestException(parsingResult.Rest);
-        }
-        else
-        {
-            return parsingResult.Value;
+            var parsingResult = parser(value);
+
+            if (parsingResult.HasError)
+            {
+                throw getUnparsedRestException(parsingResult.Rest);
+            }
+            else
+            {
+                return parsingResult.Value;
+            }
         }
     }
 }

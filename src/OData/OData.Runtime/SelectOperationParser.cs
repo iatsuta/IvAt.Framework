@@ -1,18 +1,14 @@
 ﻿using OData.Domain;
 
-using System.Collections.Concurrent;
-
 using CommonFramework;
 
 namespace OData;
 
-public class SelectOperationParser(IRawSelectOperationParser rawParser, ILambdaExpressionConverter lambdaExpressionConverter) : ISelectOperationParser
+public class SelectOperationParser(IODataCache<string, object> cache, IRawSelectOperationParser rawParser, ILambdaExpressionConverter lambdaExpressionConverter) : ISelectOperationParser
 {
-    private readonly ConcurrentDictionary<string, object> cache = [];
-
     public SelectOperation<TDomainObject> Parse<TDomainObject>(string input) =>
 
-        this.cache.GetOrAddAs(input, _ =>
+        (SelectOperation<TDomainObject>)cache.GetOrAdd(input, _ =>
         {
             var rawSelectOperation = rawParser.Parse(input);
 

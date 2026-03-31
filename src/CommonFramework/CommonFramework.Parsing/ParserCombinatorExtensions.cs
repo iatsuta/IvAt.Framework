@@ -4,15 +4,9 @@ public static class ParserCombinatorExtensions
 {
     extension<TInput, TValue>(Parser<TInput, TValue> parser)
     {
-        public Parser<TInput, TValue> Or(Func<Parser<TInput, TValue>> otherParser)
-        {
-            return input =>
-            {
-                var result = parser(input);
+        public Parser<TInput, TValue> Or(Func<Parser<TInput, TValue>> getOtherParser) =>
 
-                return result.HasError ? otherParser().Invoke(input) : result;
-            };
-        }
+            parser.Or(Parser.Return(getOtherParser));
 
         public Parser<TInput, TValue> Or(Parser<TInput, TValue> otherParser)
         {

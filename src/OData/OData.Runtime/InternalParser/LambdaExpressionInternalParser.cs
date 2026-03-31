@@ -211,10 +211,8 @@ public class LambdaExpressionInternalParser(
                 '[',
                 ']');
 
-            var propWithoutAlias = this.BetweenSpaces(this.Variable)
+            var propWithoutAlias = () => this.BetweenSpaces(this.Variable)
                 .Select(propertyName => new { PropertyName = propertyName, Alias = default(string?) });
-
-
 
             return from properties in this.SepBy(propWithAlias.Or(propWithoutAlias), '/')
 
@@ -302,7 +300,7 @@ public class LambdaExpressionInternalParser(
 
     private Parser<SharedMemoryString, decimal> DecimalParser =>
 
-        from isNegate in this.TryChar('-')
+        from isNegate in this.TryString(culture.NumberFormat.NegativeSign)
 
         from numberText in this.Many1(this.Digit.Or(this.Char(culture.NumberFormat.NumberDecimalSeparator.Contains)))
 
