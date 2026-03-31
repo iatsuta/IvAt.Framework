@@ -2,8 +2,8 @@
 using OData.Domain.QueryLanguage;
 using OData.Domain.QueryLanguage.Constant;
 using OData.Domain.QueryLanguage.Operations;
+
 using System.Diagnostics;
-using CommonFramework.Parsing;
 
 namespace OData.Tests;
 
@@ -256,10 +256,10 @@ public class ODataParsingAutoTests : TestBase
     [Fact]
     public void SelectOperation_ParseNegativeIntNumberInFilter_NoException()
     {
-        var list = new char[] { 'a', 'b', 'c' };
+        var list = new[] { 'a', 'b', 'c' };
 
-        var str1 = new SharedMemoryString("abc");
-        var str2 = new SharedMemoryString(string.Concat(list));
+        var str1 = "abc";
+        var str2 = string.Concat(list);
 
         var e = str1 == str2;
 
