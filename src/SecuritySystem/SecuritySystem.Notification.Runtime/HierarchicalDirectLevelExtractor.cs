@@ -3,15 +3,17 @@
 using HierarchicalExpand;
 
 using System.Linq.Expressions;
+
 using SecuritySystem.Notification.Domain;
 
 namespace SecuritySystem.Notification;
 
 public class HierarchicalDirectLevelExtractor<TSecurityContext, TSecurityContextIdent>(
+    INotificationFilterGroupConverter notificationFilterGroupConverter,
     IHierarchicalObjectExpanderFactory hierarchicalObjectExpanderFactory,
     IIdentityInfo<TSecurityContext, TSecurityContextIdent> identityInfo,
     DeepLevelInfo<TSecurityContext> deepLevelInfo)
-    : DirectLevelExtractor<TSecurityContext, TSecurityContextIdent>
+    : DirectLevelExtractor<TSecurityContext, TSecurityContextIdent>(notificationFilterGroupConverter)
     where TSecurityContextIdent : notnull
 {
     protected override Expression<Func<IQueryable<TSecurityContext>, int>> GetDirectLevelExpression(
@@ -23,7 +25,7 @@ public class HierarchicalDirectLevelExtractor<TSecurityContext, TSecurityContext
                 HierarchicalExpandType.Parents)
             : notificationFilterGroup.Idents;
 
-        var containsFilter = identityInfo.CreateContainsFilter(expandedSecIdents);
+        var containsFilter = identityInfo.CreateFilter(expandedSecIdents);
 
         return permissionSecurityContextItems => permissionSecurityContextItems
                                                      .Where(containsFilter)

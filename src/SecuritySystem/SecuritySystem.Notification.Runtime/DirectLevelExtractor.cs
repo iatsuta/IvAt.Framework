@@ -4,6 +4,7 @@ using CommonFramework.IdentitySource;
 using HierarchicalExpand;
 
 using System.Linq.Expressions;
+
 using SecuritySystem.Notification.Domain;
 
 namespace SecuritySystem.Notification;
@@ -28,10 +29,12 @@ public class DirectLevelExtractor<TSecurityContext>(
         this.lazyInnerService.Value.GetDirectLevelExpression(notificationFilterGroup);
 }
 
-public abstract class DirectLevelExtractor<TSecurityContext, TSecurityContextIdent> : IDirectLevelExtractor<TSecurityContext>
+public abstract class DirectLevelExtractor<TSecurityContext, TSecurityContextIdent>(
+    INotificationFilterGroupConverter notificationFilterGroupConverter) : IDirectLevelExtractor<TSecurityContext>
+    where TSecurityContextIdent : notnull
 {
     public Expression<Func<IQueryable<TSecurityContext>, int>> GetDirectLevelExpression(NotificationFilterGroup notificationFilterGroup) =>
-        this.GetDirectLevelExpression((NotificationFilterGroup<TSecurityContextIdent>)notificationFilterGroup);
+        this.GetDirectLevelExpression(notificationFilterGroupConverter.Convert<TSecurityContextIdent>(notificationFilterGroup));
 
     protected abstract Expression<Func<IQueryable<TSecurityContext>, int>> GetDirectLevelExpression(
         NotificationFilterGroup<TSecurityContextIdent> notificationFilterGroup);

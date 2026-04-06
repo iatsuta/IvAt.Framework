@@ -45,7 +45,7 @@ public class VirtualPermissionRestrictionSource<TPermission, TSecurityContext, T
 
     private IEnumerable<Expression<Func<TPermission, bool>>> GetManyContainsIdentsExpr(IEnumerable<TSecurityContextIdent> idents)
     {
-        var filterExpr = identityInfo.CreateContainsFilter(idents.ToArray());
+        var filterExpr = identityInfo.CreateFilter(idents);
 
         foreach (var restrictionPath in virtualBindingInfo.Restrictions)
         {

@@ -16,6 +16,7 @@ public class SecuritySystemNotificationSetup : ISecuritySystemNotificationSetup,
             .AddExtensions(services =>
             {
                 services
+                    .AddSingleton<INotificationFilterGroupConverter, NotificationFilterGroupConverter>()
                     .AddScoped(typeof(IDirectLevelExtractor<>), typeof(DirectLevelExtractor<>))
                     .AddScoped(typeof(INotificationPermissionExtractor<>), typeof(NotificationPermissionExtractor<>))
                     .AddScoped(typeof(INotificationPrincipalExtractor<>), typeof(NotificationPrincipalExtractor<>))
