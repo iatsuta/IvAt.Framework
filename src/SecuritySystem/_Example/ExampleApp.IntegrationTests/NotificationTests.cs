@@ -467,7 +467,7 @@ public abstract class NotificationTests(IServiceProvider rootServiceProvider) : 
     }
 
     [Fact]
-    public async Task Test()
+    public async Task NotificationPrincipalExtractor_ReturnsUser_ForTypedFilterGroup()
     {
         // Arrange
         var permissionBuIdentity =
