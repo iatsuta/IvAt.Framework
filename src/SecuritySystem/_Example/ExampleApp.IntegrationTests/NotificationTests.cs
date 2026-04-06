@@ -1,4 +1,6 @@
-﻿using ExampleApp.Application;
+﻿using CommonFramework.GenericRepository;
+
+using ExampleApp.Application;
 using ExampleApp.Domain;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -436,14 +438,6 @@ public abstract class NotificationTests(IServiceProvider rootServiceProvider) : 
         result.Should().Contain(this.searchNotificationEmployeeLogin2);
     }
 
-    private Task<string[]> GetNotificationPrincipalsAsync(params NotificationFilterGroup[] notificationFilterGroups) =>
-
-        this.GetEvaluator<INotificationPrincipalExtractor<ExampleApp.Domain.Auth.General.Principal>>()
-            .EvaluateAsync(TestingScopeMode.Read, async extractor =>
-                await extractor.GetPrincipalsAsync([testSecurityRole], [.. notificationFilterGroups])
-                    .Select(p => p.Name)
-                    .ToArrayAsync(this.CancellationToken));
-
     [Fact]
     public async Task NotificationPrincipalExtractor_ReturnsUser_ForAssignedRoleAndBusinessUnit()
     {
@@ -471,6 +465,49 @@ public abstract class NotificationTests(IServiceProvider rootServiceProvider) : 
         // Assert
         principalNames.Should().BeEquivalentTo(testUserName);
     }
+
+    [Fact]
+    public async Task Test()
+    {
+        // Arrange
+        var permissionBuIdentity =
+            await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>($"Test{nameof(BusinessUnit)}2", this.CancellationToken);
+
+        var searchBuIdentity =
+            await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>($"Test{nameof(BusinessUnit)}2-Child", this.CancellationToken);
+
+
+        var testUserName = nameof(NotificationPrincipalExtractor_ReturnsUser_ForAssignedRoleAndBusinessUnit);
+
+        await this.AuthManager.For(testUserName).AddRoleAsync(new TestPermission(testSecurityRole) { BusinessUnit = permissionBuIdentity }, this.CancellationToken);
+
+        // Act
+        var principalNames = await this.GetEvaluator<IServiceProvider>()
+            .EvaluateAsync(TestingScopeMode.Read, async sp =>
+            {
+                var queryableSource = sp.GetRequiredService<IQueryableSource>();
+                var extractor = sp.GetRequiredService<INotificationPrincipalExtractor<ExampleApp.Domain.Auth.General.Principal>>();
+
+                var notificationFilterGroup = new TypedNotificationFilterGroup<BusinessUnit>
+                {
+                    Items = [queryableSource.GetQueryable<BusinessUnit>().Single(bu => bu.Id == searchBuIdentity.Id)],
+                    ExpandType = NotificationExpandType.DirectOrFirstParent
+                };
+
+                return await extractor.GetPrincipalsAsync([testSecurityRole], [notificationFilterGroup]).Select(p => p.Name).ToArrayAsync(this.CancellationToken);
+            });
+
+        // Assert
+        principalNames.Should().BeEquivalentTo(testUserName);
+    }
+
+    private Task<string[]> GetNotificationPrincipalsAsync(params NotificationFilterGroup[] notificationFilterGroups) =>
+
+        this.GetEvaluator<INotificationPrincipalExtractor<ExampleApp.Domain.Auth.General.Principal>>()
+            .EvaluateAsync(TestingScopeMode.Read, async extractor =>
+                await extractor.GetPrincipalsAsync([testSecurityRole], [.. notificationFilterGroups])
+                    .Select(p => p.Name)
+                    .ToArrayAsync(this.CancellationToken));
 
     private Task<TypedSecurityIdentity<Guid>> SaveBusinessUnit(string name, TypedSecurityIdentity<Guid>? parent = null) =>
 

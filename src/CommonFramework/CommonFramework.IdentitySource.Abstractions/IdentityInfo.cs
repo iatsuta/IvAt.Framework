@@ -12,9 +12,14 @@ public record IdentityInfo<TDomainObject, TIdent>(PropertyAccessors<TDomainObjec
 
 	public override Type IdentityType { get; } = typeof(TIdent);
 
-    public Expression<Func<TDomainObject, bool>> CreateContainsFilter(IEnumerable<TIdent> idents)
+    public Expression<Func<TDomainObject, bool>> CreateFilter(IEnumerable<TIdent> idents)
     {
         return this.Id.Path.Select(ident => idents.Contains(ident));
+    }
+
+    public Expression<Func<TDomainObject, bool>> CreateFilter(TIdent ident)
+    {
+        return this.Id.Path.Select(ExpressionHelper.GetEqualityWithExpr(ident));
     }
 
     public override object GetId(TDomainObject domainObject)

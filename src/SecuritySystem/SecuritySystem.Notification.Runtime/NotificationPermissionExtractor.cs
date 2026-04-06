@@ -26,10 +26,10 @@ public class NotificationPermissionExtractor<TPermission>(
             .Where(notificationGeneralPermissionFilterFactory.Create(securityRoles))
             .Select(p => new PermissionLevelInfo<TPermission> { Permission = p, LevelInfo = "" });
 
-        var typeArr = notificationFilterGroups.Select(g => g.SecurityContextType).ToArray();
+        var typeArr = notificationFilterGroups.Select(g => g.GetSecurityContextType()).ToArray();
 
         var permissionInfoResult = notificationFilterGroups
-            .Aggregate(startPermissionQ, (q, g) => this.ApplyNotificationFilter(q, g, typeArr.IndexOf(g.SecurityContextType))).GenericAsAsyncEnumerable();
+            .Aggregate(startPermissionQ, (q, g) => this.ApplyNotificationFilter(q, g, typeArr.IndexOf(g.GetSecurityContextType()))).GenericAsAsyncEnumerable();
 
         var parsedLevelInfoResult =
             permissionInfoResult
@@ -56,7 +56,7 @@ public class NotificationPermissionExtractor<TPermission>(
 
                     from pair in state
 
-                    group pair by pair.LevelDict[notificationFilterGroup.SecurityContextType]
+                    group pair by pair.LevelDict[notificationFilterGroup.GetSecurityContextType()]
 
                     into levelGroup
 
@@ -76,7 +76,7 @@ public class NotificationPermissionExtractor<TPermission>(
         NotificationFilterGroup notificationFilterGroup,
         int securityContextIndex)
     {
-        var extractorType = typeof(PermissionLevelInfoExtractor<,>).MakeGenericType(typeof(TPermission), notificationFilterGroup.SecurityContextType);
+        var extractorType = typeof(PermissionLevelInfoExtractor<,>).MakeGenericType(typeof(TPermission), notificationFilterGroup.GetSecurityContextType());
 
         var selector = serviceProxyFactory.Create<IPermissionLevelInfoExtractor<TPermission>>(extractorType).GetSelector(notificationFilterGroup);
 

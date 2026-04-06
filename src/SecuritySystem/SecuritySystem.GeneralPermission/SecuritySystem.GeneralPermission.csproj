@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\SecuritySystem.DiTests\SecuritySystem.DiTests.csproj" />
     <ProjectReference Include="..\SecuritySystem.GeneralPermission.Runtime\SecuritySystem.GeneralPermission.Runtime.csproj" />
     <ProjectReference Include="..\SecuritySystem\SecuritySystem.csproj" />
   </ItemGroup>

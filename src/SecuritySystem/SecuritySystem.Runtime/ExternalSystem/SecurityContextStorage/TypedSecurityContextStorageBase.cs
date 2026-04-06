@@ -23,14 +23,14 @@ public abstract class TypedSecurityContextStorageBase<TSecurityContext, TSecurit
 
 	public IEnumerable<SecurityContextData<TSecurityContextIdent>> GetSecurityContextsByIdents(IEnumerable<TSecurityContextIdent> preSecurityEntityIdents)
 	{
-		var filter = identityInfo.CreateContainsFilter(preSecurityEntityIdents.ToArray());
+		var filter = identityInfo.CreateFilter(preSecurityEntityIdents);
 
 		return queryableSource.GetQueryable<TSecurityContext>().Where(filter).ToList().Select(this.CreateSecurityContextData);
 	}
 
 	public IEnumerable<SecurityContextData<TSecurityContextIdent>> GetSecurityContextsWithMasterExpand(TSecurityContextIdent startSecurityEntityId)
 	{
-		var filter = identityInfo.CreateContainsFilter([startSecurityEntityId]);
+		var filter = identityInfo.CreateFilter(startSecurityEntityId);
 
 		var securityObject = queryableSource.GetQueryable<TSecurityContext>().Single(filter);
 
@@ -39,7 +39,7 @@ public abstract class TypedSecurityContextStorageBase<TSecurityContext, TSecurit
 
 	public bool IsExists(TSecurityContextIdent securityContextId)
 	{
-		var filter = identityInfo.CreateContainsFilter([securityContextId]);
+		var filter = identityInfo.CreateFilter(securityContextId);
 
 		return localStorage.IsExists(securityContextId)
 		       || queryableSource.GetQueryable<TSecurityContext>().Any(filter);

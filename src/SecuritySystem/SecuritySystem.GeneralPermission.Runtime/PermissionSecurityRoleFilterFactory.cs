@@ -46,7 +46,7 @@ public class PermissionSecurityRoleFilterFactory<TPermission, TSecurityRole, TSe
     {
         var convertedIdents = idents.Select(ident => securityIdentityConverter.Convert(TypedSecurityIdentity.Create(ident)).Id).ToList();
 
-        var containsFilter = identityInfo.CreateContainsFilter(convertedIdents);
+        var containsFilter = identityInfo.CreateFilter(convertedIdents);
 
         return generalBindingInfo.SecurityRole.Path.Select(containsFilter);
     }

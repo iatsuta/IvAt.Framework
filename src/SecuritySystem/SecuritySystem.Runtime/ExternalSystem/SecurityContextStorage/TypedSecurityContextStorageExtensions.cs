@@ -52,7 +52,7 @@ public static class TypedSecurityContextStorageExtensions
 
         IEnumerable<SecurityContextData<object>> ITypedSecurityContextStorage.GetSecurityContextsByIdents(Array securityContextIdents)
         {
-            return this.GetSecurityContextsByIdents(securityContextIdents.Cast<TIdent>()).Select(scd => scd.UpCast());
+            return this.GetSecurityContextsByIdents((TIdent[])securityContextIdents).Select(scd => scd.UpCast());
         }
 
         IEnumerable<SecurityContextData<object>> ITypedSecurityContextStorage.GetSecurityContexts()

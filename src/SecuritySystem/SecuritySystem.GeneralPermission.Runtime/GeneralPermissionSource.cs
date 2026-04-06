@@ -78,7 +78,7 @@ public class GeneralPermissionSource<TPrincipal, TPermission, TPermissionRestric
             .Select(permissionIdentityInfo.Id.Path)
             .GenericToArrayAsync(cancellationToken);
 
-        var containsPermissionFilter = permissionIdentityInfo.CreateContainsFilter(permissionIdents);
+        var containsPermissionFilter = permissionIdentityInfo.CreateFilter(permissionIdents);
 
         var permissionRestrictions = await queryableSource
             .GetQueryable<TPermissionRestriction>()

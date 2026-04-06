@@ -12,7 +12,9 @@ public class IdentityInfoProxy<TDomainObject, TIdent>(IIdentityInfoSource identi
 
     public PropertyAccessors<TDomainObject, TIdent> Id => innerInfo.Id;
 
-    public Expression<Func<TDomainObject, bool>> CreateContainsFilter(IEnumerable<TIdent> idents) => innerInfo.CreateContainsFilter(idents);
+    public Expression<Func<TDomainObject, bool>> CreateFilter(IEnumerable<TIdent> idents) => innerInfo.CreateFilter(idents);
+
+    public Expression<Func<TDomainObject, bool>> CreateFilter(TIdent ident) => innerInfo.CreateFilter(ident);
 }
 
 public class IdentityInfoProxy<TDomainObject>(IIdentityInfoSource identityInfoSource) : IdentityInfoProxyBase<TDomainObject>

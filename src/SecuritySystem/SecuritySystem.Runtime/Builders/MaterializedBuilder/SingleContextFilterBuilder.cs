@@ -15,7 +15,7 @@ public class SingleContextFilterBuilder<TDomainObject, TSecurityContext, TSecuri
 {
 	protected override Expression<Func<TDomainObject, bool>> GetSecurityFilterExpression(IEnumerable<TSecurityContextIdent> permissionIdents)
 	{
-		var singleFilter = identityInfo.CreateContainsFilter(permissionIdents);
+		var singleFilter = identityInfo.CreateFilter(permissionIdents);
 
 		var containsFilterExpr = securityPath.Expression!.Select(singleFilter);
 

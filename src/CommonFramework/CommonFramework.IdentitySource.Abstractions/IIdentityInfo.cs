@@ -6,7 +6,9 @@ public interface IIdentityInfo<TDomainObject, TIdent> : IIdentityInfo<TDomainObj
 {
     PropertyAccessors<TDomainObject, TIdent> Id { get; }
 
-    Expression<Func<TDomainObject, bool>> CreateContainsFilter(IEnumerable<TIdent> idents);
+    Expression<Func<TDomainObject, bool>> CreateFilter(IEnumerable<TIdent> idents);
+
+    Expression<Func<TDomainObject, bool>> CreateFilter(TIdent ident);
 }
 
 public interface IIdentityInfo<in TDomainObject> : IIdentityInfo
