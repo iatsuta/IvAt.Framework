@@ -23,6 +23,10 @@ public class PermissionLevelInfoExtractor<TPermission, TSecurityContext>(
 
         var getPermissionDirectLevel = restrictionsPath.Select(getDirectLevelExpression);
 
+        var getUnrestrictedLevel = unrestrictedAccess
+            ? unrestrictedFilter.Select(v => v ? PriorityLevels.Unrestricted : PriorityLevels.AccessDenied)
+            : _ => PriorityLevels.AccessDenied;
+
         return ExpressionEvaluateHelper.InlineEvaluate(ee =>
 
             from permissionInfo in ExpressionHelper.GetIdentity<PermissionLevelInfo<TPermission>>()
@@ -31,7 +35,7 @@ public class PermissionLevelInfoExtractor<TPermission, TSecurityContext>(
 
             let directLevel = ee.Evaluate(getPermissionDirectLevel, permission)
 
-            let unrestrictedLevel = unrestrictedAccess && ee.Evaluate(unrestrictedFilter, permission) ? PriorityLevels.Unrestricted : PriorityLevels.AccessDenied
+            let unrestrictedLevel = ee.Evaluate(getUnrestrictedLevel, permission)
 
             let resultLevel = directLevel > unrestrictedLevel ? directLevel : unrestrictedLevel
 
