@@ -60,13 +60,13 @@ public class AncestorLinkExtractor<TDomainObject, TDirectAncestorLink>(
     {
         var expectedParents = await domainObjectExpander.GetAllParents([domainObject], cancellationToken);
 
-        var existsParentLinks = await queryableSource
+        var existsParents = await queryableSource
             .GetQueryable<TDirectAncestorLink>()
             .Where(ancestorLinkInfo.To.Path.Select(toObj => toObj == domainObject))
-            .WithFetch(linkFetchRule)
+            .Select(ancestorLinkInfo.From.Path)
             .GenericToListAsync(cancellationToken);
 
-        var mergeResult = existsParentLinks.GetMergeResult(expectedParents, ancestorLinkInfo.From.Getter, v => v);
+        var mergeResult = existsParents.GetMergeResult(expectedParents);
 
         if (mergeResult.IsEmpty)
         {
@@ -84,14 +84,13 @@ public class AncestorLinkExtractor<TDomainObject, TDirectAncestorLink>(
 
                 select new AncestorLinkData<TDomainObject>(newParent, child);
 
-
             var removedLinks = await queryableSource
                 .GetQueryable<TDirectAncestorLink>()
                 .Where(ancestorLinkInfo.To.Path.Select(toObj => children.Contains(toObj))
-                    .BuildAnd(ancestorLinkInfo.From.Path.Select(toObj => mergeResult.RemovingItems.Select(ancestorLinkInfo.From.Getter).Contains(toObj))))
+                    .BuildAnd(ancestorLinkInfo.From.Path.Select(toObj => mergeResult.RemovingItems.Contains(toObj))))
                 .GenericToListAsync(cancellationToken);
 
-            return new(addedLinks, mergeResult.RemovingItems);
+            return new(addedLinks, removedLinks);
         }
     }
 

@@ -1,11 +1,9 @@
-﻿using System.Collections.Immutable;
-
-namespace CommonFramework;
+﻿namespace CommonFramework;
 
 public readonly record struct MergeResult<TSource, TTarget>(
-    ImmutableArray<TTarget> AddingItems,
-    ImmutableArray<ValueTuple<TSource, TTarget>> CombineItems,
-    ImmutableArray<TSource> RemovingItems)
+    IReadOnlyList<TTarget> AddingItems,
+    IReadOnlyList<ValueTuple<TSource, TTarget>> CombineItems,
+    IReadOnlyList<TSource> RemovingItems)
 {
     public MergeResult(
         IEnumerable<TTarget> addingItems,

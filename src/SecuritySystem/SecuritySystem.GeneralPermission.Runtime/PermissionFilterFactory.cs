@@ -14,12 +14,11 @@ public class PermissionFilterFactory<TPermission, TPermissionRestriction, TSecur
     IPermissionRestrictionTypeFilterFactory<TPermissionRestriction> permissionRestrictionTypeFilterFactory) : IPermissionFilterFactory<TPermission>
     where TPermissionRestriction : class
 {
-    public Expression<Func<TPermission, bool>> CreateFilter(SecurityContextRestriction securityContextRestriction)
-    {
-        return new Func<SecurityContextRestriction<ISecurityContext>, Expression<Func<TPermission, bool>>>(this.CreateFilter)
+    public Expression<Func<TPermission, bool>> CreateFilter(SecurityContextRestriction securityContextRestriction) =>
+
+        new Func<SecurityContextRestriction<ISecurityContext>, Expression<Func<TPermission, bool>>>(this.CreateFilter)
             .CreateGenericMethod(securityContextRestriction.SecurityContextType)
             .Invoke<Expression<Func<TPermission, bool>>>(this, securityContextRestriction);
-    }
 
     public Expression<Func<TPermission, bool>> CreateFilter<TSecurityContext>(
         SecurityContextRestriction<TSecurityContext> securityContextRestriction)
