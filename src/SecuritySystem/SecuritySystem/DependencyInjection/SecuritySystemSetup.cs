@@ -48,7 +48,8 @@ public class SecuritySystemSetup : ISecuritySystemSetup, IServiceInitializer
 
     private Action<IServiceCollection> registerRawCurrentUserAction = sc => sc.AddKeyedScoped<ICurrentUser, RawCurrentUser>(ICurrentUser.RawKey);
 
-    private Action<IServiceCollection> registerDefaultCurrentUserAction = sc => sc.AddKeyedSingleton<ICurrentUser>(ICurrentUser.DefaultKey, FixedCurrentUser.CurrentMachine);
+    private Action<IServiceCollection> registerDefaultCurrentUserAction =
+        sc => sc.AddKeyedSingleton<ICurrentUser>(ICurrentUser.DefaultKey, (_, __) => FixedCurrentUser.CurrentMachine); // TODO: remove factory after fix https://github.com/dotnet/runtime/issues/126960
 
     private Action<IServiceCollection>? registerGenericRepositoryAction;
 
