@@ -1,6 +1,6 @@
 ﻿using CommonFramework;
 using CommonFramework.DictionaryCache;
-using SyncWorkflow.Domain.Definition;
+using SyncWorkflow.Definition;
 
 namespace SyncWorkflow.StateFactory;
 

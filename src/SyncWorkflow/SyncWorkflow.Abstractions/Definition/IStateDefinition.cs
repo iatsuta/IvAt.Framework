@@ -9,17 +9,17 @@ public interface IStateDefinition
 
     object? Status { get; }
 
-    IWorkflowDefinition Workflow { get; }
-
     Type StateType { get; set; }
 
-    ImmutableArray<Delegate> InputActions { get; }
+    IWorkflowDefinition Workflow { get; }
 
-    ImmutableArray<Delegate> OutputActions { get; }
+    ImmutableList<Delegate> InputActions { get; }
 
-    ImmutableArray<ITransitionDefinition> Transitions { get; }
+    ImmutableList<Delegate> OutputActions { get; }
 
-    ImmutableArray<IWorkflow> SubWorkflow { get; }
+    ImmutableList<ITransitionDefinition> Transitions { get; }
+
+    ImmutableList<IWorkflow> SubWorkflow { get; }
 
     FrozenDictionary<string, object> AdditionalInfo { get; }
 }

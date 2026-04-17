@@ -1,7 +1,9 @@
-﻿using System.Linq.Expressions;
-using CommonFramework;
-using SyncWorkflow.Domain.Definition;
+﻿using CommonFramework;
+using SyncWorkflow.Definition;
 using SyncWorkflow.States;
+using System.Collections.Frozen;
+using System.Collections.Immutable;
+using System.Linq.Expressions;
 
 namespace SyncWorkflow.Builder.Default.DomainDefinition;
 
@@ -23,8 +25,6 @@ public class WorkflowDefinition : IWorkflowDefinition
     }
 
     public WorkflowDefinitionIdentity Identity { get; set; } = null!;
-
-    public LambdaExpression? IdProperty { get; set; }
 
     public LambdaExpression? StatusProperty { get; set; }
 
@@ -52,9 +52,9 @@ public class WorkflowDefinition : IWorkflowDefinition
 
     IStateDefinition IWorkflowDefinition.DefaultFinalState => this.DefaultFinalState;
 
-    IEnumerable<IStateDefinition> IWorkflowDefinition.States => this.States;
+    ImmutableList<IStateDefinition> IWorkflowDefinition.States => field ??= [ .. this.States];
 
-    IReadOnlyDictionary<string, object> IWorkflowDefinition.Settings => this.Settings;
+    FrozenDictionary<string, object> IWorkflowDefinition.Settings => field ??= this.Settings.ToFrozenDictionary();
 
     public WorkflowDefinition HeaderClone()
     {

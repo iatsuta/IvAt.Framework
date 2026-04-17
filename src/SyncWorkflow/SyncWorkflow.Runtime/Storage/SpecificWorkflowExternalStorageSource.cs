@@ -1,6 +1,6 @@
 ﻿using CommonFramework;
 using Microsoft.Extensions.DependencyInjection;
-using SyncWorkflow.Domain.Definition;
+using SyncWorkflow.Definition;
 
 namespace SyncWorkflow.Storage;
 

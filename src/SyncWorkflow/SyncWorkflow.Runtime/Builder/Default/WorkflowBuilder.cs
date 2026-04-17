@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 
 using SyncWorkflow.Builder.Default.DomainDefinition;
-using SyncWorkflow.Domain.Definition;
+using SyncWorkflow.Definition;
 using SyncWorkflow.States;
 using SyncWorkflow.States._Base;
 

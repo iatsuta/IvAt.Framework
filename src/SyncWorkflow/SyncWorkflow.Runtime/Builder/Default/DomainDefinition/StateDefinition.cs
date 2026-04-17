@@ -1,4 +1,7 @@
-﻿using SyncWorkflow.Domain.Definition;
+﻿using SyncWorkflow.Definition;
+
+using System.Collections.Frozen;
+using System.Collections.Immutable;
 
 namespace SyncWorkflow.Builder.Default.DomainDefinition;
 
@@ -14,30 +17,30 @@ public class StateDefinition : IStateDefinition
 
     public Type StateType { get; set; } = null!;
 
-    public List<EventDefinition> Events { get; set; } = [];
+    public List<EventDefinition> Events { get; } = [];
 
-    public List<Delegate> InputActions { get; set; } = [];
+    public List<Delegate> InputActions { get; } = [];
 
-    public List<Delegate> OutputActions { get; set; } = [];
+    public List<Delegate> OutputActions { get; } = [];
 
     public List<TransitionDefinition> Transitions { get; set; } = [];
 
     public List<BuildWorkflow> SubWorkflows { get; set; } = [];
 
-    public Dictionary<string, object> AdditionalInfo { get; set; } = new();
+    public Dictionary<string, object> AdditionalInfo { get; set; } = [];
 
 
-    IReadOnlyDictionary<string, object> IStateDefinition.AdditionalInfo => this.AdditionalInfo;
+    FrozenDictionary<string, object> IStateDefinition.AdditionalInfo => field ??= this.AdditionalInfo.ToFrozenDictionary();
 
     IWorkflowDefinition IStateDefinition.Workflow => this.Workflow;
 
-    IEnumerable<Delegate> IStateDefinition.InputActions => this.InputActions;
+    ImmutableList<Delegate> IStateDefinition.InputActions => field ??= [.. this.InputActions];
 
-    IEnumerable<Delegate> IStateDefinition.OutputActions => this.OutputActions;
+    ImmutableList<Delegate> IStateDefinition.OutputActions => field ??= [.. this.OutputActions];
 
-    IEnumerable<ITransitionDefinition> IStateDefinition.Transitions => this.Transitions;
+    ImmutableList<ITransitionDefinition> IStateDefinition.Transitions => field ??= this.Transitions.ToImmutableList<ITransitionDefinition>();
 
-    IEnumerable<IWorkflow> IStateDefinition.SubWorkflow => this.SubWorkflows;
+    ImmutableList<IWorkflow> IStateDefinition.SubWorkflow => field ??= this.SubWorkflows.ToImmutableList<IWorkflow>();
 
 
     public override string ToString()

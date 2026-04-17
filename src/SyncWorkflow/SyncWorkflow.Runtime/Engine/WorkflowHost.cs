@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using SyncWorkflow.Domain.Definition;
+using SyncWorkflow.Definition;
 using SyncWorkflow.Domain.Runtime;
 using SyncWorkflow.Storage;
 

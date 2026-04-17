@@ -1,5 +1,5 @@
 ﻿using CommonFramework;
-using SyncWorkflow.Domain.Definition;
+using SyncWorkflow.Definition;
 using SyncWorkflow.Domain.Runtime;
 
 namespace SyncWorkflow.Storage;

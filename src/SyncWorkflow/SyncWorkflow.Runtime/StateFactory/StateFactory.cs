@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using SyncWorkflow.Domain.Definition;
-using SyncWorkflow.States;
+using SyncWorkflow.Definition;
 using SyncWorkflow.States._Base;
 
 namespace SyncWorkflow.StateFactory;

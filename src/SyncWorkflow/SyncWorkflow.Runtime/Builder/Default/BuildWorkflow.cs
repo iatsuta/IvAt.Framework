@@ -1,6 +1,7 @@
 ﻿using CommonFramework;
-using SyncWorkflow.Domain.Definition;
+
 using SyncWorkflow.Builder.Default.DomainDefinition;
+using SyncWorkflow.Definition;
 
 namespace SyncWorkflow.Builder.Default;
 

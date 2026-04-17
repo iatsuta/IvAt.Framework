@@ -18,7 +18,7 @@ public interface IWorkflowDefinition
 
     bool InTechnical { get; }
 
-    ImmutableArray<IStateDefinition> States { get; }
+    ImmutableList<IStateDefinition> States { get; }
 
     IStateDefinition StartState { get; }
 

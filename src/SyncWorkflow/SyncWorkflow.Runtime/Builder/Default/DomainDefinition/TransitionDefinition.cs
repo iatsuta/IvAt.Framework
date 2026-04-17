@@ -1,4 +1,4 @@
-﻿using SyncWorkflow.Domain.Definition;
+﻿using SyncWorkflow.Definition;
 
 namespace SyncWorkflow.Builder.Default.DomainDefinition;
 

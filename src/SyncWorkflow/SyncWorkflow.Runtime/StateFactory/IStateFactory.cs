@@ -1,5 +1,4 @@
-﻿using SyncWorkflow.States;
-using SyncWorkflow.States._Base;
+﻿using SyncWorkflow.States._Base;
 
 namespace SyncWorkflow.StateFactory;
 

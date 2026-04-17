@@ -1,4 +1,6 @@
-﻿namespace SyncWorkflow;
+﻿using SyncWorkflow.Domain.Runtime;
+
+namespace SyncWorkflow;
 
 public record WaitEventInfo(
     EventHeader Event,

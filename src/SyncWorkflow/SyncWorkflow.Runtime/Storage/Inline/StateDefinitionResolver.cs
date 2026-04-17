@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 using CommonFramework.ExpressionEvaluate;
-using SyncWorkflow.Domain.Definition;
+using SyncWorkflow.Definition;
 
 namespace SyncWorkflow.Storage.Inline;
 
