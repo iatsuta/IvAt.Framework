@@ -105,7 +105,7 @@ public class PrincipalDomainService<TPrincipal, TPermission, TPrincipalIdent>(
 		if (!force && await queryableSource.GetQueryable<TPermission>()
 			    .GenericAnyAsync(bindingInfo.Principal.Path.Select(p => p == principal), cancellationToken))
 		{
-			throw new InvalidOperationException($"Removing principal \"{visualIdentityInfo.Name.Getter(principal)}\" must be empty");
+			throw new SecuritySystemException($"Removing principal \"{visualIdentityInfo.Name.Getter(principal)}\" must be empty");
 		}
 
 		await genericRepository.RemoveAsync(principal, cancellationToken);
