@@ -67,7 +67,7 @@ public class CustomPermissionManagementService(
 
         if (managedPermission.ExtendedData.TryGetValue(ExtendedKey, out var extendedValue) && (string)extendedValue != dbPermission.ExtendedValue)
         {
-            throw new InvalidOperationException($"{ExtendedKey} can't be changed");
+            throw new SecuritySystemException($"{ExtendedKey} can't be changed");
         }
 
         return baseResult;
