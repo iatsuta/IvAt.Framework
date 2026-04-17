@@ -1,0 +1,13 @@
+namespace SyncWorkflow.Tests.Wait;
+
+public class WaitWorkflowSource
+{
+    public Guid Id { get; set; }
+
+    public WaitWorkflowStatus Status { get; set; }
+}
+
+public enum WaitWorkflowStatus
+{
+    ExampleWaitEvent
+}

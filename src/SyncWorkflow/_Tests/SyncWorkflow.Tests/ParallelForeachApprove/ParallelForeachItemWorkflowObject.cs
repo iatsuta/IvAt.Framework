@@ -1,0 +1,13 @@
+namespace SyncWorkflow.Tests.ParallelForeachApprove;
+
+public class ParallelForeachApproveItemWorkflowObject
+{
+    public ParallelForeachApproveStatus Status { get; set; } = ParallelForeachApproveStatus.Draft;
+
+    public string Name { get; set; } = null!;
+
+    public override string ToString()
+    {
+        return this.Name;
+    }
+}

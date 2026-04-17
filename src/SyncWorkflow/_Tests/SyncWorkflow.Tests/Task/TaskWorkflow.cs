@@ -1,0 +1,35 @@
+using SyncWorkflow.Builder;
+using SyncWorkflow.Builder.Default;
+
+namespace SyncWorkflow.Tests._TaskState;
+
+public class TaskWorkflow : BuildWorkflow<TaskWorkflowObject>
+{
+    public static readonly EventHeader ApproveEventHeader = new("Approve");
+
+    public static readonly EventHeader RejectEventHeader = new("Reject");
+
+
+    protected override void Build(IWorkflowBuilder<TaskWorkflowObject> builder)
+    {
+        builder
+            .Then(wfObj => wfObj.Status = TaskApproveStatus.Approving)
+            .WithName("Start")
+
+            .Task(tb => tb
+                .AddCommand(ApproveEventHeader,
+                    approveBranch => approveBranch
+                        .Then(wfObj => wfObj.Status = TaskApproveStatus.Approved)
+                        .WithStatus(TaskApproveStatus.Approved))
+
+                .AddCommand(RejectEventHeader,
+                    rejectBranch => rejectBranch
+                        .Then(wfObj => wfObj.Status = TaskApproveStatus.Rejected)
+                        .WithStatus(TaskApproveStatus.Rejected)))
+
+            .WithStatus(TaskApproveStatus.Approving)
+
+            .Then(wfObj => wfObj.PostProcessWork = true)
+            .WithName("PostProcessWorkState");
+    }
+}
