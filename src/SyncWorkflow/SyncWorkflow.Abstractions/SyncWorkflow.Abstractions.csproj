@@ -5,4 +5,8 @@
     <RootNamespace>SyncWorkflow</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\CommonFramework\CommonFramework\CommonFramework.csproj" />
+  </ItemGroup>
+
 </Project>

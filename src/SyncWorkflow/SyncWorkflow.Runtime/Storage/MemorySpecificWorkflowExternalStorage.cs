@@ -19,14 +19,14 @@ public class MemorySpecificWorkflowExternalStorage(
             throw new InvalidOperationException("Wrong storage");
         }
 
-        if (workflowInstance.Id.IsDefault())
+        if (workflowInstance.Id == Guid.Empty)
         {
             workflowInstance.Id = workflowInstanceIdGenerator.GenerateId(workflowInstance);
         }
 
         var currentState = workflowInstance.CurrentState;
 
-        if (currentState.Id.IsDefault())
+        if (currentState.Id == Guid.Empty)
         {
             currentState.Id = stateInstanceIdGenerator.GenerateId(currentState);
         }

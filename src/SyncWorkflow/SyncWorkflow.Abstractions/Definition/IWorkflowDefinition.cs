@@ -12,9 +12,7 @@ public interface IWorkflowDefinition
 
     long Version => 1;
 
-    LambdaExpression? StatusProperty { get; }
-
-    LambdaExpression? VersionProperty { get; }
+    WorkflowDomainBindingInfo DomainBindingInfo { get; }
 
     bool InTechnical { get; }
 

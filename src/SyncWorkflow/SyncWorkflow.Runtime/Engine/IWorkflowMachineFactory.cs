@@ -2,4 +2,7 @@
 
 namespace SyncWorkflow.Engine;
 
-public interface IWorkflowMachineFactory : IFactory<WorkflowInstance, IWorkflowMachine>;
+public interface IWorkflowMachineFactory
+{
+    IWorkflowMachine Create(WorkflowInstance wi);
+}
