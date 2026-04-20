@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+
 using SecuritySystem.AccessDenied;
 using SecuritySystem.DiTests.DomainObjects;
 using SecuritySystem.DiTests.Rules;
@@ -6,13 +7,13 @@ using SecuritySystem.Providers;
 
 namespace SecuritySystem.DiTests;
 
-public class AccessDeniedExceptionServiceTests : TestBase
+public class AccessDeniedExceptionServiceTests(IServiceProvider rootServiceProvider)
 {
     [Fact]
     public void CreateNewObject_AccessDeniedMessage_IsValid()
     {
         // Arrange
-        var service = this.RootServiceProvider.GetRequiredService<IAccessDeniedExceptionService>();
+        var service = rootServiceProvider.GetRequiredService<IAccessDeniedExceptionService>();
         var employee = new Employee();
 
         // Act
@@ -27,7 +28,7 @@ public class AccessDeniedExceptionServiceTests : TestBase
     public void ChangeExistObject_AccessDeniedMessage_IsValid()
     {
         // Arrange
-        var service = this.RootServiceProvider.GetRequiredService<IAccessDeniedExceptionService>();
+        var service = rootServiceProvider.GetRequiredService<IAccessDeniedExceptionService>();
         var employee = new Employee() { Id = Guid.NewGuid() };
 
         // Act
@@ -42,7 +43,7 @@ public class AccessDeniedExceptionServiceTests : TestBase
     public void CreateNewObjectWithOperation_AccessDeniedMessage_IsValid()
     {
         // Arrange
-        var service = this.RootServiceProvider.GetRequiredService<IAccessDeniedExceptionService>();
+        var service = rootServiceProvider.GetRequiredService<IAccessDeniedExceptionService>();
         var employee = new Employee();
         var securityRule = ExampleSecurityOperation.EmployeeView;
 
@@ -58,7 +59,7 @@ public class AccessDeniedExceptionServiceTests : TestBase
     public void ChangeExistObjectWithOperation_AccessDeniedMessage_IsValid()
     {
         // Arrange
-        var service = this.RootServiceProvider.GetRequiredService<IAccessDeniedExceptionService>();
+        var service = rootServiceProvider.GetRequiredService<IAccessDeniedExceptionService>();
         var employee = new Employee() { Id = Guid.NewGuid() };
         var securityRule = ExampleSecurityOperation.EmployeeView;
 

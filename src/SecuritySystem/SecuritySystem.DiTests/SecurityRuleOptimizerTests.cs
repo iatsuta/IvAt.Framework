@@ -4,14 +4,14 @@ using SecuritySystem.Services;
 
 namespace SecuritySystem.DiTests;
 
-public class SecurityRuleOptimizerTests : TestBase
+public class SecurityRuleOptimizerTests(IServiceProvider rootServiceProvider)
 {
     [Theory]
     [MemberData(nameof(OptimizeSecurityRule_RuleOptimized_Data))]
     public void OptimizeSecurityRule_RuleOptimized(DomainSecurityRule securityRule, DomainSecurityRule expectedOptimizedSecurityRule)
     {
         //Arrange
-        var service = this.RootServiceProvider.GetRequiredService<ISecurityRuleBasicOptimizer>();
+        var service = rootServiceProvider.GetRequiredService<ISecurityRuleBasicOptimizer>();
 
         //Act
         var optimizedSecurityPath = service.Optimize(securityRule);
@@ -33,38 +33,38 @@ public class SecurityRuleOptimizerTests : TestBase
         yield return (SecurityRole.Administrator.Or(SecurityRole.Administrator), SecurityRole.Administrator);
 
         yield return
-            (
-                SecurityRole.Administrator.Or(SecurityRole.SystemIntegration),
-                new[] { SecurityRole.Administrator, SecurityRole.SystemIntegration }
-            );
+        (
+            SecurityRole.Administrator.Or(SecurityRole.SystemIntegration),
+            new[] { SecurityRole.Administrator, SecurityRole.SystemIntegration }
+        );
 
         yield return
-            (
-                SecurityRole.Administrator.Or(DomainSecurityRule.CurrentUser.Or(SecurityRole.SystemIntegration)),
-                new[] { SecurityRole.Administrator, SecurityRole.SystemIntegration }.Or(DomainSecurityRule.CurrentUser)
-            );
+        (
+            SecurityRole.Administrator.Or(DomainSecurityRule.CurrentUser.Or(SecurityRole.SystemIntegration)),
+            new[] { SecurityRole.Administrator, SecurityRole.SystemIntegration }.Or(DomainSecurityRule.CurrentUser)
+        );
         yield return
-            (
-                SecurityRole.Administrator.Or(SecurityRole.SystemIntegration.Or(DomainSecurityRule.CurrentUser)),
-                new[] { SecurityRole.Administrator, SecurityRole.SystemIntegration }.Or(DomainSecurityRule.CurrentUser)
-            );
+        (
+            SecurityRole.Administrator.Or(SecurityRole.SystemIntegration.Or(DomainSecurityRule.CurrentUser)),
+            new[] { SecurityRole.Administrator, SecurityRole.SystemIntegration }.Or(DomainSecurityRule.CurrentUser)
+        );
 
         yield return
-            (
-                SecurityRole.Administrator.Or(DomainSecurityRule.CurrentUser).Or(SecurityRole.SystemIntegration),
-                DomainSecurityRule.CurrentUser.Or(new[] { SecurityRole.Administrator, SecurityRole.SystemIntegration })
-            );
+        (
+            SecurityRole.Administrator.Or(DomainSecurityRule.CurrentUser).Or(SecurityRole.SystemIntegration),
+            DomainSecurityRule.CurrentUser.Or(new[] { SecurityRole.Administrator, SecurityRole.SystemIntegration })
+        );
 
         yield return
-            (
-                DomainSecurityRule.CurrentUser.Or(SecurityRole.Administrator).Or(SecurityRole.SystemIntegration),
-                DomainSecurityRule.CurrentUser.Or(new[] { SecurityRole.Administrator, SecurityRole.SystemIntegration })
-            );
+        (
+            DomainSecurityRule.CurrentUser.Or(SecurityRole.Administrator).Or(SecurityRole.SystemIntegration),
+            DomainSecurityRule.CurrentUser.Or(new[] { SecurityRole.Administrator, SecurityRole.SystemIntegration })
+        );
 
         yield return
-            (
-                DomainSecurityRule.CurrentUser.Negate().Negate(),
-                DomainSecurityRule.CurrentUser
-            );
+        (
+            DomainSecurityRule.CurrentUser.Negate().Negate(),
+            DomainSecurityRule.CurrentUser
+        );
     }
 }

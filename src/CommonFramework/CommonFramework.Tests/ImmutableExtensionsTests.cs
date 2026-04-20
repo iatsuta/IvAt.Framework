@@ -16,7 +16,7 @@ public class ImmutableExtensionsTests
     [CommonFact]
     public async Task ToImmutableArrayAsync_ShouldReturnArray(CancellationToken ct)
     {
-        var source = GetAsyncEnumerable(1, 2, 3);
+        var source = this.GetAsyncEnumerable(1, 2, 3);
 
         var result = await source.ToImmutableArrayAsync(ct);
 
@@ -26,7 +26,7 @@ public class ImmutableExtensionsTests
     [CommonFact]
     public async Task ToImmutableListAsync_ShouldReturnList(CancellationToken ct)
     {
-        var source = GetAsyncEnumerable(1, 2, 3);
+        var source = this.GetAsyncEnumerable(1, 2, 3);
 
         var result = await source.ToImmutableListAsync(ct);
 
@@ -36,7 +36,7 @@ public class ImmutableExtensionsTests
     [CommonFact]
     public async Task ToImmutableHashSetAsync_ShouldReturnSet(CancellationToken ct)
     {
-        var source = GetAsyncEnumerable(1, 2, 2, 3);
+        var source = this.GetAsyncEnumerable(1, 2, 2, 3);
 
         var result = await source.ToImmutableHashSetAsync(ct);
 
@@ -46,7 +46,7 @@ public class ImmutableExtensionsTests
     [CommonFact]
     public async Task ToImmutableArrayAsync_Empty_ShouldReturnEmpty(CancellationToken ct)
     {
-        var source = GetAsyncEnumerable();
+        var source = this.GetAsyncEnumerable();
 
         var result = await source.ToImmutableArrayAsync(ct);
 

@@ -1,6 +1,6 @@
 ﻿using CommonFramework;
 
-namespace SecuritySystem.DiTests;
+namespace SecuritySystem.DiTests.Environment;
 
 public class XUnitDefaultCancellationTokenSource : IDefaultCancellationTokenSource
 {
