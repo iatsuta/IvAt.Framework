@@ -10,7 +10,7 @@ public class CommonFactDiscoverer : FactDiscoverer
         IXunitTestMethod testMethod,
         IFactAttribute factAttribute)
     {
-        if (testMethod.Parameters.Count == 1 && testMethod.Parameters.Single().ParameterType == typeof(CancellationToken))
+        if (testMethod.Method.LastParameterIsCt())
         {
             return new([this.CreateTestCase(discoveryOptions, testMethod, factAttribute)]);
         }

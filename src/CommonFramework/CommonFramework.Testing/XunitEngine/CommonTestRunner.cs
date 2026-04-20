@@ -1,6 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Globalization;
-using System.Reflection;
+﻿using System.Globalization;
 using Xunit;
 using Xunit.Internal;
 using Xunit.Sdk;
@@ -12,16 +10,10 @@ public class CommonTestRunner : XunitTestRunner
 {
     public new static CommonTestRunner Instance { get; } = new();
 
-    private static readonly ConcurrentDictionary<MethodInfo, bool> IsCtCache = [];
-
-    private bool LastParameterIsCt(XunitTestRunnerContext ctxt)
-    {
-        return IsCtCache.GetOrAdd(ctxt.TestMethod, m => m.GetParameters().LastOrDefault()?.ParameterType == typeof(CancellationToken));
-    }
 
     protected override object? InvokeTestMethod(XunitTestRunnerContext ctxt, object? testClassInstance)
     {
-        if (!this.LastParameterIsCt(ctxt))
+        if (!ctxt.TestMethod.LastParameterIsCt())
         {
             return base.InvokeTestMethod(ctxt, testClassInstance);
         }
@@ -34,7 +26,7 @@ public class CommonTestRunner : XunitTestRunner
         XunitTestRunnerContext ctxt,
         object? testClassInstance)
     {
-        if (!this.LastParameterIsCt(ctxt))
+        if (!ctxt.TestMethod.LastParameterIsCt())
         {
             return base.InvokeTest(ctxt, testClassInstance);
         }

@@ -5,7 +5,7 @@ using Xunit.v3;
 
 namespace CommonFramework.Testing.XunitEngine;
 
-public class CommonXunitTestAssemblyRunnerContext(
+public class CommonTestAssemblyRunnerContext(
     IXunitTestAssembly testAssembly,
     IReadOnlyCollection<IXunitTestCase> testCases,
     IMessageSink executionMessageSink,

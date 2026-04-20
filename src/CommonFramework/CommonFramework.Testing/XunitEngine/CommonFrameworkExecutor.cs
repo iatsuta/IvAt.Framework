@@ -4,7 +4,7 @@ using Xunit.v3;
 
 namespace CommonFramework.Testing.XunitEngine;
 
-public class CommonFrameworkExecutor(IXunitTestAssembly testAssembly, CommonXunitTestAssemblyRunner commonXunitTestAssemblyRunner) : XunitTestFrameworkExecutor(testAssembly)
+public class CommonFrameworkExecutor(IXunitTestAssembly testAssembly, CommonTestAssemblyRunner commonXunitTestAssemblyRunner) : XunitTestFrameworkExecutor(testAssembly)
 {
     public override async ValueTask RunTestCases(IReadOnlyCollection<IXunitTestCase> testCases, IMessageSink executionMessageSink,
         ITestFrameworkExecutionOptions executionOptions,

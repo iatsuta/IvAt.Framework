@@ -4,7 +4,7 @@ using Xunit.v3;
 
 namespace CommonFramework.Testing.XunitEngine;
 
-public class CommonXunitTestAssemblyRunner(CommonTestCollectionRunner commonTestCollectionRunner) : XunitTestAssemblyRunnerBase<CommonXunitTestAssemblyRunnerContext, IXunitTestAssembly, IXunitTestCollection, IXunitTestCase>
+public class CommonTestAssemblyRunner(CommonTestCollectionRunner commonTestCollectionRunner) : XunitTestAssemblyRunnerBase<CommonTestAssemblyRunnerContext, IXunitTestAssembly, IXunitTestCollection, IXunitTestCase>
 {
     public async ValueTask<RunSummary> Run(
         IXunitTestAssembly testAssembly,
@@ -18,7 +18,7 @@ public class CommonXunitTestAssemblyRunner(CommonTestCollectionRunner commonTest
         Guard.ArgumentNotNull(executionMessageSink);
         Guard.ArgumentNotNull(executionOptions);
 
-        await using var ctxt = new CommonXunitTestAssemblyRunnerContext(
+        await using var ctxt = new CommonTestAssemblyRunnerContext(
             testAssembly,
             testCases,
             executionMessageSink,
@@ -31,7 +31,7 @@ public class CommonXunitTestAssemblyRunner(CommonTestCollectionRunner commonTest
         return await this.Run(ctxt);
     }
 
-    protected override ValueTask<RunSummary> RunTestCollection(CommonXunitTestAssemblyRunnerContext ctxt, IXunitTestCollection testCollection, IReadOnlyCollection<IXunitTestCase> testCases)
+    protected override ValueTask<RunSummary> RunTestCollection(CommonTestAssemblyRunnerContext ctxt, IXunitTestCollection testCollection, IReadOnlyCollection<IXunitTestCase> testCases)
     {
         Guard.ArgumentNotNull(ctxt);
         Guard.ArgumentNotNull(testCollection);
