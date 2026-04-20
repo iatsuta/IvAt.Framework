@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Reflection;
 
@@ -16,6 +17,8 @@ public class CommonMemberDataAttribute(string memberName, params object?[] argum
 {
     internal IServiceProvider? ServiceProvider { get; set; }
 
+    private readonly ConcurrentDictionary<MethodInfo, object?> testInstanceCache = [];
+
     static readonly Lazy<string> supportedDataSignatures;
 
     static CommonMemberDataAttribute() =>
@@ -31,19 +34,21 @@ public class CommonMemberDataAttribute(string memberName, params object?[] argum
             return string.Join(Environment.NewLine, dataSignatures);
         });
 
-    private object? GetTestInstance(MethodInfo testMethod)
-    {
-        if (testMethod.IsStatic || this.ServiceProvider == null)
-        {
-            return null;
-        }
-        else
-        {
-            var testType = testMethod.ReflectedType!;
+    private object? GetTestInstance(MethodInfo testMethod) =>
 
-            return ActivatorUtilities.CreateInstance(this.ServiceProvider, testType);
-        }
-    }
+        this.testInstanceCache.GetOrAdd(testMethod, _ =>
+        {
+            if (testMethod.IsStatic || this.ServiceProvider == null)
+            {
+                return null;
+            }
+            else
+            {
+                var testType = testMethod.ReflectedType!;
+
+                return ActivatorUtilities.CreateInstance(this.ServiceProvider, testType);
+            }
+        });
 
     /// <inheritdoc/>
     public override ValueTask<IReadOnlyCollection<ITheoryDataRow>> GetData(
