@@ -350,8 +350,8 @@ public abstract class NotificationTests(IServiceProvider rootServiceProvider) : 
     }
 
     [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
+    [CommonInlineData(true)]
+    [CommonInlineData(false)]
     public async Task GetPrincipals_DirectOrFirstParentOrEmpty_Test3_Searched(bool swapPriority, CancellationToken ct)
     {
         // Arrange
