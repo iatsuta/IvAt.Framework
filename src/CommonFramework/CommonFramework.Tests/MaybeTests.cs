@@ -1,23 +1,14 @@
 ﻿using CommonFramework.ExpressionEvaluate;
-using CommonFramework.Testing;
 
 using System.Linq.Expressions;
 
 namespace CommonFramework.Tests;
 
-public class MaybeTests(IServiceProvider serviceProvider)
+public class MaybeTests
 {
-    [CommonFact]
-    public Task Yoba(CancellationToken ct)
-    {
-        Assert.Equal(ct, TestContext.Current.CancellationToken);
-
-        return Task.CompletedTask;
-    }
-
     [Theory]
-    [CommonMemberData(nameof(GetInjectMaybeTestCases))]
-    public void InjectMaybe_Works_AsExpected(A input, string? expected, CancellationToken ct)
+    [MemberData(nameof(GetInjectMaybeTestCases))]
+    public void InjectMaybe_Works_AsExpected(A input, string? expected)
     {
         // arrange
         Expression<Func<A, string?>> expr = a => a.Parent!.Name;
@@ -31,7 +22,7 @@ public class MaybeTests(IServiceProvider serviceProvider)
         result.Should().Be(expected);
     }
 
-    public IEnumerable<object?[]> GetInjectMaybeTestCases()
+    public static IEnumerable<object?[]> GetInjectMaybeTestCases()
     {
         yield return [null, null];
         yield return [new A { Name = "A1" }, null];

@@ -1,25 +1,39 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
 
+using Microsoft.Extensions.DependencyInjection;
+
 using Xunit.v3;
 
 namespace CommonFramework.Testing;
 
 public class CommonTestFramework : XunitTestFramework
 {
+    private readonly ConcurrentDictionary<Assembly, ICommonTestFrameworkInitializer> initializerCache = [];
+
     private readonly ConcurrentDictionary<Assembly, IServiceProvider> rootServiceProviderCache = [];
 
-    private IServiceProvider GetRootServiceProvider(Assembly assembly)
+    private ICommonTestFrameworkInitializer GetInitializer(Assembly assembly)
     {
-        return this.rootServiceProviderCache.GetOrAdd(assembly, asm =>
+        return this.initializerCache.GetOrAdd(assembly, asm =>
         {
             var commonTestFrameworkAttribute = asm.GetCustomAttribute<CommonTestFrameworkAttribute>()
                                                ?? throw new InvalidOperationException(
-                                                   $"Assembly '{asm.FullName}' must be decorated with '{typeof(CommonTestFrameworkAttribute).FullName}' attribute.");
+                                                   $"Assembly '{asm.FullName}' must be decorated with '{typeof(CommonTestFrameworkAttribute).FullName}' attribute");
 
-            var initializer = (ICommonTestFrameworkInitializer)Activator.CreateInstance(commonTestFrameworkAttribute.InitializerType)!;
+            return Activator.CreateInstance(commonTestFrameworkAttribute.InitializerType) as ICommonTestFrameworkInitializer
+                   ?? throw new InvalidOperationException(
+                       $"Failed to create initializer of type '{commonTestFrameworkAttribute.InitializerType.FullName}'");
+        });
+    }
 
-            return initializer.BuildServiceProvider(initializer.CreateServiceCollection());
+    private IServiceProvider GetRootServiceProvider(Assembly assembly)
+    {
+        return this.rootServiceProviderCache.GetOrAdd(assembly, _ =>
+        {
+            var services = new ServiceCollection();
+
+            return this.GetInitializer(assembly).BuildServiceProvider(services);
         });
     }
 

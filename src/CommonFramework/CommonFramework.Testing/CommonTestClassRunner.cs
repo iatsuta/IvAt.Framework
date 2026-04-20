@@ -1,7 +1,5 @@
-﻿using System.Collections.ObjectModel;
-using System.Reflection;
+﻿using System.Reflection;
 
-using Xunit;
 using Xunit.Internal;
 using Xunit.v3;
 
@@ -42,7 +40,7 @@ public class CommonTestClassRunner(IServiceProvider rootServiceProvider) : Xunit
 
         //await ExecutionTimer.MeasureAsync(null);
 
-        return await new CommonTestMethodRunner(rootServiceProvider).Run(
+        return await CommonTestMethodRunner.Instance.Run(
             testMethod,
             testCases,
             ctxt.ExplicitOption,
@@ -50,34 +48,6 @@ public class CommonTestClassRunner(IServiceProvider rootServiceProvider) : Xunit
             ctxt.Aggregator.Clone(),
             ctxt.CancellationTokenSource,
             constructorArguments
-        );
-    }
-}
-
-public class CommonTestMethodRunner(IServiceProvider rootServiceProvider) : XunitTestMethodRunner
-{
-    protected override ValueTask<RunSummary> RunTestCase(XunitTestMethodRunnerContext ctxt, IXunitTestCase testCase)
-    {
-        // if (testCase is CommonXunitTestCase commonXunitTestCase)
-        // {
-        ////     commonXunitTestCase.TestMethodArguments[^1] = TestContext.Current.CancellationToken;
-        // }
-
-        // return base.RunTestCase(ctxt, testCase);
-
-        Guard.ArgumentNotNull(ctxt);
-        Guard.ArgumentNotNull(testCase);
-
-        if (testCase is ISelfExecutingXunitTestCase selfExecutingTestCase)
-            return selfExecutingTestCase.Run(ctxt.ExplicitOption, ctxt.MessageBus, ctxt.ConstructorArguments, ctxt.Aggregator.Clone(), ctxt.CancellationTokenSource);
-
-        return CommonRunnerHelper.RunXunitTestCase(
-            testCase,
-            ctxt.MessageBus,
-            ctxt.CancellationTokenSource,
-            ctxt.Aggregator.Clone(),
-            ctxt.ExplicitOption,
-            ctxt.ConstructorArguments
         );
     }
 }
