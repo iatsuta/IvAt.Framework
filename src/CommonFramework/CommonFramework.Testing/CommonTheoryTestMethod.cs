@@ -7,8 +7,6 @@ namespace CommonFramework.Testing;
 
 public class CommonTheoryTestMethod(IXunitTestMethod baseMethod, IServiceProvider serviceProvider) : IXunitTestMethod
 {
-    public IServiceProvider ServiceProvider { get; } = serviceProvider;
-
     public int? MethodArity => baseMethod.MethodArity;
 
     public string MethodName => baseMethod.MethodName;
@@ -20,10 +18,20 @@ public class CommonTheoryTestMethod(IXunitTestMethod baseMethod, IServiceProvide
     public IReadOnlyCollection<IBeforeAfterTestAttribute> BeforeAfterTestAttributes
         => baseMethod.BeforeAfterTestAttributes;
 
-    public IReadOnlyCollection<IDataAttribute> DataAttributes
-        => baseMethod.DataAttributes;
+    public IReadOnlyCollection<IDataAttribute> DataAttributes => field ??=
+    [
+        .. baseMethod.DataAttributes.Select(attr =>
+        {
+            if (attr is CommonMemberDataAttribute commonMemberDataAttribute)
+            {
+                commonMemberDataAttribute.ServiceProvider = serviceProvider;
+            }
 
-    public IReadOnlyCollection<IFactAttribute> FactAttributes => [.. baseMethod.FactAttributes.Cast<ITheoryAttribute>().Select(v => new CommonTheoryAttribute(v))];
+            return attr;
+        })
+    ];
+
+    public IReadOnlyCollection<IFactAttribute> FactAttributes => baseMethod.FactAttributes;
 
     public bool IsGenericMethodDefinition
         => baseMethod.IsGenericMethodDefinition;
