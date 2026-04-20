@@ -102,7 +102,7 @@ public abstract class RestrictionFilterTests(IServiceProvider rootServiceProvide
     //    await this.AuthManager.For(this.testLogin).SetRoleAsync(this.securityRole, ct);
 
     //    // Act
-    //    await using var scope = this.RootServiceProvider.CreateAsyncScope();
+    //    await using var scope = rootServiceProvider.CreateAsyncScope();
 
     //    var queryableSource = scope.ServiceProvider.GetRequiredService<IQueryableSource>();
     //    var domainSecurityService = scope.ServiceProvider.GetRequiredService<IDomainSecurityService<BusinessUnit>>();
@@ -127,7 +127,7 @@ public abstract class RestrictionFilterTests(IServiceProvider rootServiceProvide
     //            ct);
 
     //    // Act
-    //    await using var scope = this.RootServiceProvider.CreateAsyncScope();
+    //    await using var scope = rootServiceProvider.CreateAsyncScope();
 
     //    var queryableSource = scope.ServiceProvider.GetRequiredService<IQueryableSource>();
     //    var domainSecurityService = scope.ServiceProvider.GetRequiredService<IDomainSecurityService<BusinessUnit>>();
@@ -152,7 +152,7 @@ public abstract class RestrictionFilterTests(IServiceProvider rootServiceProvide
     //            ct);
 
     //    // Act
-    //    await using var scope = this.RootServiceProvider.CreateAsyncScope();
+    //    await using var scope = rootServiceProvider.CreateAsyncScope();
 
     //    var queryableSource = scope.ServiceProvider.GetRequiredService<IQueryableSource>();
     //    var domainSecurityService = scope.ServiceProvider.GetRequiredService<IDomainSecurityService<BusinessUnit>>();

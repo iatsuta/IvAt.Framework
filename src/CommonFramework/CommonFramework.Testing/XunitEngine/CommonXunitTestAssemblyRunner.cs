@@ -2,7 +2,7 @@
 using Xunit.Sdk;
 using Xunit.v3;
 
-namespace CommonFramework.Testing.Engine;
+namespace CommonFramework.Testing.XunitEngine;
 
 public class CommonXunitTestAssemblyRunner(CommonTestCollectionRunner commonTestCollectionRunner) : XunitTestAssemblyRunnerBase<CommonXunitTestAssemblyRunnerContext, IXunitTestAssembly, IXunitTestCollection, IXunitTestCase>
 {

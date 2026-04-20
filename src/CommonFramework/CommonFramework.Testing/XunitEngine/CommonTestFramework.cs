@@ -1,11 +1,9 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
-
 using Microsoft.Extensions.DependencyInjection;
-
 using Xunit.v3;
 
-namespace CommonFramework.Testing.Engine;
+namespace CommonFramework.Testing.XunitEngine;
 
 public class CommonTestFramework : XunitTestFramework
 {

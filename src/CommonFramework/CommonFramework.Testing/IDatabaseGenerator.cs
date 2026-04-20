@@ -1,4 +1,4 @@
-﻿namespace CommonFramework.Testing.Engine;
+﻿namespace CommonFramework.Testing;
 
 public interface IDatabaseGenerator
 {

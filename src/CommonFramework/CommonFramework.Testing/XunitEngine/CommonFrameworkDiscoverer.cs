@@ -1,9 +1,8 @@
 ﻿using System.Reflection;
-
 using Xunit.Sdk;
 using Xunit.v3;
 
-namespace CommonFramework.Testing.Engine;
+namespace CommonFramework.Testing.XunitEngine;
 
 public class CommonFrameworkDiscoverer(IXunitTestAssembly testAssembly, IServiceProvider rootServiceProvider)
     : XunitTestFrameworkDiscoverer(testAssembly)

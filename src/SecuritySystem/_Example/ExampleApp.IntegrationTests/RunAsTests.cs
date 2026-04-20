@@ -21,14 +21,14 @@ public abstract class RunAsManagerTests(IServiceProvider rootServiceProvider) : 
         var runAsUserId = (Guid)runAsUserIdentity.GetId();
 
         // Act
-        await this.RootServiceProvider.GetRequiredService<ITestingEvaluator<IRunAsManager>>().EvaluateAsync(TestingScopeMode.Write, manager =>
+        await rootServiceProvider.GetRequiredService<ITestingEvaluator<IRunAsManager>>().EvaluateAsync(TestingScopeMode.Write, manager =>
             manager.StartRunAsUserAsync(runAsUserIdentity, ct));
 
         // Assert
-        var currentUserName = await this.RootServiceProvider.GetRequiredService<ITestingEvaluator<ICurrentUser>>()
+        var currentUserName = await rootServiceProvider.GetRequiredService<ITestingEvaluator<ICurrentUser>>()
             .EvaluateAsync(TestingScopeMode.Read, async c => c.Name);
 
-        var currentUserId = await this.RootServiceProvider.GetRequiredService<ITestingEvaluator<ICurrentUserSource<Principal>>>()
+        var currentUserId = await rootServiceProvider.GetRequiredService<ITestingEvaluator<ICurrentUserSource<Principal>>>()
             .EvaluateAsync(TestingScopeMode.Read, async c => c.CurrentUser.Id);
 
         currentUserName.Should().Be(runAsUserName);
@@ -47,17 +47,17 @@ public abstract class RunAsManagerTests(IServiceProvider rootServiceProvider) : 
         var runAsUserId = (Guid)runAsUserIdentity.GetId();
 
         // Act
-        await this.RootServiceProvider.GetRequiredService<ITestingEvaluator<IRunAsManager>>().EvaluateAsync(TestingScopeMode.Write, manager =>
+        await rootServiceProvider.GetRequiredService<ITestingEvaluator<IRunAsManager>>().EvaluateAsync(TestingScopeMode.Write, manager =>
             manager.StartRunAsUserAsync(runAsUserIdentity, ct));
 
-        await this.RootServiceProvider.GetRequiredService<ITestingEvaluator<IRunAsManager>>().EvaluateAsync(TestingScopeMode.Write, manager =>
+        await rootServiceProvider.GetRequiredService<ITestingEvaluator<IRunAsManager>>().EvaluateAsync(TestingScopeMode.Write, manager =>
             manager.StartRunAsUserAsync(runAsUserIdentity, ct));
 
         // Assert
-        var currentUserName = await this.RootServiceProvider.GetRequiredService<ITestingEvaluator<ICurrentUser>>()
+        var currentUserName = await rootServiceProvider.GetRequiredService<ITestingEvaluator<ICurrentUser>>()
             .EvaluateAsync(TestingScopeMode.Read, async c => c.Name);
 
-        var currentUserId = await this.RootServiceProvider.GetRequiredService<ITestingEvaluator<ICurrentUserSource<Principal>>>()
+        var currentUserId = await rootServiceProvider.GetRequiredService<ITestingEvaluator<ICurrentUserSource<Principal>>>()
             .EvaluateAsync(TestingScopeMode.Read, async c => c.CurrentUser.Id);
 
         currentUserName.Should().Be(runAsUserName);

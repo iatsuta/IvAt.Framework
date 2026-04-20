@@ -1,9 +1,8 @@
 ﻿using System.Reflection;
-
 using Xunit.Internal;
 using Xunit.v3;
 
-namespace CommonFramework.Testing.Engine;
+namespace CommonFramework.Testing.XunitEngine;
 
 public class CommonTestClassRunner(IServiceProvider rootServiceProvider) : XunitTestClassRunner
 {

@@ -1,7 +1,7 @@
 ﻿using Xunit.Internal;
 using Xunit.v3;
 
-namespace CommonFramework.Testing.Engine;
+namespace CommonFramework.Testing.XunitEngine;
 
 public class CommonTestCaseRunner : XunitTestCaseRunner
 {

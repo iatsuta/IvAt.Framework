@@ -6,7 +6,7 @@ using Xunit.Internal;
 using Xunit.Sdk;
 using Xunit.v3;
 
-namespace CommonFramework.Testing.Engine;
+namespace CommonFramework.Testing.XunitEngine;
 
 public class CommonTestRunner : XunitTestRunner
 {
@@ -80,7 +80,7 @@ public class CommonTestRunner : XunitTestRunner
                     }
                     else
                     {
-                        var result = InvokeTestMethod(ctxt, testClassInstance);
+                        var result = this.InvokeTestMethod(ctxt, testClassInstance);
                         var valueTask = AsyncUtility.TryConvertToValueTask(result);
                         if (valueTask.HasValue)
                             await valueTask.Value;
