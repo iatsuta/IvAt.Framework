@@ -1,5 +1,3 @@
-﻿using ExampleApp.IntegrationTests.Environment;
-
-namespace ExampleApp.IntegrationTests;
+﻿namespace ExampleApp.IntegrationTests;
 
 public class DomainSecurityRuleCredentialTestsImpl(IServiceProvider rootServiceProvider) : DomainSecurityRuleCredentialTests(rootServiceProvider);

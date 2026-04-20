@@ -1,5 +1,3 @@
-﻿using ExampleApp.IntegrationTests.Environment;
-
-namespace ExampleApp.IntegrationTests;
+﻿namespace ExampleApp.IntegrationTests;
 
 public class PermissionExtendedDataTestsImpl(IServiceProvider rootServiceProvider) : PermissionExtendedDataTests(rootServiceProvider);
