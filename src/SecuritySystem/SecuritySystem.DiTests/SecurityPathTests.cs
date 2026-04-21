@@ -24,7 +24,7 @@ public class SecurityPathTests
 
     public SecurityPathTests()
     {
-        this.rootServiceProvider = new CustomTestServiceProviderBuilder(this.bu1).Build(new ServiceCollection());
+        this.rootServiceProvider = new CustomTestServiceProviderBuilder(this.bu1).BuildServiceProvider(new ServiceCollection());
     }
 
     [Fact]

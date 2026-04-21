@@ -14,7 +14,7 @@ namespace ExampleApp.IntegrationTests.Environment;
 
 public abstract class TestEnvironmentBase : ITestEnvironment
 {
-    public IServiceProvider Build(IServiceCollection services)
+    public IServiceProvider BuildServiceProvider(IServiceCollection services)
     {
         var configuration = new ConfigurationBuilder().AddJsonFile("testAppSettings.json", false, true).Build();
 

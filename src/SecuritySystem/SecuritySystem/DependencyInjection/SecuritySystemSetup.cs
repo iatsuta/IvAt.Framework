@@ -292,6 +292,13 @@ public class SecuritySystemSetup : ISecuritySystemSetup, IServiceInitializer
         return this;
     }
 
+    public ISecuritySystemSetup SetQueryableSource(Func<IServiceProvider, IQueryableSource> getQueryableSource)
+    {
+        this.registerQueryableSourceAction = sc => sc.AddScoped(getQueryableSource);
+
+        return this;
+    }
+
     public ISecuritySystemSetup SetRawCurrentUser<TCurrentUser>()
         where TCurrentUser : class, ICurrentUser
     {

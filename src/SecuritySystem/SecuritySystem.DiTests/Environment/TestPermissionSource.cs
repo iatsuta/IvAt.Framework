@@ -1,11 +1,11 @@
 ﻿using System.Collections.Immutable;
-using CommonFramework;
 
+using SecuritySystem.DiTests.Services;
 using SecuritySystem.ExternalSystem;
 
-namespace SecuritySystem.DiTests.Services;
+namespace SecuritySystem.DiTests.Environment;
 
-public class ExamplePermissionSource(TestPermissions data, DomainSecurityRule.ExpandedRoleGroupSecurityRule securityRule) : IPermissionSource
+public class TestPermissionSource(TestPermissions data, DomainSecurityRule.ExpandedRoleGroupSecurityRule securityRule) : IPermissionSource
 {
     public ValueTask<bool> HasAccessAsync(CancellationToken cancellationToken)
     {

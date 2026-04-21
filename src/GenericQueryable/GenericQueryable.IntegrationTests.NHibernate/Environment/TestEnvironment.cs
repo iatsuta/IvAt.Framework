@@ -16,7 +16,7 @@ namespace GenericQueryable.IntegrationTests.Environment;
 
 public class TestEnvironment : TestEnvironmentBase
 {
-    public override IServiceProvider Build(IServiceCollection services) =>
+    public override IServiceProvider BuildServiceProvider(IServiceCollection services) =>
 
         services
             .AddIdentitySource()
@@ -34,5 +34,5 @@ public class TestEnvironment : TestEnvironmentBase
 
             .AddNHibernateGenericQueryable(SetupGenericQueryable)
 
-            .Pipe(base.Build);
+            .Pipe(base.BuildServiceProvider);
 }

@@ -19,13 +19,46 @@ namespace SecuritySystem.DiTests;
 
 public class MainTests
 {
-    private readonly TestData testData = new();
+    private readonly BusinessUnit bu1;
+
+    private readonly BusinessUnit bu2;
+
+    private readonly BusinessUnit bu3;
+
+    private readonly Employee employee1;
+
+    private readonly Employee employee2;
+
+    private readonly Employee employee3;
+
+    private readonly Employee employee4;
+
 
     private readonly IServiceProvider rootServiceProvider;
 
-    public MainTests()
+    public MainTests(IServiceProvider rootServiceProvider)
     {
-        this.rootServiceProvider = new CustomTestServiceProviderBuilder(this.testData).Build(new ServiceCollection());
+        this.rootServiceProvider = rootServiceProvider;
+
+        this.bu1 = new() { Id = Guid.NewGuid() };
+        this.bu2 = new BusinessUnit() { Id = Guid.NewGuid(), Parent = this.bu1 };
+        this.bu3 = new BusinessUnit() { Id = Guid.NewGuid() };
+
+        this.employee1 = new Employee() { Id = Guid.NewGuid(), BusinessUnit = this.bu1 };
+        this.employee2 = new Employee() { Id = Guid.NewGuid(), BusinessUnit = this.bu2 };
+        this.employee3 = new Employee() { Id = Guid.NewGuid(), BusinessUnit = this.bu3 };
+        this.employee4 = new Employee() { Id = Guid.NewGuid() };
+
+
+        var queryableSource = this.rootServiceProvider.GetRequiredService<TestQueryableSource>();
+
+        queryableSource.GetQueryable<BusinessUnitDirectAncestorLink>()
+            .Returns(this.GetBusinessUnitAncestorLinkSource(serviceProvider).AsQueryable());
+
+        queryableSource.GetQueryable<Employee>()
+            .Returns(new[] { this.employee1, this.employee2, this.employee3, this.employee4 }.AsQueryable());
+
+        return queryableSource;
     }
 
 
@@ -40,9 +73,9 @@ public class MainTests
         var securityProvider = employeeDomainSecurityService.GetSecurityProvider(SecurityRule.View);
 
         // Act
-        var result1 = await securityProvider.HasAccessAsync(testData.employee1, ct);
-        var result2 = await securityProvider.HasAccessAsync(testData.employee2, ct);
-        var result3 = await securityProvider.HasAccessAsync(testData.employee3, ct);
+        var result1 = await securityProvider.HasAccessAsync(this.employee1, ct);
+        var result2 = await securityProvider.HasAccessAsync(this.employee2, ct);
+        var result3 = await securityProvider.HasAccessAsync(this.employee3, ct);
 
         // Assert
         result1.Should().BeTrue();
@@ -64,86 +97,30 @@ public class MainTests
         var securityProvider = employeeDomainSecurityService.GetSecurityProvider(SecurityRule.View);
 
         // Act
-        var checkAccessAction = () => securityProvider.CheckAccessAsync(testData.employee3, accessDeniedExceptionService, ct);
+        var checkAccessAction = () => securityProvider.CheckAccessAsync(this.employee3, accessDeniedExceptionService, ct);
 
         // Assert
         await checkAccessAction.Should().ThrowAsync<AccessDeniedException>();
     }
 
-    private class BusinessUnitAncestorLinkSourceExecuteCounter
+
+    private IEnumerable<BusinessUnitDirectAncestorLink> GetBusinessUnitAncestorLinkSource()
     {
-        public int Count { get; set; }
+        var counter = this.rootServiceProvider.GetRequiredService<BusinessUnitAncestorLinkSourceExecuteCounter>();
+        counter.Count++;
+
+        yield return new BusinessUnitDirectAncestorLink { Ancestor = this.bu1, Child = this.bu1 };
+        yield return new BusinessUnitDirectAncestorLink { Ancestor = this.bu2, Child = this.bu2 };
+        yield return new BusinessUnitDirectAncestorLink { Ancestor = this.bu3, Child = this.bu3 };
+
+        yield return new BusinessUnitDirectAncestorLink { Ancestor = this.bu1, Child = this.bu2 };
     }
 
-    private class CustomTestServiceProviderBuilder(TestData testData) : TestEnvironment
+
+    private  IEnumerable<TestPermission> GetPermissions()
     {
-        protected override IServiceCollection CreateServices(IServiceCollection serviceCollection) =>
-
-            base.CreateServices(serviceCollection)
-
-                .AddScoped<BusinessUnitAncestorLinkSourceExecuteCounter>()
-                .ReplaceScopedFrom<IQueryableSource, IServiceProvider>(sp => new TestQueryableSource { BaseQueryableSource = this.BuildQueryableSource(sp) });
-
-
-        protected override IEnumerable<TestPermission> GetPermissions()
-        {
-            yield return new TestPermission(
-                ExampleSecurityRole.TestRole,
-                new Dictionary<Type, ImmutableArray<Guid>> { { typeof(BusinessUnit), [testData.bu1.Id] } }.ToFrozenDictionary());
-        }
-
-        private IQueryableSource BuildQueryableSource(IServiceProvider serviceProvider)
-        {
-            var queryableSource = Substitute.For<IQueryableSource>();
-
-            queryableSource.GetQueryable<BusinessUnitDirectAncestorLink>()
-                .Returns(this.GetBusinessUnitAncestorLinkSource(serviceProvider).AsQueryable());
-
-            queryableSource.GetQueryable<Employee>()
-                .Returns(new[] { testData.employee1, testData.employee2, testData.employee3, testData.employee4 }.AsQueryable());
-
-            return queryableSource;
-        }
-
-        private IEnumerable<BusinessUnitDirectAncestorLink> GetBusinessUnitAncestorLinkSource(IServiceProvider serviceProvider)
-        {
-            var counter = serviceProvider.GetRequiredService<BusinessUnitAncestorLinkSourceExecuteCounter>();
-            counter.Count++;
-
-            yield return new BusinessUnitDirectAncestorLink { Ancestor = testData.bu1, Child = testData.bu1 };
-            yield return new BusinessUnitDirectAncestorLink { Ancestor = testData.bu2, Child = testData.bu2 };
-            yield return new BusinessUnitDirectAncestorLink { Ancestor = testData.bu3, Child = testData.bu3 };
-
-            yield return new BusinessUnitDirectAncestorLink { Ancestor = testData.bu1, Child = testData.bu2 };
-        }
-    }
-
-    public class TestData
-    {
-        public readonly BusinessUnit bu1;
-
-        public readonly BusinessUnit bu2;
-
-        public readonly BusinessUnit bu3;
-
-        public readonly Employee employee1;
-
-        public readonly Employee employee2;
-
-        public readonly Employee employee3;
-
-        public readonly Employee employee4;
-
-        public TestData()
-        {
-            this.bu1 = new() { Id = Guid.NewGuid() };
-            this.bu2 = new BusinessUnit() { Id = Guid.NewGuid(), Parent = this.bu1 };
-            this.bu3 = new BusinessUnit() { Id = Guid.NewGuid() };
-
-            this.employee1 = new Employee() { Id = Guid.NewGuid(), BusinessUnit = this.bu1 };
-            this.employee2 = new Employee() { Id = Guid.NewGuid(), BusinessUnit = this.bu2 };
-            this.employee3 = new Employee() { Id = Guid.NewGuid(), BusinessUnit = this.bu3 };
-            this.employee4 = new Employee() { Id = Guid.NewGuid() };
-        }
+        yield return new TestPermission(
+            ExampleSecurityRole.TestRole,
+            new Dictionary<Type, ImmutableArray<Guid>> { { typeof(BusinessUnit), [this.bu1.Id] } }.ToFrozenDictionary());
     }
 }

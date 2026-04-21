@@ -1,21 +1,19 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
 
-using Microsoft.Extensions.DependencyInjection;
-
 using Xunit.v3;
 
 namespace CommonFramework.Testing.XunitEngine;
 
 public class CommonTestFramework : XunitTestFramework
 {
-    private readonly ConcurrentDictionary<Assembly, ITestEnvironment?> initializerCache = [];
+    private readonly ConcurrentDictionary<Assembly, ITestEnvironment?> testEnvironmentCache = [];
 
-    private readonly ConcurrentDictionary<Assembly, IServiceProvider?> rootServiceProviderCache = [];
+    private readonly ConcurrentDictionary<Assembly, IServiceProviderPool?> rootServiceProviderPoolCache = [];
 
-    private ITestEnvironment? GetServiceProviderBuilder(Assembly assembly)
+    private ITestEnvironment? GetTestEnvironment(Assembly assembly)
     {
-        return this.initializerCache.GetOrAdd(assembly, asm =>
+        return this.testEnvironmentCache.GetOrAdd(assembly, asm =>
         {
             var commonTestFrameworkAttribute = asm.GetCustomAttribute<CommonTestFrameworkAttribute>()
                                                ?? throw new InvalidOperationException(
@@ -23,27 +21,30 @@ public class CommonTestFramework : XunitTestFramework
 
             return commonTestFrameworkAttribute.TestEnvironmentType == null
                 ? null
-                : (Activator.CreateInstance(commonTestFrameworkAttribute.TestEnvironmentType) as ITestEnvironment
-                   ?? throw new InvalidOperationException(
-                       $"Failed to create initializer of type '{commonTestFrameworkAttribute.TestEnvironmentType.FullName}'"));
+                : Activator.CreateInstance(commonTestFrameworkAttribute.TestEnvironmentType) as ITestEnvironment
+                  ?? throw new InvalidOperationException(
+                      $"Failed to create initializer of type '{commonTestFrameworkAttribute.TestEnvironmentType.FullName}'");
         });
     }
 
-    private IServiceProvider? GetRootServiceProvider(Assembly assembly) =>
+    private IServiceProviderPool? GetServiceProviderPool(Assembly assembly) =>
 
-        this.rootServiceProviderCache.GetOrAdd(assembly, _ => this.GetServiceProviderBuilder(assembly)?.Build(new ServiceCollection()));
+        this.rootServiceProviderPoolCache.GetOrAdd(assembly,
+            _ => this.GetTestEnvironment(assembly) is { } testEnvironment
+                ? new ServiceProviderPool(testEnvironment)
+                : null);
 
     protected override ITestFrameworkExecutor CreateExecutor(Assembly assembly)
     {
-        var rootServiceProvider = this.GetRootServiceProvider(assembly);
-
-        var rootRunner = new CommonTestAssemblyRunner(new CommonTestCollectionRunner(new CommonTestClassRunner(rootServiceProvider)));
+        var rootRunner =
+            new CommonTestAssemblyRunner(
+                new CommonTestCollectionRunner(new CommonTestClassRunner(this.GetServiceProviderPool(assembly))));
 
         return new CommonFrameworkExecutor(new XunitTestAssembly(assembly), rootRunner);
     }
 
-    protected override ITestFrameworkDiscoverer CreateDiscoverer(Assembly assembly)
-    {
-        return new CommonFrameworkDiscoverer(new XunitTestAssembly(assembly, null, assembly.GetName().Version), this.GetRootServiceProvider(assembly));
-    }
+    protected override ITestFrameworkDiscoverer CreateDiscoverer(Assembly assembly) =>
+
+        new CommonFrameworkDiscoverer(new XunitTestAssembly(assembly, null, assembly.GetName().Version),
+            this.GetServiceProviderPool(assembly));
 }

@@ -1,13 +1,16 @@
-﻿using System.Reflection;
+﻿using System.Collections.Concurrent;
+using System.Reflection;
 
 using Xunit.Internal;
 using Xunit.v3;
 
 namespace CommonFramework.Testing.XunitEngine;
 
-public class CommonTestClassRunner(IServiceProvider? rootServiceProvider) : XunitTestClassRunner
+public class CommonTestClassRunner(IServiceProviderPool? rootServiceProvider) : XunitTestClassRunner
 {
-    protected override ValueTask<object?> GetConstructorArgument(
+    private readonly ConcurrentDictionary<XunitTestClassRunnerContext, Task<IServiceProvider>> serviceProviderCache = [];
+
+    protected override async ValueTask<object?> GetConstructorArgument(
         XunitTestClassRunnerContext ctxt,
         ConstructorInfo constructor,
         int index,
@@ -15,12 +18,24 @@ public class CommonTestClassRunner(IServiceProvider? rootServiceProvider) : Xuni
     {
         if (rootServiceProvider != null && parameter.ParameterType == typeof(IServiceProvider))
         {
-            return new ValueTask<object?>(rootServiceProvider);
+            return this.serviceProviderCache.GetOrAdd(ctxt, async _ => await rootServiceProvider.GetAsync(ctxt.CancellationTokenSource.Token));
         }
         else
         {
-            return base.GetConstructorArgument(ctxt, constructor, index, parameter);
+            return await base.GetConstructorArgument(ctxt, constructor, index, parameter);
         }
+    }
+
+    protected override async ValueTask<bool> OnTestClassFinished(XunitTestClassRunnerContext ctxt, RunSummary summary)
+    {
+        var result = await base.OnTestClassFinished(ctxt, summary);
+
+        if (rootServiceProvider != null && this.serviceProviderCache.Remove(ctxt, out var getSpTask))
+        {
+            await rootServiceProvider.ReleaseAsync(await getSpTask, ctxt.CancellationTokenSource.Token);
+        }
+
+        return result;
     }
 
     protected override async ValueTask<RunSummary> RunTestMethod(XunitTestClassRunnerContext ctxt, IXunitTestMethod? testMethod, IReadOnlyCollection<IXunitTestCase> testCases, object?[] constructorArguments)

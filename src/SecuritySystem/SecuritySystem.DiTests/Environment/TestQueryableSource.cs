@@ -1,10 +1,15 @@
 ﻿using CommonFramework.GenericRepository;
 
-namespace SecuritySystem.DiTests.Services;
+namespace SecuritySystem.DiTests.Environment;
 
 public class TestQueryableSource : IQueryableSource
 {
     public IQueryableSource BaseQueryableSource { get; set; } = Substitute.For<IQueryableSource>();
+
+    public void Reset()
+    {
+        this.BaseQueryableSource = Substitute.For<IQueryableSource>();
+    }
 
     public IQueryable<TDomainObject> GetQueryable<TDomainObject>()
         where TDomainObject : class

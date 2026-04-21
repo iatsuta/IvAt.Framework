@@ -18,13 +18,17 @@ namespace SecuritySystem.DiTests.Environment;
 
 public class TestEnvironment : ITestEnvironment
 {
-    protected virtual IServiceCollection CreateServices(IServiceCollection services)
+    public void Reset(IServiceProvider serviceProvider)
     {
-        return services
-            .AddSecuritySystem(settings =>
+        serviceProvider.GetRequiredService<TestQueryableSource>().Reset();
+    }
+
+    public IServiceProvider BuildServiceProvider(IServiceCollection services) =>
+
+        services.AddSecuritySystem(settings =>
 
                 settings
-                    .SetQueryableSource<TestQueryableSource>()
+                    .SetQueryableSource(sp => sp.GetRequiredService<TestQueryableSource>())
                     .SetGenericRepository<TestGenericRepository>()
                     .SetDefaultCancellationTokenSource<XUnitDefaultCancellationTokenSource>()
 
@@ -76,15 +80,12 @@ public class TestEnvironment : ITestEnvironment
             .AddRelativeDomainPath((Employee employee) => employee)
             .AddSingleton(typeof(TestCheckboxConditionFactory<>))
 
-            .AddSingleton(_ => new TestPermissions(this.GetPermissions().ToList()));
-    }
+            .AddSingleton<TestQueryableSource>()
+            .AddSingleton<BusinessUnitAncestorLinkSourceExecuteCounter>()
 
-    public IServiceProvider Build(IServiceCollection services) =>
+            .AddSingleton(_ => new TestPermissions(this.GetPermissions().ToList()))
 
-        this.CreateServices(services)
             .AddValidator<DuplicateServiceUsageValidator>()
             .Validate()
             .BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
-
-    protected virtual IEnumerable<TestPermission> GetPermissions() => [];
 }

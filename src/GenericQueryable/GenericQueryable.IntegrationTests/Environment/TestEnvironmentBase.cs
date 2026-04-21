@@ -11,7 +11,7 @@ namespace GenericQueryable.IntegrationTests.Environment;
 
 public abstract class TestEnvironmentBase : ITestEnvironment
 {
-    public virtual IServiceProvider Build(IServiceCollection services) =>
+    public virtual IServiceProvider BuildServiceProvider(IServiceCollection services) =>
 
         services
             .AddValidator<DuplicateServiceUsageValidator>()

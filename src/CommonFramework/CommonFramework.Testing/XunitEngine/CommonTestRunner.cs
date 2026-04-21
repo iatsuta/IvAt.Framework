@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+
 using Xunit;
 using Xunit.Internal;
 using Xunit.Sdk;
@@ -9,7 +10,6 @@ namespace CommonFramework.Testing.XunitEngine;
 public class CommonTestRunner : XunitTestRunner
 {
     public new static CommonTestRunner Instance { get; } = new();
-
 
     protected override object? InvokeTestMethod(XunitTestRunnerContext ctxt, object? testClassInstance)
     {

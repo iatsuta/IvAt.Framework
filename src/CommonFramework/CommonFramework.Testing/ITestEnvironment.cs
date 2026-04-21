@@ -4,9 +4,9 @@ namespace CommonFramework.Testing;
 
 public interface ITestEnvironment
 {
-    void Reset(IServiceProvider serviceProvider)
-    {
-    }
+    IServiceProvider BuildServiceProvider(IServiceCollection services);
 
-    IServiceProvider Build(IServiceCollection services);
+    ValueTask Initialize(IServiceProvider serviceProvider, CancellationToken ct) => ValueTask.CompletedTask;
+
+    ValueTask Cleanup(IServiceProvider serviceProvider, CancellationToken ct) => ValueTask.CompletedTask;
 }

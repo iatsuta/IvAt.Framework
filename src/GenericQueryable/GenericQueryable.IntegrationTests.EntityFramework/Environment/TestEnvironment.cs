@@ -13,7 +13,7 @@ namespace GenericQueryable.IntegrationTests.Environment;
 
 public class TestEnvironment : TestEnvironmentBase
 {
-    public override IServiceProvider Build(IServiceCollection services) =>
+    public override IServiceProvider BuildServiceProvider(IServiceCollection services) =>
 
         services
 
@@ -26,5 +26,5 @@ public class TestEnvironment : TestEnvironmentBase
 
             .AddScoped<IDbSchemeInitializer, DbSchemeInitializer>()
 
-            .Pipe(base.Build);
+            .Pipe(base.BuildServiceProvider);
 }

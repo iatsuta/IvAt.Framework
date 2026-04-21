@@ -5,13 +5,13 @@ using Xunit.v3;
 
 namespace CommonFramework.Testing.XunitEngine;
 
-public class CommonFrameworkDiscoverer(IXunitTestAssembly testAssembly, IServiceProvider? rootServiceProvider)
+public class CommonFrameworkDiscoverer(IXunitTestAssembly testAssembly, IServiceProviderPool? serviceProviderPool)
     : XunitTestFrameworkDiscoverer(testAssembly)
 {
     protected override ValueTask<bool> FindTestsForMethod(IXunitTestMethod testMethod, ITestFrameworkDiscoveryOptions discoveryOptions,
         Func<ITestCase, ValueTask<bool>> discoveryCallback)
     {
-        var actualTestMethod = testMethod.Method.GetCustomAttributes<CommonMemberDataAttribute>().Any() ? new CommonTheoryTestMethod(testMethod, rootServiceProvider) : testMethod;
+        var actualTestMethod = testMethod.Method.GetCustomAttributes<CommonMemberDataAttribute>().Any() ? new CommonTheoryTestMethod(testMethod, serviceProviderPool) : testMethod;
 
         return base.FindTestsForMethod(actualTestMethod, discoveryOptions, discoveryCallback);
     }

@@ -1,9 +1,11 @@
-﻿using System.Collections;
+﻿using Microsoft.Extensions.DependencyInjection;
+
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Globalization;
 using System.Reflection;
 
-using Microsoft.Extensions.DependencyInjection;
+using CommonFramework.Testing.XunitEngine;
 
 using Xunit;
 using Xunit.Internal;
@@ -15,7 +17,7 @@ namespace CommonFramework.Testing;
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
 public class CommonMemberDataAttribute(string memberName, params object?[] arguments) : MemberDataAttributeBase(memberName, arguments)
 {
-    internal IServiceProvider? RootServiceProvider { get; set; }
+    internal IServiceProviderPool? ServiceProviderPool { get; set; }
 
     private readonly ConcurrentDictionary<MethodInfo, object?> testInstanceCache = [];
 
@@ -34,7 +36,7 @@ public class CommonMemberDataAttribute(string memberName, params object?[] argum
             return string.Join(Environment.NewLine, dataSignatures);
         });
 
-    private object? GetTestInstance(MethodInfo testMethod) =>
+    private object? GetTestInstance(MethodInfo testMethod, IServiceProvider? serviceProvider) =>
 
         this.testInstanceCache.GetOrAdd(testMethod, _ =>
         {
@@ -46,13 +48,13 @@ public class CommonMemberDataAttribute(string memberName, params object?[] argum
             {
                 var testType = testMethod.ReflectedType!;
 
-                if (this.RootServiceProvider == null)
+                if (serviceProvider == null)
                 {
                     return Activator.CreateInstance(testType);
                 }
                 else
                 {
-                    return ActivatorUtilities.CreateInstance(this.RootServiceProvider, testType);
+                    return ActivatorUtilities.CreateInstance(serviceProvider, testType);
                 }
             }
         });
@@ -62,7 +64,7 @@ public class CommonMemberDataAttribute(string memberName, params object?[] argum
         MethodInfo testMethod,
         DisposalTracker disposalTracker)
     {
-        if (this.RootServiceProvider == null)
+        if (this.ServiceProviderPool == null)
         {
             return await base.GetData(testMethod, disposalTracker);
         }
@@ -71,59 +73,78 @@ public class CommonMemberDataAttribute(string memberName, params object?[] argum
             return [];
 
         var accessor = this.GetPropertyAccessor(this.MemberType)
-            ?? this.GetFieldAccessor(this.MemberType)
-            ?? this.GetMethodAccessor(this.MemberType)
-            ?? throw new ArgumentException(
-                string.Format(
-                    CultureInfo.CurrentCulture,
-                    "Could not find public static member (property, field, or method) named '{0}' on '{1}'{2}", this.MemberName, this.MemberType.SafeName(), this.Arguments.Length > 0
-                        ? string.Format(CultureInfo.CurrentCulture, " with parameter types: {0}",
-                            string.Join(", ", this.Arguments.Select(p => p?.GetType().SafeName() ?? "(null)")))
-                        : ""
-                )
-            );
+                       ?? this.GetFieldAccessor(this.MemberType)
+                       ?? this.GetMethodAccessor(this.MemberType)
+                       ?? throw new ArgumentException(
+                           string.Format(
+                               CultureInfo.CurrentCulture,
+                               "Could not find public static member (property, field, or method) named '{0}' on '{1}'{2}",
+                               this.MemberName, this.MemberType.SafeName(), this.Arguments.Length > 0
+                                   ? string.Format(CultureInfo.CurrentCulture, " with parameter types: {0}",
+                                       string.Join(", ",
+                                           this.Arguments.Select(p => p?.GetType().SafeName() ?? "(null)")))
+                                   : ""
+                           )
+                       );
 
-        var testInstance = this.GetTestInstance(testMethod);
+        var testContext = TestContext.Current;
 
-        if (testInstance is IAsyncLifetime asyncInit)
-        {
-            await asyncInit.InitializeAsync();
-        }
+        var serviceProvider = this.ServiceProviderPool == null
+            ? null
+            : await this.ServiceProviderPool.GetAsync(testContext.CancellationToken);
 
         try
         {
-            var returnValue =
-                accessor(testInstance)
-                ?? throw new ArgumentException(
-                    string.Format(
-                        CultureInfo.CurrentCulture,
-                        "Member '{0}' on '{1}' returned null when queried for test data", this.MemberName, this.MemberType.SafeName()
-                    ));
+            var testInstance = this.GetTestInstance(testMethod, serviceProvider);
 
-            if (returnValue is IEnumerable dataItems)
+            if (testInstance is IAsyncLifetime asyncInit)
             {
-                var result = new List<ITheoryDataRow>();
-
-                foreach (var dataItem in dataItems)
-                    if (dataItem is not null)
-                        result.Add(this.ConvertDataRow(dataItem));
-
-                return result.CastOrToReadOnlyCollection();
+                await asyncInit.InitializeAsync();
             }
 
-            return await this.GetDataAsync(returnValue, this.MemberType);
+            try
+            {
+                var returnValue =
+                    accessor(testInstance)
+                    ?? throw new ArgumentException(
+                        string.Format(
+                            CultureInfo.CurrentCulture,
+                            "Member '{0}' on '{1}' returned null when queried for test data", this.MemberName,
+                            this.MemberType.SafeName()
+                        ));
+
+                if (returnValue is IEnumerable dataItems)
+                {
+                    var result = new List<ITheoryDataRow>();
+
+                    foreach (var dataItem in dataItems)
+                        if (dataItem is not null)
+                            result.Add(this.ConvertDataRow(dataItem));
+
+                    return result.CastOrToReadOnlyCollection();
+                }
+
+                return await this.GetDataAsync(returnValue, this.MemberType);
+            }
+            finally
+            {
+                if (testInstance is IAsyncLifetime asyncDispose)
+                {
+                    try
+                    {
+                        await asyncDispose.DisposeAsync();
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
         }
         finally
         {
-            if (testInstance is IAsyncLifetime asyncDispose)
+            if (serviceProvider != null && this.ServiceProviderPool != null)
             {
-                try
-                {
-                    await asyncDispose.DisposeAsync();
-                }
-                catch
-                {
-                }
+                await this.ServiceProviderPool.ReleaseAsync(serviceProvider, testContext.CancellationToken);
             }
         }
     }
