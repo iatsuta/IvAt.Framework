@@ -21,23 +21,9 @@ public class SecurityPathTests
     public SecurityPathTests(IServiceProvider rootServiceProvider)
     {
         this.rootServiceProvider = rootServiceProvider;
-
-
-        var queryableSource = this.rootServiceProvider.GetRequiredService<TestQueryableSource>();
-
-        queryableSource.InnerSource.GetQueryable<BusinessUnitDirectAncestorLink>()
-            .Returns(new[] { new BusinessUnitDirectAncestorLink { Ancestor = bu1, Child = bu1 } }.AsQueryable());
-
-
-        var permissionStorge = this.rootServiceProvider.GetRequiredService<TestPermissionStorge>();
-
-        permissionStorge.Permissions =
-        [
-            new TestPermission(ExampleSecurityRole.TestRole)
-            {
-                Restrictions = { { typeof(BusinessUnit), new[] { this.bu1.Id } } }
-            }
-        ];
+        this.rootServiceProvider.SetTestQueryable([new BusinessUnitDirectAncestorLink { Ancestor = bu1, Child = bu1 }]);
+        this.rootServiceProvider.SetTestPermissions(new TestPermission(ExampleSecurityRole.TestRole)
+            { Restrictions = { { typeof(BusinessUnit), new[] { this.bu1.Id } } } });
     }
 
     [Fact]

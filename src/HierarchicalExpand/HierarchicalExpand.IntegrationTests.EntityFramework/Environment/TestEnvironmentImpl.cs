@@ -5,6 +5,10 @@ using GenericQueryable.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
+#if DEBUG
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
+#endif
+
 namespace HierarchicalExpand.IntegrationTests.Environment;
 
 public class TestEnvironmentImpl : TestEnvironment

@@ -3,7 +3,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
+#if DEBUG
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
+#endif
+
 [assembly: CommonFramework.Testing.CommonTestFramework<ExampleApp.IntegrationTests.Environment.TestEnvironment>]
 
 namespace ExampleApp.IntegrationTests.Environment;

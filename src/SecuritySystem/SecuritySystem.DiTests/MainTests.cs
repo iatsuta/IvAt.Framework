@@ -45,25 +45,12 @@ public class MainTests
         this.employee3 = new Employee { Id = Guid.NewGuid(), BusinessUnit = this.bu3 };
         this.employee4 = new Employee { Id = Guid.NewGuid() };
 
-
-        var queryableSource = this.rootServiceProvider.GetRequiredService<TestQueryableSource>();
-
-        queryableSource.InnerSource.GetQueryable<BusinessUnitDirectAncestorLink>()
-            .Returns(this.GetBusinessUnitAncestorLinkSource().AsQueryable());
-
-        queryableSource.InnerSource.GetQueryable<Employee>()
-            .Returns(new[] { this.employee1, this.employee2, this.employee3, this.employee4 }.AsQueryable());
-
-
-        var permissionStorge = this.rootServiceProvider.GetRequiredService<TestPermissionStorge>();
-
-        permissionStorge.Permissions =
-        [
-            new TestPermission(ExampleSecurityRole.TestRole)
-            {
-                Restrictions = { { typeof(BusinessUnit), new[] { this.bu1.Id } } }
-            }
-        ];
+        this.rootServiceProvider.SetTestQueryable(this.GetBusinessUnitAncestorLinkSource());
+        this.rootServiceProvider.SetTestQueryable([this.employee1, this.employee2, this.employee3, this.employee4]);
+        this.rootServiceProvider.SetTestPermissions(new TestPermission(ExampleSecurityRole.TestRole)
+        {
+            Restrictions = { { typeof(BusinessUnit), new[] { this.bu1.Id } } }
+        });
     }
 
 

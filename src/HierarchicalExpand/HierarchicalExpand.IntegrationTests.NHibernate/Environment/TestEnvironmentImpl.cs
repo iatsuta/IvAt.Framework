@@ -7,6 +7,10 @@ using GenericQueryable.NHibernate;
 using Microsoft.Extensions.DependencyInjection;
 using NHibernate.Tool.hbm2ddl;
 
+#if DEBUG
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
+#endif
+
 namespace HierarchicalExpand.IntegrationTests.Environment;
 
 public class TestEnvironmentImpl : TestEnvironment

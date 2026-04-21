@@ -7,6 +7,10 @@ using GenericQueryable.IntegrationTests.Environment;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
+#if DEBUG
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
+#endif
+
 [assembly: CommonFramework.Testing.CommonTestFramework<TestEnvironment>]
 
 namespace GenericQueryable.IntegrationTests.Environment;
