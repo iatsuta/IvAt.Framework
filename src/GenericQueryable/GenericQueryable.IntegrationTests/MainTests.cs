@@ -72,7 +72,7 @@ public abstract class MainTests(IServiceProvider rootServiceProvider) : IAsyncLi
             .ToArrayAsync(ct);
 
         //Assert
-        result0.Should().ContainSingle(testObj => testObj.Id == this.testObjId);
+        Assert.Single(result0, testObj => testObj.Id == this.testObjId);
     }
 
 

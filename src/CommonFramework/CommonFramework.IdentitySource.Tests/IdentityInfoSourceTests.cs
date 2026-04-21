@@ -25,7 +25,7 @@ public class IdentityInfoSourceTests
 		var result = service.GetIdentityInfo<TestObject1, int>();
 
 		//Assert
-		result.Id.Path.Should().Be(expectedResult, ExpressionComparer.Default);
+     Assert.Equal(expectedResult, result.Id.Path, ExpressionComparer.Default);
 	}
 
 
@@ -47,7 +47,7 @@ public class IdentityInfoSourceTests
 		var result = service.GetIdentityInfo(typeof(TestObject2));
 
 		//Assert
-		result.Should().Be(expectedResult);
+     Assert.Equal(expectedResult, result);
 	}
 
     public class TestObject1

@@ -21,8 +21,8 @@ public class DuplicateServiceUsageValidatorTests
         Action act = () => services.Validate();
 
         // assert
-        act.Should().Throw<InvalidOperationException>()
-            .Where(ex => ex.Message.Contains("has been registered many times"));
+        var ex = Assert.Throws<InvalidOperationException>(act);
+        Assert.Contains("has been registered many times", ex.Message);
     }
 
     [Fact]
@@ -42,7 +42,7 @@ public class DuplicateServiceUsageValidatorTests
         Action act = () => services.Validate();
 
         // assert
-        act.Should().NotThrow();
+        act();
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public class DuplicateServiceUsageValidatorTests
         Action act = () => services.Validate();
 
         // assert
-        act.Should().NotThrow();
+        act();
     }
 
 
@@ -83,8 +83,8 @@ public class DuplicateServiceUsageValidatorTests
         Action act = () => services.Validate();
 
         // assert
-        act.Should().Throw<InvalidOperationException>()
-            .Where(ex => ex.Message.Contains("has been registered many times"));
+        var ex = Assert.Throws<InvalidOperationException>(act);
+        Assert.Contains("has been registered many times", ex.Message);
     }
 
     [Fact]
@@ -104,7 +104,7 @@ public class DuplicateServiceUsageValidatorTests
         Action act = () => services.Validate();
 
         // assert
-        act.Should().NotThrow();
+        act();
     }
 
     private interface IInnerService

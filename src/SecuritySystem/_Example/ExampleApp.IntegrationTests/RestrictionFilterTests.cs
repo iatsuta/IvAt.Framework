@@ -45,9 +45,9 @@ public abstract class RestrictionFilterTests(IServiceProvider rootServiceProvide
             }, ct);
 
         // Assert
-        var error = await action.Should().ThrowAsync<SecuritySystemValidationException>();
+        var error = await Assert.ThrowsAsync<SecuritySystemValidationException>(action);
 
-        error.And.Message.Should().Contain($"SecurityContext: '{this.defaultBu.Id}' denied by filter");
+        Assert.Contains($"SecurityContext: '{this.defaultBu.Id}' denied by filter", error.Message);
     }
 
     [CommonFact]
@@ -63,7 +63,7 @@ public abstract class RestrictionFilterTests(IServiceProvider rootServiceProvide
                          }, ct);
 
         // Assert
-        await action.Should().NotThrowAsync();
+        await action();
     }
 
 
@@ -78,7 +78,7 @@ public abstract class RestrictionFilterTests(IServiceProvider rootServiceProvide
         var allowedBuList = await this.AuthManager.GetIdentityListAsync<BusinessUnit, Guid>(this.restrictionRule, ct);
 
         // Assert
-        allowedBuList.Should().BeEquivalentTo([this.buWithAllowedFilter]);
+        Assert.Equivalent(new[] { this.buWithAllowedFilter }, allowedBuList);
     }
 
     [CommonFact]
@@ -92,7 +92,7 @@ public abstract class RestrictionFilterTests(IServiceProvider rootServiceProvide
         var allowedBuList = await this.AuthManager.GetIdentityListAsync<BusinessUnit, Guid>(this.restrictionRule, ct);
 
         // Assert
-        allowedBuList.Should().BeEquivalentTo([this.buWithAllowedFilter]);
+        Assert.Equivalent(new[] { this.buWithAllowedFilter }, allowedBuList);
     }
 
     //[CommonFact]
@@ -115,7 +115,7 @@ public abstract class RestrictionFilterTests(IServiceProvider rootServiceProvide
     //    var accessors = securityAccessorResolver.Resolve(accessorData).ToList();
 
     //    // Assert
-    //    accessors.Should().Contain(this.testLogin);
+    //    Assert.Contains(this.testLogin, accessors);
     //}
 
     //[CommonFact]
@@ -140,7 +140,7 @@ public abstract class RestrictionFilterTests(IServiceProvider rootServiceProvide
     //    var accessors = securityAccessorResolver.Resolve(accessorData).ToList();
 
     //    // Assert
-    //    accessors.Should().Contain(this.testLogin);
+    //    Assert.Contains(this.testLogin, accessors);
     //}
 
     //[CommonFact]
@@ -165,6 +165,6 @@ public abstract class RestrictionFilterTests(IServiceProvider rootServiceProvide
     //    var accessors = securityAccessorResolver.Resolve(accessorData).ToList();
 
     //    // Assert
-    //    accessors.Should().NotContainInConsecutiveOrder(this.testLogin);
+    //    Assert.DoesNotContain(this.testLogin, accessors);
     //}
 }

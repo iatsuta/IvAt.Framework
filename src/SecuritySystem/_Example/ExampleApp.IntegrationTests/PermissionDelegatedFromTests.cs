@@ -29,10 +29,10 @@ public abstract class PermissionDelegationFromTests(IServiceProvider rootService
         // Assert
         var managedPrincipal = await this.AuthManager.For(principalIdentity).GetPrincipalAsync(ct);
 
-        var managedPermission = managedPrincipal.Permissions.Should().ContainSingle().Subject;
+        var managedPermission = Assert.Single(managedPrincipal.Permissions);
 
-        managedPermission.Identity.Should().Be(subPermission.Identity);
-        managedPermission.DelegatedFrom.Should().Be(subPermission.DelegatedFrom);
+        Assert.Equal(subPermission.Identity, managedPermission.Identity);
+        Assert.Equal(subPermission.DelegatedFrom, managedPermission.DelegatedFrom);
     }
 
     [CommonFact]
@@ -51,9 +51,9 @@ public abstract class PermissionDelegationFromTests(IServiceProvider rootService
         var action = () => this.AuthManager.For(principalIdentity).AddRoleAsync(subPermission, ct);
 
         // Assert
-        var error = await action.Should().ThrowAsync<SecuritySystemValidationException>();
+        var error = await Assert.ThrowsAsync<SecuritySystemValidationException>(action);
 
-        error.And.Message.Should().Be("Invalid delegation target: the permission cannot be delegated to its original principal");
+        Assert.Equal("Invalid delegation target: the permission cannot be delegated to its original principal", error.Message);
     }
 
     [CommonFact]
@@ -80,11 +80,11 @@ public abstract class PermissionDelegationFromTests(IServiceProvider rootService
         // Assert
         var managedPrincipal = await this.AuthManager.For(principalIdentity).GetPrincipalAsync(ct);
 
-        var managedPermission = managedPrincipal.Permissions.Should().ContainSingle().Subject;
+        var managedPermission = Assert.Single(managedPrincipal.Permissions);
 
-        managedPermission.Identity.Should().Be(subPermission.Identity);
-        managedPermission.DelegatedFrom.Should().Be(subPermission.DelegatedFrom);
-        managedPermission.Restrictions.Should().BeEquivalentTo(subPermission.Restrictions);
+        Assert.Equal(subPermission.Identity, managedPermission.Identity);
+        Assert.Equal(subPermission.DelegatedFrom, managedPermission.DelegatedFrom);
+        Assert.Equivalent(subPermission.Restrictions, managedPermission.Restrictions);
     }
 
     [CommonFact]
@@ -108,11 +108,11 @@ public abstract class PermissionDelegationFromTests(IServiceProvider rootService
         var action = () => this.AuthManager.For(targetPrincipalName).SetRoleAsync(subPermission, ct);
 
         // Assert
-        var error = await action.Should().ThrowAsync<SecuritySystemValidationException>();
+        var error = await Assert.ThrowsAsync<SecuritySystemValidationException>(action);
 
-        error.And.Message.Should()
-            .Be(
-                $"Invalid security context delegation: the security contexts of \"{targetPrincipalName}\" exceed those granted by \"{sourcePrincipalName}\": {invalidObjects}");
+        Assert.Equal(
+            $"Invalid security context delegation: the security contexts of \"{targetPrincipalName}\" exceed those granted by \"{sourcePrincipalName}\": {invalidObjects}",
+            error.Message);
     }
 
     [CommonFact]
@@ -137,11 +137,11 @@ public abstract class PermissionDelegationFromTests(IServiceProvider rootService
         var action = () => this.AuthManager.For(targetPrincipalName).SetRoleAsync(subPermission, ct);
 
         // Assert
-        var error = await action.Should().ThrowAsync<SecuritySystemValidationException>();
+        var error = await Assert.ThrowsAsync<SecuritySystemValidationException>(action);
 
-        error.And.Message.Should()
-            .Be(
-                $"Invalid security context delegation: the security contexts of \"{targetPrincipalName}\" exceed those granted by \"{sourcePrincipalName}\": {invalidObjects}");
+        Assert.Equal(
+            $"Invalid security context delegation: the security contexts of \"{targetPrincipalName}\" exceed those granted by \"{sourcePrincipalName}\": {invalidObjects}",
+            error.Message);
     }
 
     [CommonFact]
@@ -165,11 +165,11 @@ public abstract class PermissionDelegationFromTests(IServiceProvider rootService
         var action = () => this.AuthManager.For(targetPrincipalName).SetRoleAsync(subPermission, ct);
 
         // Assert
-        var error = await action.Should().ThrowAsync<SecuritySystemValidationException>();
+        var error = await Assert.ThrowsAsync<SecuritySystemValidationException>(action);
 
-        error.And.Message.Should()
-            .Be(
-                $"Invalid delegated permission role: the selected role \"{targetRole}\" is not a subset of \"{sourceRole}\"");
+        Assert.Equal(
+            $"Invalid delegated permission role: the selected role \"{targetRole}\" is not a subset of \"{sourceRole}\"",
+            error.Message);
     }
 
     [CommonFact]
@@ -197,8 +197,8 @@ public abstract class PermissionDelegationFromTests(IServiceProvider rootService
         var action = () => this.AuthManager.For(targetPrincipalName).SetRoleAsync(subPermission, ct);
 
         // Assert
-        var error = await action.Should().ThrowAsync<SecuritySystemValidationException>();
+        var error = await Assert.ThrowsAsync<SecuritySystemValidationException>(action);
 
-        error.And.Message.Should().Be(expectedErrorMessage);
+        Assert.Equal(expectedErrorMessage, error.Message);
     }
 }
