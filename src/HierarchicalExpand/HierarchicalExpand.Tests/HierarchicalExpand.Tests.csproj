@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\CommonFramework\CommonFramework.Testing\CommonFramework.Testing.csproj" />
     <ProjectReference Include="..\HierarchicalExpand\HierarchicalExpand.csproj" />
   </ItemGroup>
 

@@ -7,7 +7,7 @@ namespace CommonFramework.Tests;
 public class MaybeTests
 {
     [Theory]
-    [MemberData(nameof(GetTestCases))]
+    [MemberData(nameof(GetInjectMaybeTestCases))]
     public void InjectMaybe_Works_AsExpected(A input, string? expected)
     {
         // arrange
@@ -22,7 +22,7 @@ public class MaybeTests
         result.Should().Be(expected);
     }
 
-    public static IEnumerable<object?[]> GetTestCases()
+    public static IEnumerable<object?[]> GetInjectMaybeTestCases()
     {
         yield return [null, null];
         yield return [new A { Name = "A1" }, null];

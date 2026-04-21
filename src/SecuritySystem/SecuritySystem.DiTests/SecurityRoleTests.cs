@@ -7,13 +7,13 @@ using SecuritySystem.Expanders;
 
 namespace SecuritySystem.DiTests;
 
-public class SecurityRoleTests : TestBase
+public class SecurityRoleTests(IServiceProvider rootServiceProvider)
 {
     [Fact]
     public void AdministratorRole_ShouldNotContains_SystemIntegrationRole()
     {
         // Arrange
-        var securityRoleSource = this.RootServiceProvider.GetRequiredService<ISecurityRoleSource>();
+        var securityRoleSource = rootServiceProvider.GetRequiredService<ISecurityRoleSource>();
 
         // Act
         var adminRole = securityRoleSource.GetSecurityRole(SecurityRole.Administrator);
@@ -26,7 +26,7 @@ public class SecurityRoleTests : TestBase
     public void SecurityRoleExpander_ExpandDeepChild_AllRolesExpanded()
     {
         // Arrange
-        var expander = this.RootServiceProvider.GetRequiredService<ISecurityRoleGroupExpander>();
+        var expander = rootServiceProvider.GetRequiredService<ISecurityRoleGroupExpander>();
 
         var expectedResult = new DomainSecurityRule.ExpandedRoleGroupSecurityRule(
         [
@@ -47,7 +47,7 @@ public class SecurityRoleTests : TestBase
     public void SecurityRoleExpander_ExpandWithDefaultExpandType_RoleResolved()
     {
         // Arrange
-        var expander = this.RootServiceProvider.GetRequiredService<ISecurityOperationExpander>();
+        var expander = rootServiceProvider.GetRequiredService<ISecurityOperationExpander>();
 
         // Act
         var expandResult = expander.Expand(new DomainSecurityRule.OperationSecurityRule(ExampleSecurityOperation.EmployeeView));
@@ -60,7 +60,7 @@ public class SecurityRoleTests : TestBase
     public void SecurityRoleExpander_ExpandWithCustomExpandType_SecurityRuleCorrected()
     {
         // Arrange
-        var expander = this.RootServiceProvider.GetRequiredService<ISecurityOperationExpander>();
+        var expander = rootServiceProvider.GetRequiredService<ISecurityOperationExpander>();
 
         // Act
         var expandResult = expander.Expand(ExampleSecurityOperation.EmployeeView.ToSecurityRule(HierarchicalExpandType.None));
@@ -73,7 +73,7 @@ public class SecurityRoleTests : TestBase
     public void SecurityRoleExpander_FullExpandWithCustomExpandType_SecurityRuleCorrected()
     {
         // Arrange
-        var expander = this.RootServiceProvider.GetRequiredService<ISecurityRuleExpander>();
+        var expander = rootServiceProvider.GetRequiredService<ISecurityRuleExpander>();
 
         var customExpandType = HierarchicalExpandType.All;
 
@@ -97,7 +97,7 @@ public class SecurityRoleTests : TestBase
     public void SecurityRoleExpander_FullExpandWithCustomExpandTypeFromOperations_SecurityRuleCorrected()
     {
         // Arrange
-        var expander = this.RootServiceProvider.GetRequiredService<ISecurityRuleExpander>();
+        var expander = rootServiceProvider.GetRequiredService<ISecurityRuleExpander>();
 
         var customExpandType = HierarchicalExpandType.None;
 

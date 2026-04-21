@@ -93,7 +93,7 @@ public class ExtractConstantExpressionTests
     public void Should_ReturnNothing_ForInstanceMemberAccess()
     {
         // Arrange
-        Expression<Func<int>> expr = () => fakeRef.Value;
+        Expression<Func<int>> expr = () => this.fakeRef.Value;
 
         // Act
         var result = expr.Body.GetConstantValue<int>();

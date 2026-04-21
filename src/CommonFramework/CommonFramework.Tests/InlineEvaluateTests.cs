@@ -30,7 +30,7 @@ public class InlineEvaluateTests
         Expression<Func<BusinessUnit, Guid>> idPath = bu => bu.Id;
 
         Expression<Func<Employee, IEnumerable<Guid>>> expectedResult = employee =>
-            employee.BusinessUnit != null ? new [] { employee.BusinessUnit.Id } : Array.Empty<Guid>();
+            employee.BusinessUnit != null ? new[] { employee.BusinessUnit.Id } : Array.Empty<Guid>();
 
         // Act
         var result =

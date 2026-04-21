@@ -190,7 +190,7 @@ public class SecuritySystemSetup : ISecuritySystemSetup, IServiceInitializer
     public ISecuritySystemSetup AddUserSource<TUser>(Action<IUserSourceSetup<TUser>>? setupUserSource)
         where TUser : class
     {
-        if (!userSourceTypes.Add(typeof(TUser)))
+        if (!this.userSourceTypes.Add(typeof(TUser)))
         {
             throw new InvalidOperationException($"{nameof(UserSource<>)} for {typeof(TUser).Name} already initialized");
         }
@@ -288,6 +288,13 @@ public class SecuritySystemSetup : ISecuritySystemSetup, IServiceInitializer
         where TQueryableSource : class, IQueryableSource
     {
         this.registerQueryableSourceAction = sc => sc.AddScoped<IQueryableSource, TQueryableSource>();
+
+        return this;
+    }
+
+    public ISecuritySystemSetup SetQueryableSource(Func<IServiceProvider, IQueryableSource> getQueryableSource)
+    {
+        this.registerQueryableSourceAction = sc => sc.AddScoped(getQueryableSource);
 
         return this;
     }

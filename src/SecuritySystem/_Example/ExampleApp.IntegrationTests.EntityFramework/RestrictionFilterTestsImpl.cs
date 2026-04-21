@@ -1,5 +1,3 @@
-﻿using ExampleApp.IntegrationTests.Environment;
+﻿namespace ExampleApp.IntegrationTests;
 
-namespace ExampleApp.IntegrationTests;
-
-public class RestrictionFilterTestsImpl() : RestrictionFilterTests(TestEnvironmentImpl.Instance.RootServiceProvider);
+public class RestrictionFilterTestsImpl(IServiceProvider rootServiceProvider) : RestrictionFilterTests(rootServiceProvider);

@@ -104,6 +104,8 @@ public interface ISecuritySystemSetup
     ISecuritySystemSetup SetQueryableSource<TQueryableSource>()
         where TQueryableSource : class, IQueryableSource;
 
+    ISecuritySystemSetup SetQueryableSource(Func<IServiceProvider, IQueryableSource> getQueryableSource);
+
     ISecuritySystemSetup SetGenericRepository<TGenericRepository>()
         where TGenericRepository : class, IGenericRepository;
     ISecuritySystemSetup SetRawCurrentUser<TRawCurrentUser>()

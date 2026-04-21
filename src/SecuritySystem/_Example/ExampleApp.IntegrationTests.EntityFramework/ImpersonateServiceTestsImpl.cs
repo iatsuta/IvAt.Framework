@@ -1,5 +1,3 @@
-﻿using ExampleApp.IntegrationTests.Environment;
+﻿namespace ExampleApp.IntegrationTests;
 
-namespace ExampleApp.IntegrationTests;
-
-public class ImpersonateServiceTestsImpl() : ImpersonateServiceTests(TestEnvironmentImpl.Instance.RootServiceProvider);
+public class ImpersonateServiceTestsImpl(IServiceProvider rootServiceProvider) : ImpersonateServiceTests(rootServiceProvider);

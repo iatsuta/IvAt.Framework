@@ -5,6 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\CommonFramework\CommonFramework.Testing\CommonFramework.Testing.csproj" />
+    <ProjectReference Include="..\SecuritySystem.Testing\SecuritySystem.Testing.csproj" />
     <ProjectReference Include="..\SecuritySystem\SecuritySystem.csproj" />
   </ItemGroup>
 

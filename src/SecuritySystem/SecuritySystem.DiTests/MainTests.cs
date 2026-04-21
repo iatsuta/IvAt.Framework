@@ -1,20 +1,19 @@
-﻿using System.Collections.Frozen;
-using System.Collections.Immutable;
-using CommonFramework.DependencyInjection;
-using CommonFramework.GenericRepository;
+﻿using CommonFramework.Testing;
 
 using Microsoft.Extensions.DependencyInjection;
 
 using SecuritySystem.AccessDenied;
 using SecuritySystem.DiTests.DomainObjects;
+using SecuritySystem.DiTests.Environment;
 using SecuritySystem.DiTests.Rules;
-using SecuritySystem.DiTests.Services;
 using SecuritySystem.DomainServices;
 using SecuritySystem.Providers;
 
+using SecuritySystem.Testing;
+
 namespace SecuritySystem.DiTests;
 
-public class MainTests : TestBase
+public class MainTests
 {
     private readonly BusinessUnit bu1;
 
@@ -30,46 +29,46 @@ public class MainTests : TestBase
 
     private readonly Employee employee4;
 
-    public MainTests()
-    {
-        this.bu1 = new BusinessUnit() { Id = Guid.NewGuid() };
-        this.bu2 = new BusinessUnit() { Id = Guid.NewGuid(), Parent = this.bu1 };
-        this.bu3 = new BusinessUnit() { Id = Guid.NewGuid() };
 
-        this.employee1 = new Employee() { Id = Guid.NewGuid(), BusinessUnit = this.bu1 };
-        this.employee2 = new Employee() { Id = Guid.NewGuid(), BusinessUnit = this.bu2 };
-        this.employee3 = new Employee() { Id = Guid.NewGuid(), BusinessUnit = this.bu3 };
-        this.employee4 = new Employee() { Id = Guid.NewGuid() };
+    private readonly IServiceProvider rootServiceProvider;
+
+    public MainTests(IServiceProvider rootServiceProvider)
+    {
+        this.rootServiceProvider = rootServiceProvider;
+
+        this.bu1 = new() { Id = Guid.NewGuid() };
+        this.bu2 = new BusinessUnit { Id = Guid.NewGuid(), Parent = this.bu1 };
+        this.bu3 = new BusinessUnit { Id = Guid.NewGuid() };
+
+        this.employee1 = new Employee { Id = Guid.NewGuid(), BusinessUnit = this.bu1 };
+        this.employee2 = new Employee { Id = Guid.NewGuid(), BusinessUnit = this.bu2 };
+        this.employee3 = new Employee { Id = Guid.NewGuid(), BusinessUnit = this.bu3 };
+        this.employee4 = new Employee { Id = Guid.NewGuid() };
+
+        this.rootServiceProvider.SetTestQueryable(this.GetBusinessUnitAncestorLinkSource());
+        this.rootServiceProvider.SetTestQueryable([this.employee1, this.employee2, this.employee3, this.employee4]);
+        this.rootServiceProvider.SetTestPermissions(new TestPermission(ExampleSecurityRole.TestRole)
+        {
+            Restrictions = { { typeof(BusinessUnit), new[] { this.bu1.Id } } }
+        });
     }
 
-    protected override IServiceCollection CreateServices(IServiceCollection serviceCollection)
-    {
-        return base.CreateServices(serviceCollection)
-            .AddScoped<BusinessUnitAncestorLinkSourceExecuteCounter>()
-            .ReplaceScopedFrom<IQueryableSource, IServiceProvider>(sp => new TestQueryableSource { BaseQueryableSource = this.BuildQueryableSource(sp) });
-    }
 
-    protected override IEnumerable<TestPermission> GetPermissions()
-    {
-        yield return new TestPermission(
-            ExampleSecurityRole.TestRole,
-            new Dictionary<Type, ImmutableArray<Guid>> { { typeof(BusinessUnit), [this.bu1.Id] } }.ToFrozenDictionary());
-    }
-
-    [Fact]
-    public async Task TestEmployeesSecurity_EmployeeHasAccessCorrect()
+    [CommonFact]
+    public async Task TestEmployeesSecurity_EmployeeHasAccessCorrect(CancellationToken ct)
     {
         // Arrange
-        await using var scope = this.RootServiceProvider.CreateAsyncScope();
+        await using var scope = this.rootServiceProvider.CreateAsyncScope();
 
-        var employeeDomainSecurityService = scope.ServiceProvider.GetRequiredService<IDomainSecurityService<Employee>>();
+        var employeeDomainSecurityService =
+            scope.ServiceProvider.GetRequiredService<IDomainSecurityService<Employee>>();
         var counterService = scope.ServiceProvider.GetRequiredService<BusinessUnitAncestorLinkSourceExecuteCounter>();
         var securityProvider = employeeDomainSecurityService.GetSecurityProvider(SecurityRule.View);
 
         // Act
-        var result1 = await securityProvider.HasAccessAsync(this.employee1, this.CancellationToken);
-        var result2 = await securityProvider.HasAccessAsync(this.employee2, this.CancellationToken);
-        var result3 = await securityProvider.HasAccessAsync(this.employee3, this.CancellationToken);
+        var result1 = await securityProvider.HasAccessAsync(this.employee1, ct);
+        var result2 = await securityProvider.HasAccessAsync(this.employee2, ct);
+        var result3 = await securityProvider.HasAccessAsync(this.employee3, ct);
 
         // Assert
         result1.Should().BeTrue();
@@ -79,39 +78,30 @@ public class MainTests : TestBase
         counterService.Count.Should().Be(1);
     }
 
-    [Fact]
-    public async Task CheckEmployeeWithoutSecurity_ExceptionRaised()
+    [CommonFact]
+    public async Task CheckEmployeeWithoutSecurity_ExceptionRaised(CancellationToken ct)
     {
         // Arrange
-        await using var scope = this.RootServiceProvider.CreateAsyncScope();
+        await using var scope = this.rootServiceProvider.CreateAsyncScope();
 
-        var employeeDomainSecurityService = scope.ServiceProvider.GetRequiredService<IDomainSecurityService<Employee>>();
+        var employeeDomainSecurityService =
+            scope.ServiceProvider.GetRequiredService<IDomainSecurityService<Employee>>();
         var accessDeniedExceptionService = scope.ServiceProvider.GetRequiredService<IAccessDeniedExceptionService>();
 
         var securityProvider = employeeDomainSecurityService.GetSecurityProvider(SecurityRule.View);
 
         // Act
-        var checkAccessAction = () => securityProvider.CheckAccessAsync(this.employee3, accessDeniedExceptionService, this.CancellationToken);
+        var checkAccessAction = () =>
+            securityProvider.CheckAccessAsync(this.employee3, accessDeniedExceptionService, ct);
 
         // Assert
         await checkAccessAction.Should().ThrowAsync<AccessDeniedException>();
     }
 
-    protected IQueryableSource BuildQueryableSource(IServiceProvider serviceProvider)
+
+    private IEnumerable<BusinessUnitDirectAncestorLink> GetBusinessUnitAncestorLinkSource()
     {
-        var queryableSource = Substitute.For<IQueryableSource>();
-
-        queryableSource.GetQueryable<BusinessUnitDirectAncestorLink>()
-                       .Returns(this.GetBusinessUnitAncestorLinkSource(serviceProvider).AsQueryable());
-
-        queryableSource.GetQueryable<Employee>().Returns(new[] { this.employee1, this.employee2, this.employee3, this.employee4 }.AsQueryable());
-
-        return queryableSource;
-    }
-
-    private IEnumerable<BusinessUnitDirectAncestorLink> GetBusinessUnitAncestorLinkSource(IServiceProvider serviceProvider)
-    {
-        var counter = serviceProvider.GetRequiredService<BusinessUnitAncestorLinkSourceExecuteCounter>();
+        var counter = this.rootServiceProvider.GetRequiredService<BusinessUnitAncestorLinkSourceExecuteCounter>();
         counter.Count++;
 
         yield return new BusinessUnitDirectAncestorLink { Ancestor = this.bu1, Child = this.bu1 };
@@ -119,10 +109,5 @@ public class MainTests : TestBase
         yield return new BusinessUnitDirectAncestorLink { Ancestor = this.bu3, Child = this.bu3 };
 
         yield return new BusinessUnitDirectAncestorLink { Ancestor = this.bu1, Child = this.bu2 };
-    }
-
-    private class BusinessUnitAncestorLinkSourceExecuteCounter
-    {
-        public int Count { get; set; }
     }
 }
