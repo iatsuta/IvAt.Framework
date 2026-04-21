@@ -4,7 +4,9 @@ namespace CommonFramework.Testing;
 
 public interface ITestEnvironment
 {
-    void Reset(IServiceProvider serviceProvider);
+    void Reset(IServiceProvider serviceProvider)
+    {
+    }
 
     IServiceProvider Build(IServiceCollection services);
 }

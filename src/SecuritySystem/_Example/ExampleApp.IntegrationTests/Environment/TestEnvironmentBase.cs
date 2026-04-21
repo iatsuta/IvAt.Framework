@@ -12,7 +12,7 @@ using SecuritySystem.Testing.DependencyInjection;
 
 namespace ExampleApp.IntegrationTests.Environment;
 
-public abstract class TestServiceProviderBuilderBase : ITestServiceProviderBuilder
+public abstract class TestEnvironmentBase : ITestEnvironment
 {
     public IServiceProvider Build(IServiceCollection services)
     {

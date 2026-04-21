@@ -12,11 +12,11 @@ using SecuritySystem.DiTests.Environment;
 using SecuritySystem.DiTests.Rules;
 using SecuritySystem.DiTests.Services;
 
-[assembly: CommonTestFramework<TestServiceProviderBuilder>]
+[assembly: CommonTestFramework<TestEnvironment>]
 
 namespace SecuritySystem.DiTests.Environment;
 
-public class TestServiceProviderBuilder : ITestServiceProviderBuilder
+public class TestEnvironment : ITestEnvironment
 {
     protected virtual IServiceCollection CreateServices(IServiceCollection services)
     {

@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace GenericQueryable.IntegrationTests.Environment;
 
-public class TestServiceProviderBuilderBase : ITestServiceProviderBuilder
+public abstract class TestEnvironmentBase : ITestEnvironment
 {
     public virtual IServiceProvider Build(IServiceCollection services) =>
 

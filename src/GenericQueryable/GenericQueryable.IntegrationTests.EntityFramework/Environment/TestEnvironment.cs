@@ -7,11 +7,11 @@ using GenericQueryable.IntegrationTests.Environment;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-[assembly: CommonFramework.Testing.CommonTestFramework<TestServiceProviderBuilder>]
+[assembly: CommonFramework.Testing.CommonTestFramework<TestEnvironment>]
 
 namespace GenericQueryable.IntegrationTests.Environment;
 
-public class TestServiceProviderBuilder : TestServiceProviderBuilderBase
+public class TestEnvironment : TestEnvironmentBase
 {
     public override IServiceProvider Build(IServiceCollection services) =>
 

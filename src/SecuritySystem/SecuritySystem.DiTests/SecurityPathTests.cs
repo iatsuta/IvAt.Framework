@@ -160,7 +160,7 @@ public class SecurityPathTests
         result2.Should().BeTrue();
     }
 
-    private class CustomTestServiceProviderBuilder(BusinessUnit bu1) : TestServiceProviderBuilder
+    private class CustomTestServiceProviderBuilder(BusinessUnit bu1) : TestEnvironment
     {
         protected override IServiceCollection CreateServices(IServiceCollection serviceCollection) =>
 

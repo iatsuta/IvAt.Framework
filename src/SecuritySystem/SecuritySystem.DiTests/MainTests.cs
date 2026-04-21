@@ -75,7 +75,7 @@ public class MainTests
         public int Count { get; set; }
     }
 
-    private class CustomTestServiceProviderBuilder(TestData testData) : TestServiceProviderBuilder
+    private class CustomTestServiceProviderBuilder(TestData testData) : TestEnvironment
     {
         protected override IServiceCollection CreateServices(IServiceCollection serviceCollection) =>
 
