@@ -17,7 +17,7 @@ public class MainTests
         var result = await qSource.GenericSumAsync(ct);
 
         //Assert
-        result.Should().Be(baseSource.Sum());
+        Assert.Equal(baseSource.Sum(), result);
     }
 
     [CommonFact]
@@ -31,7 +31,7 @@ public class MainTests
         var result = await qSource.GenericToArrayAsync(ct);
 
         //Assert
-        result.Should().BeEquivalentTo(baseSource);
+        Assert.Equivalent(baseSource, result);
     }
 
     [CommonFact]
@@ -45,7 +45,7 @@ public class MainTests
         var result = await qSource.GenericToListAsync(ct);
 
         //Assert
-        result.Should().BeEquivalentTo(baseSource);
+        Assert.Equivalent(baseSource, result);
     }
 
     [CommonFact]
@@ -59,7 +59,7 @@ public class MainTests
         var result = await qSource.GenericToHashSetAsync(ct);
 
         //Assert
-        result.Should().BeEquivalentTo(baseSource);
+        Assert.Equivalent(baseSource, result);
     }
 
     [CommonFact]
@@ -73,7 +73,7 @@ public class MainTests
         var result = await qSource.GenericToHashSetAsync(EqualityComparer<int>.Default, ct);
 
         //Assert
-        result.Should().BeEquivalentTo(baseSource);
+        Assert.Equivalent(baseSource, result);
     }
 
 
@@ -88,7 +88,7 @@ public class MainTests
         var result = await qSource.GenericToDictionaryAsync(v => v, ct);
 
         //Assert
-        result.Should().BeEquivalentTo(baseSource.ToDictionary(v => v));
+        Assert.Equivalent(baseSource.ToDictionary(v => v), result);
     }
 
     [CommonFact]
@@ -102,7 +102,7 @@ public class MainTests
         var result = await qSource.GenericToDictionaryAsync(v => v, EqualityComparer<int>.Default, ct);
 
         //Assert
-        result.Should().BeEquivalentTo(baseSource.ToDictionary(v => v));
+        Assert.Equivalent(baseSource.ToDictionary(v => v), result);
     }
 
     [CommonFact]
@@ -116,7 +116,7 @@ public class MainTests
         var result = await qSource.GenericToDictionaryAsync(v => v, v => v, ct);
 
         //Assert
-        result.Should().BeEquivalentTo(baseSource.ToDictionary(v => v));
+        Assert.Equivalent(baseSource.ToDictionary(v => v), result);
     }
 
     [CommonFact]
@@ -130,7 +130,7 @@ public class MainTests
         var result = await qSource.GenericToDictionaryAsync(v => v, v => v, EqualityComparer<int>.Default, ct);
 
         //Assert
-        result.Should().BeEquivalentTo(baseSource.ToDictionary(v => v));
+        Assert.Equivalent(baseSource.ToDictionary(v => v), result);
     }
 
     [CommonFact]
@@ -144,7 +144,7 @@ public class MainTests
         var result = qSource.ToList();
 
         //Assert
-        result.Should().BeEquivalentTo(baseSource);
+        Assert.Equivalent(baseSource, result);
     }
 
     [CommonFact]
@@ -158,7 +158,7 @@ public class MainTests
         var result = await qSource.GenericSingleOrDefaultAsync(_ => true, ct);
 
         //Assert
-        result.Should().Be(baseSource);
+        Assert.Equal(baseSource, result);
     }
 
     [CommonFact]
@@ -172,7 +172,7 @@ public class MainTests
         var result = await qSource.GenericAsAsyncEnumerable().SingleAsync(ct);
 
         //Assert
-        result.Should().Be(baseSource);
+        Assert.Equal(baseSource, result);
     }
 
     [CommonFact]
@@ -187,6 +187,6 @@ public class MainTests
             .GenericSingleOrDefaultAsync(_ => true, ct);
 
         //Assert
-        result.Should().Be(baseSource);
+        Assert.Equal(baseSource, result);
     }
 }

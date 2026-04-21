@@ -25,9 +25,9 @@ public abstract class DuplicatePermissionValidationTests(IServiceProvider rootSe
         var action = Assign;
 
         // Assert
-        var error = await action.Should().ThrowAsync<SecuritySystemValidationException>();
+        var error = await Assert.ThrowsAsync<SecuritySystemValidationException>(action);
 
-        error.And.Message.Should().Contain($"Principal \"{principalName}\" has duplicate permissions");
+        Assert.Contains($"Principal \"{principalName}\" has duplicate permissions", error.Message);
     }
 
 
@@ -47,6 +47,6 @@ public abstract class DuplicatePermissionValidationTests(IServiceProvider rootSe
         var action = () => Assign(new PermissionPeriod(new DateTime(2010, 1, 1), new DateTime(2019, 1, 1)));
 
         // Assert
-        await action.Should().NotThrowAsync();
+        await action();
     }
 }
