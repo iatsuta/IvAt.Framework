@@ -4,4 +4,8 @@
     <PackageId>IvAt.CommonFramework.Testing.Database.Sqlite</PackageId>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\CommonFramework.Testing.Database\CommonFramework.Testing.Database.csproj" />
+  </ItemGroup>
+
 </Project>
