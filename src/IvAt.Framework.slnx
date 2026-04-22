@@ -7,6 +7,7 @@
   </Folder>
 
   <Folder Name="/CommonFramework/">
+    <Project Path="CommonFramework/CommonFramework.Threading/CommonFramework.Threading.csproj" />
     <Project Path="CommonFramework/CommonFramework/CommonFramework.csproj" /> 
     <Project Path="CommonFramework/CommonFramework.DependencyInjection/CommonFramework.DependencyInjection.csproj" />
     <Project Path="CommonFramework/CommonFramework.GenericRepository/CommonFramework.GenericRepository.csproj" />

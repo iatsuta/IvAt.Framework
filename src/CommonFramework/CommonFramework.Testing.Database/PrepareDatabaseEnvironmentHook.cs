@@ -2,12 +2,15 @@
 
 public class PrepareDatabaseEnvironmentHook(
     IDatabaseSchemaInitializer databaseSchemaInitializer,
-    IDatabaseTestDataInitializer databaseTestDataInitializer) : ITestEnvironmentHook
+    IDatabaseTestDataInitializer databaseTestDataInitializer,
+    IRestoreBackupInitializer restoreBackupInitializer) : ITestEnvironmentHook
 {
     public async ValueTask Process(CancellationToken ct)
     {
         await databaseSchemaInitializer.Initialize(ct);
 
         await databaseTestDataInitializer.Initialize(ct);
+
+        await restoreBackupInitializer.Initialize(ct);
     }
 }
