@@ -2,5 +2,9 @@
 
 public interface ITestConnectionStringProvider
 {
-    string CreateWithPostfix(string postfix);
+    TestDatabaseConnectionString EmptySnapshot { get; }
+
+    TestDatabaseConnectionString FilledSnapshot { get; }
+
+    TestDatabaseConnectionString Actual { get; }
 }

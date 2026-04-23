@@ -18,13 +18,9 @@ public class EfTestEnvironment : TestEnvironment
     public override IServiceProvider BuildServiceProvider(IServiceCollection services) =>
 
         services
-
             .AddDbContext<TestDbContext>()
-
             .AddScoped<IGenericRepository, EfGenericRepository>()
             .AddScoped<IQueryableSource, EfQueryableSource>()
-
-            .AddScoped<IDbSchemaInitializer, DbSchemaInitializer>()
-
+            .AddScoped<IDbSchemaInitializer, EfSchemaInitializer>()
             .Pipe(base.BuildServiceProvider);
 }

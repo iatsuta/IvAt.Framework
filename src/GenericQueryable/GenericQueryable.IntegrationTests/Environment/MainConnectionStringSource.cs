@@ -1,6 +1,6 @@
 ﻿namespace GenericQueryable.IntegrationTests.Environment;
 
-public class MainConnectionStringSource : IMainConnectionStringSource
+public class MainConnectionStringSource(string connectionString) : IMainConnectionStringSource
 {
-    public string ConnectionString { get; } = "Data Source=test.db";
+    public string ConnectionString { get; } = connectionString;
 }

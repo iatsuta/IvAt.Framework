@@ -1,6 +1,6 @@
 ﻿namespace GenericQueryable.IntegrationTests.Environment;
 
-public class DbSchemaInitializer(TestDbContext dbContext) : IDbSchemaInitializer
+public class EfSchemaInitializer(TestDbContext dbContext) : IDbSchemaInitializer
 {
     public async Task Initialize(CancellationToken cancellationToken = default)
     {
