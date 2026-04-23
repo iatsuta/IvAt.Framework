@@ -4,7 +4,7 @@ public class FillTestDataInitializer(
     ISynchronizedInitializer<DatabaseSchemaInitializer> synchronizedInitializer,
     ITestConnectionStringProvider connectionStringProvider,
     IDatabaseChecker databaseChecker,
-    IEmptyDatabaseSchemaSeeder emptyDatabaseSchemaSeeder) : IDatabaseSchemaInitializer
+    IEmptyDatabaseSchemaSeeder emptyDatabaseSchemaSeeder) : IFillTestDataInitializer
 {
     public async Task Initialize(CancellationToken cancellationToken) =>
 

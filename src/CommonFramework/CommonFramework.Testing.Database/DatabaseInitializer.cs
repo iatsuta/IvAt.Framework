@@ -4,7 +4,7 @@ public class DatabaseSchemaInitializer(
     ISynchronizedInitializer<DatabaseSchemaInitializer> synchronizedInitializer,
     ITestConnectionStringProvider connectionStringProvider,
     IDatabaseChecker databaseChecker,
-    IDatabaseSchemaCreator databaseSchemaCreator) : IDatabaseSchemaInitializer
+    IDatabaseSchemaCreator databaseSchemaCreator) : ISchemaInitializer
 {
     public async Task Initialize(CancellationToken cancellationToken) =>
 
