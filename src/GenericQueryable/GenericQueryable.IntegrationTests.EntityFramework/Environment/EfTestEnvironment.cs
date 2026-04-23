@@ -1,5 +1,4 @@
-﻿using CommonFramework;
-using CommonFramework.GenericRepository;
+﻿using CommonFramework.GenericRepository;
 
 using GenericQueryable.IntegrationTests.Environment;
 

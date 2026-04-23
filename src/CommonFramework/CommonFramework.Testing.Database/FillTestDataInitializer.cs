@@ -1,7 +1,7 @@
 ﻿namespace CommonFramework.Testing.Database;
 
 public class FillTestDataInitializer(
-    ISynchronizedInitializer<DatabaseSchemaInitializer> synchronizedInitializer,
+    ISynchronizedInitializer<FillTestDataInitializer> synchronizedInitializer,
     ITestConnectionStringProvider connectionStringProvider,
     IDatabaseChecker databaseChecker,
     IEmptyDatabaseSchemaSeeder emptyDatabaseSchemaSeeder) : IFillTestDataInitializer
@@ -15,12 +15,4 @@ public class FillTestDataInitializer(
                 await emptyDatabaseSchemaSeeder.SeedTestData(cancellationToken);
             }
         });
-}
-
-public class RestoreBackupInitializer : IRestoreBackupInitializer
-{
-    public Task Initialize(CancellationToken cancellationToken)
-    {
-        throw new NotImplementedException();
-    }
 }

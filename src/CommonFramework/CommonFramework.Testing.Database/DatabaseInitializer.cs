@@ -4,7 +4,9 @@ public class DatabaseSchemaInitializer(
     ISynchronizedInitializer<DatabaseSchemaInitializer> synchronizedInitializer,
     ITestConnectionStringProvider connectionStringProvider,
     IDatabaseChecker databaseChecker,
-    IDatabaseSchemaCreator databaseSchemaCreator) : ISchemaInitializer
+    IDatabaseSchemaCreator databaseSchemaCreator,
+    IDatabaseCleaner databaseCleaner,
+    TestDatabaseSettings settings) : ISchemaInitializer
 {
     public async Task Initialize(CancellationToken cancellationToken) =>
 
@@ -12,7 +14,26 @@ public class DatabaseSchemaInitializer(
         {
             if (!databaseChecker.Exists(connectionStringProvider.EmptySnapshot))
             {
-                await databaseSchemaCreator.Create(cancellationToken);
+                try
+                {
+                    await databaseSchemaCreator.Create(cancellationToken);
+                }
+                catch (Exception createSchemaEx)
+                {
+                    if (settings.RemoveDatabaseOnFailure)
+                    {
+                        try
+                        {
+                            await databaseCleaner.Clean(connectionStringProvider.EmptySnapshot, cancellationToken);
+                        }
+                        catch (Exception cleanEx)
+                        {
+                            throw new AggregateException(createSchemaEx, cleanEx);
+                        }
+                    }
+
+                    throw;
+                }
             }
         });
 }
