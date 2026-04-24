@@ -10,6 +10,12 @@ namespace ExampleApp.IntegrationTests;
 public abstract class DuplicatePermissionValidationTests(IServiceProvider rootServiceProvider) : TestBase(rootServiceProvider)
 {
     [CommonFact]
+    public async Task Yoba(CancellationToken ct)
+    {
+        throw null;
+    }
+
+    [CommonFact]
     public async Task AddRoleAsync_WhenDuplicatePermissionExists_ShouldThrowValidationException(CancellationToken ct)
     {
         // Arrange
