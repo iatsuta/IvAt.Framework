@@ -4,8 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace CommonFramework.Testing.Database.Initializers;
 
-public class CachingSharedTestDataInitializer(
-    ISynchronizedInitializer<CachingSharedTestDataInitializer> synchronizedInitializer,
+public class CachedSharedTestDataInitializer(
+    ISynchronizedInitializer<CachedSharedTestDataInitializer> synchronizedInitializer,
     ITestConnectionStringProvider connectionStringProvider,
     IDatabaseManager databaseManager,
     [FromKeyedServices(TestDatabaseInitializer.SharedTestDataKey)]
