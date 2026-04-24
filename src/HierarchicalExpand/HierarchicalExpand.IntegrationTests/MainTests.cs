@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace HierarchicalExpand.IntegrationTests;
 
-public abstract class MainTests(IServiceProvider rootServiceProvider) : TestBase(rootServiceProvider)
+public abstract class MainTests(IServiceProvider rootServiceProvider)
 {
     [CommonFact]
     public async Task InvokeExpandWithParents_ForRootBu_DataCorrected(CancellationToken ct)

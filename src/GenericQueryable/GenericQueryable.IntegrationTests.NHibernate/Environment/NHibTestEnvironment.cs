@@ -22,8 +22,8 @@ public class NHibTestEnvironment : TestEnvironment
     protected override IServiceCollection AddServices(IServiceCollection services) =>
 
         services.AddIdentitySource()
-            .AddSingleton<ConfigurationSource>()
-            .AddSingletonFrom((ConfigurationSource configurationSource) => configurationSource.BuildConfiguration())
+            .AddSingleton<NHibConfigurationSource>()
+            .AddSingletonFrom((NHibConfigurationSource configurationSource) => configurationSource.BuildConfiguration())
             .AddSingletonFrom((global::NHibernate.Cfg.Configuration cfg) => cfg.BuildSessionFactory())
             .AddScopedFrom((ISessionFactory sessionFactory) => sessionFactory.OpenSession())
 

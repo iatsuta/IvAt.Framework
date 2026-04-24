@@ -6,7 +6,7 @@ using GenericQueryable.Services;
 namespace HierarchicalExpand.IntegrationTests.Environment;
 
 public class NHibQueryableSource(
-    AutoCommitSession session,
+    NHibAutoCommitSession session,
     IGenericQueryableExecutor genericQueryableExecutor,
     INHibExpressionVisitorSource? nhibExpressionVisitorSource = null) : IQueryableSource
 {

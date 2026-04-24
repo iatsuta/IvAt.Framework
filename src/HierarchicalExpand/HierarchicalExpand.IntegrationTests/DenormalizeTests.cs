@@ -6,13 +6,16 @@ using GenericQueryable;
 
 using HierarchicalExpand.Denormalization;
 using HierarchicalExpand.IntegrationTests.Domain;
+using HierarchicalExpand.IntegrationTests.Environment;
 
 using Microsoft.Extensions.DependencyInjection;
 
 namespace HierarchicalExpand.IntegrationTests;
 
-public abstract class DenormalizeTests(IServiceProvider rootServiceProvider) : TestBase(rootServiceProvider)
+public abstract class DenormalizeTests(IServiceProvider rootServiceProvider)
 {
+    private ScopeEvaluator ScopeEvaluator => field ??= rootServiceProvider.GetRequiredService<ScopeEvaluator>();
+
     [CommonFact]
     public async Task Initialize_Should_DenormalizeAncestors_ForLargeTree(CancellationToken ct)
     {

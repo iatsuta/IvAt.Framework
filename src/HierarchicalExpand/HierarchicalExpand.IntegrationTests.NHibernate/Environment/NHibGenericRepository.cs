@@ -6,7 +6,7 @@ namespace HierarchicalExpand.IntegrationTests.Environment;
 
 public class NHibGenericRepository(
     IServiceProvider serviceProvider,
-    AutoCommitSession session) : IGenericRepository
+    NHibAutoCommitSession session) : IGenericRepository
 {
     public Task SaveAsync<TDomainObject>(TDomainObject domainObject, CancellationToken cancellationToken)
         where TDomainObject : class =>

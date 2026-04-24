@@ -17,9 +17,9 @@ using NHibernate.Tool.hbm2ddl;
 
 namespace HierarchicalExpand.IntegrationTests.Environment;
 
-public static class BuildConfigurationHelper
+public class NHibConfigurationSource(IMainConnectionStringSource mainConnectionStringSource)
 {
-    public static Configuration BuildConfiguration(string connectionString)
+    public Configuration BuildConfiguration()
     {
         var cfg = new Configuration();
 
@@ -28,7 +28,7 @@ public static class BuildConfigurationHelper
             .Database(SQLiteConfiguration.Standard
                 .Dialect<SQLiteDialect>()
                 .Driver<SQLite20Driver>()
-                .ConnectionString(connectionString))
+                .ConnectionString(mainConnectionStringSource.ConnectionString))
             .Mappings(
                 m =>
                 {

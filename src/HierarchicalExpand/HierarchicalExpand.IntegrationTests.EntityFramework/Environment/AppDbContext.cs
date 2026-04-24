@@ -1,16 +1,27 @@
-﻿using HierarchicalExpand.IntegrationTests.Domain;
+﻿using GenericQueryable.EntityFramework;
+
+using HierarchicalExpand.IntegrationTests.Domain;
 
 using Microsoft.EntityFrameworkCore;
 
 namespace HierarchicalExpand.IntegrationTests.Environment;
 
-public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+public class AppDbContext(
+    DbContextOptions<AppDbContext> options,
+    IMainConnectionStringSource mainConnectionStringSource) : DbContext(options)
 {
     private const string DefaultIdPostfix = "Id";
 
     private const string DefaultSchema = "app";
 
     private const int DefaultMaxLength = 255;
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
+
+        optionsBuilder
+            .UseSqlite(mainConnectionStringSource.ConnectionString)
+            .UseLazyLoadingProxies()
+            .UseGenericQueryable();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -62,7 +73,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         }
 
         {
-            var entity = modelBuilder.Entity<TestHierarchicalObjectDirectAncestorLink>().ToTable(nameof(TestHierarchicalObjectDirectAncestorLink), DefaultSchema);
+            var entity = modelBuilder.Entity<TestHierarchicalObjectDirectAncestorLink>()
+                .ToTable(nameof(TestHierarchicalObjectDirectAncestorLink), DefaultSchema);
             entity.HasKey(v => v.Id);
 
             var ancestorKey = $"{nameof(TestHierarchicalObjectDirectAncestorLink.Ancestor)}{DefaultIdPostfix}";
@@ -75,11 +87,14 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         }
 
         {
-            var entity = modelBuilder.Entity<TestHierarchicalObjectUndirectAncestorLink>().ToView(nameof(TestHierarchicalObjectUndirectAncestorLink), DefaultSchema);
+            var entity = modelBuilder.Entity<TestHierarchicalObjectUndirectAncestorLink>()
+                .ToView(nameof(TestHierarchicalObjectUndirectAncestorLink), DefaultSchema);
             entity.HasNoKey();
 
-            entity.HasOne(e => e.Source).WithMany().HasForeignKey($"{nameof(TestHierarchicalObjectUndirectAncestorLink.Source)}{DefaultIdPostfix}").IsRequired();
-            entity.HasOne(e => e.Target).WithMany().HasForeignKey($"{nameof(TestHierarchicalObjectUndirectAncestorLink.Target)}{DefaultIdPostfix}").IsRequired();
+            entity.HasOne(e => e.Source).WithMany().HasForeignKey($"{nameof(TestHierarchicalObjectUndirectAncestorLink.Source)}{DefaultIdPostfix}")
+                .IsRequired();
+            entity.HasOne(e => e.Target).WithMany().HasForeignKey($"{nameof(TestHierarchicalObjectUndirectAncestorLink.Target)}{DefaultIdPostfix}")
+                .IsRequired();
         }
     }
 }

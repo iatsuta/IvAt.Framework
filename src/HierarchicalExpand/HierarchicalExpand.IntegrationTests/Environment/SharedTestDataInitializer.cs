@@ -1,12 +1,11 @@
-﻿using CommonFramework;
-using CommonFramework.GenericRepository;
+﻿using CommonFramework.GenericRepository;
 
 using HierarchicalExpand.Denormalization;
 using HierarchicalExpand.IntegrationTests.Domain;
 
 namespace HierarchicalExpand.IntegrationTests.Environment;
 
-public class TestDataInitializer(ScopeEvaluator scopeEvaluator) : IInitializer
+public class SharedTestDataInitializer(ScopeEvaluator scopeEvaluator) : ISharedTestDataInitializer
 {
     public async Task Initialize(CancellationToken ct)
     {

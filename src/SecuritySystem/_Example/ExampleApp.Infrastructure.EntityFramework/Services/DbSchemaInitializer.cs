@@ -4,9 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ExampleApp.Infrastructure.Services;
 
-public class DbSchemaInitializer(
+public class EmptySchemaInitializer(
     AppDbContext dbContext,
-    IEnumerable<IViewCreationScriptProvider> viewCreationScriptProviders) : IDbSchemaInitializer
+    IEnumerable<IViewCreationScriptProvider> viewCreationScriptProviders) : IEmptySchemaInitializer
 {
     public async Task Initialize(CancellationToken cancellationToken)
     {

@@ -2,4 +2,4 @@
 
 namespace HierarchicalExpand.IntegrationTests.Environment;
 
-public interface IDbSchemaInitializer : IInitializer;
+public interface IEmptySchemaInitializer : IInitializer;
