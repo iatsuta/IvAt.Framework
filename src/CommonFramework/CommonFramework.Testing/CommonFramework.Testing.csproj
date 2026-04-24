@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CommonFramework.Threading\CommonFramework.Threading.csproj" />
+    <ProjectReference Include="..\CommonFramework\CommonFramework.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,6 @@
 ﻿using CommonFramework.Testing.XunitEngine;
 
-namespace CommonFramework.Testing.Database;
+namespace CommonFramework.Testing.Database.ConnectionStringManagement;
 
 public class TestConnectionStringProvider(
     ITestDatabaseConnectionStringBuilder testDatabaseConnectionStringBuilder,

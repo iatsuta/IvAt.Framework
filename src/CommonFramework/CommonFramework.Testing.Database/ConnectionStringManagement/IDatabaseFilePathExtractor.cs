@@ -1,4 +1,4 @@
-﻿namespace CommonFramework.Testing.Database;
+﻿namespace CommonFramework.Testing.Database.ConnectionStringManagement;
 
 public interface IDatabaseFilePathExtractor
 {

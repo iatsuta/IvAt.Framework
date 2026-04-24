@@ -1,4 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using CommonFramework.Testing.Database.ConnectionStringManagement;
+using CommonFramework.Testing.Database.Hooks;
+using CommonFramework.Testing.Database.Initializers;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace CommonFramework.Testing.Database.Sqlite;
 
@@ -10,14 +13,13 @@ public static class ServiceCollectionExtensions
             .AddKeyedSingleton<ITestEnvironmentHook, PrepareDatabaseEnvironmentHook>(EnvironmentHookType.Before)
             .AddKeyedSingleton<ITestEnvironmentHook, CleanDatabaseEnvironmentHook>(EnvironmentHookType.After)
 
-            .AddSingleton<ISchemaInitializer, DatabaseSchemaInitializer>()
-            .AddSingleton<IFillTestDataInitializer, FillTestDataInitializer>()
-            .AddSingleton<IRestoreBackupInitializer, RestoreBackupInitializer>()
 
             .AddSingleton(typeof(ISynchronizedInitializer<>), typeof(SynchronizedInitializer<>))
 
-            .AddSingleton<IDatabaseChecker, FileDatabaseChecker>()
-            .AddSingleton<IDatabaseCleaner, FileDatabaseCleaner>()
+            .AddKeyedSingleton<IInitializer, CachingSharedTestDataInitializer>(TestDatabaseInitializer.CachedEmptySchemaKey)
+            .AddKeyedSingleton<IInitializer, CachingSharedTestDataInitializer>(TestDatabaseInitializer.CachedSharedTestDataKey)
+
+            .AddSingleton<IDatabaseManager, FileDatabaseManager>()
 
             .AddSingleton<IDatabaseFilePathExtractor, SqliteDatabaseFilePathExtractor>()
             .AddSingleton<ITestDatabaseConnectionStringBuilder, SqliteTestDatabaseConnectionStringBuilder>();

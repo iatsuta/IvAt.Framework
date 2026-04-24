@@ -2,6 +2,7 @@
 using CommonFramework.DependencyInjection;
 using CommonFramework.Testing;
 using CommonFramework.Testing.Database;
+using CommonFramework.Testing.Database.ConnectionStringManagement;
 using CommonFramework.Testing.Database.Sqlite;
 
 using Microsoft.Extensions.DependencyInjection;

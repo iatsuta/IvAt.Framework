@@ -1,4 +1,6 @@
-﻿namespace CommonFramework.Testing.Database;
+﻿using CommonFramework.Testing.Database.ConnectionStringManagement;
+
+namespace CommonFramework.Testing.Database;
 
 public record TestDatabaseSettings
 {
