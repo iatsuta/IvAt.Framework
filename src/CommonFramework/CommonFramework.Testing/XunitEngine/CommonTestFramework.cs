@@ -38,7 +38,8 @@ public class CommonTestFramework : XunitTestFramework
     {
         var rootRunner =
             new CommonTestAssemblyRunner(
-                new CommonTestCollectionRunner(new CommonTestClassRunner(this.GetServiceProviderPool(assembly))));
+                new CommonTestCollectionRunner(
+                    new CommonTestClassRunner(), this.GetServiceProviderPool(assembly)));
 
         return new CommonFrameworkExecutor(new XunitTestAssembly(assembly), rootRunner);
     }

@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HierarchicalExpand.IntegrationTests.Environment;
 
-public class EfGenericRepository(AutoCommitSession session) : IGenericRepository
+public class EfGenericRepository(EfAutoCommitSession session) : IGenericRepository
 {
     public async Task SaveAsync<TDomainObject>(TDomainObject domainObject, CancellationToken cancellationToken)
         where TDomainObject : class

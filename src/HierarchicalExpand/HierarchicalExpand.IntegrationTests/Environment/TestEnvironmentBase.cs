@@ -1,6 +1,9 @@
 ﻿using CommonFramework;
 using CommonFramework.DependencyInjection;
 using CommonFramework.Testing;
+using CommonFramework.Testing.Database;
+using CommonFramework.Testing.Database.DependencyInjection;
+using CommonFramework.Testing.Database.Sqlite;
 
 using HierarchicalExpand.DependencyInjection;
 using HierarchicalExpand.IntegrationTests.Domain;
@@ -11,11 +14,21 @@ namespace HierarchicalExpand.IntegrationTests.Environment;
 
 public abstract class TestEnvironmentBase : ITestEnvironment
 {
+    private readonly DatabaseInitMode databaseInitMode =
+
+#if DEBUG
+        DatabaseInitMode.RebuildSnapshot;
+#else
+        DatabaseInitMode.RebuildSnapshot;
+#endif
+
     public IServiceProvider BuildServiceProvider(IServiceCollection services)
     {
         return services
 
             .Pipe(this.InitializeServices)
+
+            .AddSingleton<ScopeEvaluator>()
 
             .AddSingleton<IUndirectedAncestorViewScriptGenerator, UndirectedAncestorViewScriptGenerator>()
             .AddSingleton<IViewCreationScriptProvider, UndirectedAncestorViewScriptProvider>()
@@ -33,13 +46,19 @@ public abstract class TestEnvironmentBase : ITestEnvironment
                     new AncestorLinkInfo<TestHierarchicalObject, TestHierarchicalObjectUndirectAncestorLink>(view => view.Source, view => view.Target),
                     v => v.DeepLevel))
 
-            .AddSingleton<ScopeEvaluator>()
-            .AddSingleton<TestDataInitializer>()
+            .AddSingleton<ISharedTestDataInitializer, SharedTestDataInitializer>()
+
+            .AddDatabaseTesting(dts => dts
+                .SetProvider<SqliteDatabaseTestingProvider>()
+                .SetEmptySchemaInitializer<IEmptySchemaInitializer>()
+                .SetSharedTestDataInitializer<ISharedTestDataInitializer>()
+                .SetSettings(new TestDatabaseSettings { InitMode = this.databaseInitMode, DefaultConnectionString = new("Data Source=test.db;Pooling=False") })
+                .RebindActualConnection<IMainConnectionStringSource>(connectionString => new MainConnectionStringSource(connectionString.Value)))
+
             .AddValidator<DuplicateServiceUsageValidator>()
             .Validate()
             .BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
     }
 
     protected abstract IServiceCollection InitializeServices(IServiceCollection services);
-
 }

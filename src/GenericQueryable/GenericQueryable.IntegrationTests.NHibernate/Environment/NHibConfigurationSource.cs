@@ -16,7 +16,7 @@ using NHibernate.Tool.hbm2ddl;
 
 namespace GenericQueryable.IntegrationTests.Environment;
 
-public class ConfigurationSource(IMainConnectionStringSource mainConnectionStringSource)
+public class NHibConfigurationSource(IMainConnectionStringSource mainConnectionStringSource)
 {
     public Configuration BuildConfiguration()
     {

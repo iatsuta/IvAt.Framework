@@ -1,27 +1,32 @@
 ﻿using Xunit.Internal;
+using Xunit.Sdk;
 using Xunit.v3;
 
 namespace CommonFramework.Testing.XunitEngine;
 
-public class CommonTestCollectionRunner(CommonTestClassRunner commonTestClassRunner) : XunitTestCollectionRunner
+public class CommonTestCollectionRunner(CommonTestClassRunner commonTestClassRunner, IServiceProviderPool? serviceProviderPool) :
+    XunitTestCollectionRunner
 {
-    protected override ValueTask<RunSummary> RunTestClass(XunitTestCollectionRunnerContext ctxt, IXunitTestClass? testClass, IReadOnlyCollection<IXunitTestCase> testCases)
+    protected override async ValueTask<RunSummary> RunTestClass(XunitTestCollectionRunnerContext ctxt, IXunitTestClass? testClass, IReadOnlyCollection<IXunitTestCase> testCases)
     {
         Guard.ArgumentNotNull(ctxt);
-        Guard.ArgumentNotNull(testCases);
 
+        // Technically not possible because of the design of TTestClass, but this signature is imposed
+        // by the base class, which allows class-less tests
         if (testClass is null)
-            return new(XunitRunnerHelper.FailTestCases(
+            return XunitRunnerHelper.FailTestCases(
                 ctxt.MessageBus,
                 ctxt.CancellationTokenSource,
                 testCases,
                 "Test case '{0}' does not have an associated class and cannot be run by XunitTestClassRunner",
-                sendTestClassMessages: true,
-                sendTestMethodMessages: true
-            ));
+                sendTestClassMessages: true
+            );
 
-        return
-            commonTestClassRunner.Run(
+        var serviceProvider = serviceProviderPool?.Get();
+
+        try
+        {
+            return await commonTestClassRunner.Run(
                 testClass,
                 testCases,
                 ctxt.ExplicitOption,
@@ -29,7 +34,13 @@ public class CommonTestCollectionRunner(CommonTestClassRunner commonTestClassRun
                 ctxt.TestCaseOrderer,
                 ctxt.Aggregator.Clone(),
                 ctxt.CancellationTokenSource,
-                ctxt.CollectionFixtureMappings
-            );
+                ctxt.CollectionFixtureMappings,
+                serviceProvider);
+        }
+        finally
+        {
+            if (serviceProviderPool != null && serviceProvider is not null)
+                serviceProviderPool.Release(serviceProvider);
+        }
     }
 }

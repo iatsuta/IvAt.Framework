@@ -1,24 +1,22 @@
-﻿using System.Collections.Concurrent;
-using System.Reflection;
+﻿using System.Reflection;
 
 using Xunit.Internal;
+using Xunit.Sdk;
 using Xunit.v3;
 
 namespace CommonFramework.Testing.XunitEngine;
 
-public class CommonTestClassRunner(IServiceProviderPool? rootServiceProvider) : XunitTestClassRunner
+public class CommonTestClassRunner : XunitTestClassRunnerBase<CommonTestClassRunnerContext, IXunitTestClass, IXunitTestMethod, IXunitTestCase>
 {
-    private readonly ConcurrentDictionary<XunitTestClassRunnerContext, Task<IServiceProvider>> serviceProviderCache = [];
-
     protected override async ValueTask<object?> GetConstructorArgument(
-        XunitTestClassRunnerContext ctxt,
+        CommonTestClassRunnerContext ctxt,
         ConstructorInfo constructor,
         int index,
         ParameterInfo parameter)
     {
-        if (rootServiceProvider != null && parameter.ParameterType == typeof(IServiceProvider))
+        if (ctxt.ServiceProvider != null && parameter.ParameterType == typeof(IServiceProvider))
         {
-            return await this.serviceProviderCache.GetOrAdd(ctxt, async _ => await rootServiceProvider.GetAsync(ctxt.CancellationTokenSource.Token));
+            return ctxt.ServiceProvider;
         }
         else
         {
@@ -26,19 +24,8 @@ public class CommonTestClassRunner(IServiceProviderPool? rootServiceProvider) : 
         }
     }
 
-    protected override async ValueTask<bool> OnTestClassFinished(XunitTestClassRunnerContext ctxt, RunSummary summary)
-    {
-        var result = await base.OnTestClassFinished(ctxt, summary);
-
-        if (rootServiceProvider != null && this.serviceProviderCache.Remove(ctxt, out var getSpTask))
-        {
-            await rootServiceProvider.ReleaseAsync(await getSpTask, ctxt.CancellationTokenSource.Token);
-        }
-
-        return result;
-    }
-
-    protected override async ValueTask<RunSummary> RunTestMethod(XunitTestClassRunnerContext ctxt, IXunitTestMethod? testMethod, IReadOnlyCollection<IXunitTestCase> testCases, object?[] constructorArguments)
+    protected override async ValueTask<RunSummary> RunTestMethod(CommonTestClassRunnerContext ctxt, IXunitTestMethod? testMethod,
+        IReadOnlyCollection<IXunitTestCase> testCases, object?[] constructorArguments)
     {
         Guard.ArgumentNotNull(ctxt);
 
@@ -55,14 +42,63 @@ public class CommonTestClassRunner(IServiceProviderPool? rootServiceProvider) : 
 
         //await ExecutionTimer.MeasureAsync(null);
 
-        return await CommonTestMethodRunner.Instance.Run(
-            testMethod,
+        if (ctxt.ServiceProvider != null)
+        {
+            await ctxt.ServiceProvider.RunEnvironmentHooks(EnvironmentHookType.Before, ctxt.CancellationTokenSource.Token);
+        }
+
+        try
+        {
+
+            return await CommonTestMethodRunner.Instance.Run(
+                testMethod,
+                testCases,
+                ctxt.ExplicitOption,
+                ctxt.MessageBus,
+                ctxt.Aggregator.Clone(),
+                ctxt.CancellationTokenSource,
+                constructorArguments
+            );
+        }
+        finally
+        {
+            if (ctxt.ServiceProvider != null)
+            {
+                await ctxt.ServiceProvider.RunEnvironmentHooks(EnvironmentHookType.After, ctxt.CancellationTokenSource.Token);
+            }
+        }
+    }
+    public async ValueTask<RunSummary> Run(
+        IXunitTestClass testClass,
+        IReadOnlyCollection<IXunitTestCase> testCases,
+        ExplicitOption explicitOption,
+        IMessageBus messageBus,
+        ITestCaseOrderer testCaseOrderer,
+        ExceptionAggregator aggregator,
+        CancellationTokenSource cancellationTokenSource,
+        FixtureMappingManager assemblyFixtureMappings,
+        IServiceProvider? serviceProvider)
+    {
+        Guard.ArgumentNotNull(testClass);
+        Guard.ArgumentNotNull(testCases);
+        Guard.ArgumentNotNull(messageBus);
+        Guard.ArgumentNotNull(testCaseOrderer);
+        Guard.ArgumentNotNull(cancellationTokenSource);
+        Guard.ArgumentNotNull(assemblyFixtureMappings);
+
+        await using var ctxt = new CommonTestClassRunnerContext(
+            testClass,
             testCases,
-            ctxt.ExplicitOption,
-            ctxt.MessageBus,
-            ctxt.Aggregator.Clone(),
-            ctxt.CancellationTokenSource,
-            constructorArguments
-        );
+            explicitOption,
+            messageBus,
+            testCaseOrderer,
+            aggregator,
+            cancellationTokenSource,
+            assemblyFixtureMappings,
+            serviceProvider);
+
+        await ctxt.InitializeAsync();
+
+        return await this.Run(ctxt);
     }
 }

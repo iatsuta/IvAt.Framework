@@ -2,7 +2,7 @@
 
 namespace HierarchicalExpand.IntegrationTests.Environment;
 
-public class EfQueryableSource(AutoCommitSession session) : IQueryableSource
+public class EfQueryableSource(EfAutoCommitSession session) : IQueryableSource
 {
     public IQueryable<TDomainObject> GetQueryable<TDomainObject>()
         where TDomainObject : class

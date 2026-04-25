@@ -6,25 +6,20 @@ using NHibernate.Tool.hbm2ddl;
 
 namespace HierarchicalExpand.IntegrationTests.Environment;
 
-public class DbSchemaInitializer(
+public class NHibEmptySchemaInitializer(
     NHibernate.Cfg.Configuration nhibConfiguration,
-    IServiceProvider serviceProvider,
-    IEnumerable<IViewCreationScriptProvider> viewCreationScriptProviders) : IDbSchemaInitializer
+    IServiceProvider rootServiceProvider,
+    IEnumerable<IViewCreationScriptProvider> viewCreationScriptProviders) : IEmptySchemaInitializer
 {
-    private readonly string dbName = "test.db";
-
     public async Task Initialize(CancellationToken cancellationToken)
     {
-        if (File.Exists(this.dbName))
-        {
-            File.Delete(this.dbName);
-        }
-
         var schemaExport = new SchemaExport(nhibConfiguration);
 
         await schemaExport.CreateAsync(false, true, cancellationToken);
 
-        var session = serviceProvider.GetRequiredService<AutoCommitSession>();
+        await using var scope = rootServiceProvider.CreateAsyncScope();
+
+        var session = scope.ServiceProvider.GetRequiredService<NHibAutoCommitSession>();
 
         foreach (var createViewScript in viewCreationScriptProviders.SelectMany(v => v.GetScripts()))
         {

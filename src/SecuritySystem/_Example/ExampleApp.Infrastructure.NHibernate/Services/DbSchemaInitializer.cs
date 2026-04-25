@@ -9,11 +9,11 @@ using ExampleApp.Infrastructure.DependencyInjection.UndirectView;
 
 namespace ExampleApp.Infrastructure.Services;
 
-public class DbSchemaInitializer(
+public class EmptySchemaInitializer(
     IConfiguration configuration,
     NHibernate.Cfg.Configuration nhibConfiguration,
     IServiceProvider serviceProvider,
-    IEnumerable<IViewCreationScriptProvider> viewCreationScriptProviders) : IDbSchemaInitializer
+    IEnumerable<IViewCreationScriptProvider> viewCreationScriptProviders) : IEmptySchemaInitializer
 {
     private readonly string dbName =
         new DbConnectionStringBuilder

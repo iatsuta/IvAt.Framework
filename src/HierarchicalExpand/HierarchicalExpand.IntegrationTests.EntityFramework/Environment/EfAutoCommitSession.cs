@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HierarchicalExpand.IntegrationTests.Environment;
 
-public sealed class AutoCommitSession : IAsyncDisposable, IDisposable
+public sealed class EfAutoCommitSession : IAsyncDisposable, IDisposable
 {
     private readonly RelationalTransaction efTransaction;
 
     private bool closed;
 
-    public AutoCommitSession(AppDbContext nativeSession)
+    public EfAutoCommitSession(AppDbContext nativeSession)
     {
         this.NativeSession = nativeSession;
         this.efTransaction = (RelationalTransaction)this.NativeSession.Database.BeginTransaction();

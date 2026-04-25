@@ -27,7 +27,7 @@ public static class ServiceCollectionExtensions
 
                 .AddScoped(typeof(IDal<>), typeof(NHibDal<>))
                 .AddScoped<AutoCommitSession>()
-                .AddScoped<IDbSchemaInitializer, DbSchemaInitializer>()
+                .AddScoped<IEmptySchemaInitializer, EmptySchemaInitializer>()
 
                 .AddSingleton<INHibExpressionVisitorSource, NHibExpressionVisitorSource>()
 

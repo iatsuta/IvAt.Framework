@@ -21,7 +21,7 @@ public static class ServiceCollectionExtensions
                     .UseGenericQueryable())
                 .AddScoped(typeof(IDal<>), typeof(EfDal<>))
                 .AddScoped<AutoCommitSession>()
-                .AddScoped<IDbSchemaInitializer, DbSchemaInitializer>();
+                .AddScoped<IEmptySchemaInitializer, EmptySchemaInitializer>();
         }
     }
 }
