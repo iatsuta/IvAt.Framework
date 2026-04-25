@@ -4,6 +4,7 @@ using CommonFramework.Testing;
 using CommonFramework.Testing.Database;
 using CommonFramework.Testing.Database.DependencyInjection;
 using CommonFramework.Testing.Database.Sqlite;
+
 using HierarchicalExpand.DependencyInjection;
 using HierarchicalExpand.IntegrationTests.Domain;
 using HierarchicalExpand.IntegrationTests.Environment.UndirectView;

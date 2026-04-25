@@ -6,7 +6,7 @@ public class SynchronizedInitializer<T> : ISynchronizedInitializer<T>
 {
     private readonly IAsyncLocker asyncLocker = new AsyncLocker();
 
-    private bool initialized = false;
+    private bool initialized;
 
     public async Task Run(Func<Task> action)
     {

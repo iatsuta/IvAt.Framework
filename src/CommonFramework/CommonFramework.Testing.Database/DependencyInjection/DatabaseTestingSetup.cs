@@ -9,15 +9,15 @@ namespace CommonFramework.Testing.Database.DependencyInjection;
 
 public class DatabaseTestingSetup : IDatabaseTestingSetup, IServiceInitializer
 {
-    private IDatabaseTestingProvider? databaseTestingProvider = null;
+    private IDatabaseTestingProvider? databaseTestingProvider;
 
-    private Action<IServiceCollection>? initEmptySchemaAction = null;
+    private Action<IServiceCollection>? initEmptySchemaAction;
 
-    private Action<IServiceCollection>? initSharedTestDataAction = null;
+    private Action<IServiceCollection>? initSharedTestDataAction;
 
-    private Action<IServiceCollection>? initSettingsAction = null;
+    private Action<IServiceCollection>? initSettingsAction;
 
-    private Action<IServiceCollection>? initRebindConnectionStringAction = null;
+    private Action<IServiceCollection>? initRebindConnectionStringAction;
 
     public void Initialize(IServiceCollection services)
     {
