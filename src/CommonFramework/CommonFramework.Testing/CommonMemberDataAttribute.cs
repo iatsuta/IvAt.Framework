@@ -89,9 +89,12 @@ public class CommonMemberDataAttribute(string memberName, params object?[] argum
 
         var testContext = TestContext.Current;
 
-        var serviceProvider = this.ServiceProviderPool == null
-            ? null
-            : await this.ServiceProviderPool.GetAsync(testContext.CancellationToken);
+        var serviceProvider = this.ServiceProviderPool?.Get();
+
+        if (serviceProvider != null)
+        {
+            await serviceProvider.RunEnvironmentHooks(EnvironmentHookType.Before, testContext.CancellationToken);
+        }
 
         try
         {
@@ -144,7 +147,9 @@ public class CommonMemberDataAttribute(string memberName, params object?[] argum
         {
             if (serviceProvider != null && this.ServiceProviderPool != null)
             {
-                await this.ServiceProviderPool.ReleaseAsync(serviceProvider, testContext.CancellationToken);
+                await serviceProvider.RunEnvironmentHooks(EnvironmentHookType.After, testContext.CancellationToken);
+
+                this.ServiceProviderPool.Release(serviceProvider);
             }
         }
     }

@@ -12,34 +12,11 @@ public class ServiceProviderPool(ITestEnvironment testEnvironment) : IServicePro
 
     private readonly RootSharedServiceSource rootSharedServiceSource = new();
 
-    public async ValueTask<IServiceProvider> GetAsync(CancellationToken ct)
-    {
-        var serviceProvider = this.Get();
-
-        foreach (var hook in serviceProvider.GetKeyedServices<ITestEnvironmentHook>(EnvironmentHookType.Before))
-        {
-            await hook.Process(ct);
-        }
-
-        return serviceProvider;
-    }
-
-    public async ValueTask ReleaseAsync(IServiceProvider serviceProvider, CancellationToken ct)
-    {
-        foreach (var hook in serviceProvider.GetKeyedServices<ITestEnvironmentHook>(EnvironmentHookType.After)
-                     .Reverse())
-        {
-            await hook.Process(ct);
-        }
-
-        this.Release(serviceProvider);
-    }
-
-    private IServiceProvider Get() => this.pool.TryTake(out var serviceProvider)
+    public IServiceProvider Get() => this.pool.TryTake(out var serviceProvider)
         ? serviceProvider
         : testEnvironment.BuildServiceProvider(this.CreateServiceCollection());
 
-    private void Release(IServiceProvider serviceProvider) => this.pool.Add(serviceProvider);
+    public void Release(IServiceProvider serviceProvider) => this.pool.Add(serviceProvider);
 
     private IServiceCollection CreateServiceCollection()
     {
