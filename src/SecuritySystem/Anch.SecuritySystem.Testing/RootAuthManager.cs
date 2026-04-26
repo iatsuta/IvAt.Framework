@@ -42,7 +42,7 @@ public class RootAuthManager(
             var idents = await queryableSource.GetQueryable<TDomainObject>().Pipe(securityProvider.Inject).Select(identityInfo.Id.Path)
                 .GenericToListAsync(cancellationToken);
 
-            return Enumerable.Select<TIdent, TypedSecurityIdentity<TIdent>>(idents, TypedSecurityIdentity.Create<TIdent>).ToList();
+            return idents.Select<TIdent, TypedSecurityIdentity<TIdent>>(TypedSecurityIdentity.Create<TIdent>).ToList();
         });
     }
 

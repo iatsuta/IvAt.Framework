@@ -39,7 +39,7 @@ public class SecurityContextInitializer<TSecurityContextType>(
     {
         var dbSecurityContextTypes = await queryableSource.GetQueryable<TSecurityContextType>().GenericToListAsync(cancellationToken);
 
-        var mergeResult = EnumerableExtensions.GetMergeResult<TSecurityContextType, SecurityContextInfo, TypedSecurityIdentity>(dbSecurityContextTypes, securityContextInfoSource.SecurityContextInfoList,
+        var mergeResult = dbSecurityContextTypes.GetMergeResult<TSecurityContextType, SecurityContextInfo, TypedSecurityIdentity>(securityContextInfoSource.SecurityContextInfoList,
             securityIdentityManager.GetIdentity,
             sc => sc.Identity);
 

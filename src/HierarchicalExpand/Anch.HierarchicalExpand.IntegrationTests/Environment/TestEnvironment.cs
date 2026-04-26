@@ -14,29 +14,29 @@ public abstract class TestEnvironment : ITestEnvironment
 {
     public IServiceProvider BuildServiceProvider(IServiceCollection services)
     {
-        return ServiceCollectionServiceExtensions
+        return services
 
-            .AddSingleton<ISharedTestDataInitializer, SharedTestDataInitializer>(services
+            .Pipe(this.InitializeServices)
 
-                .Pipe(this.InitializeServices)
+            .AddSingleton<ScopeEvaluator>()
 
-                .AddSingleton<ScopeEvaluator>()
+            .AddSingleton<IUndirectedAncestorViewScriptGenerator, UndirectedAncestorViewScriptGenerator>()
+            .AddSingleton<IViewCreationScriptProvider, UndirectedAncestorViewScriptProvider>()
 
-                .AddSingleton<IUndirectedAncestorViewScriptGenerator, UndirectedAncestorViewScriptGenerator>()
-                .AddSingleton<IViewCreationScriptProvider, UndirectedAncestorViewScriptProvider>()
+            .AddHierarchicalExpand(scb => scb
+                .AddHierarchicalInfo(
+                    v => v.Parent,
+                    new AncestorLinkInfo<BusinessUnit, BusinessUnitDirectAncestorLink>(link => link.Ancestor, link => link.Child),
+                    new AncestorLinkInfo<BusinessUnit, BusinessUnitUndirectAncestorLink>(view => view.Source, view => view.Target),
+                    v => v.DeepLevel)
 
-                .AddHierarchicalExpand(scb => scb
-                    .AddHierarchicalInfo(
-                        v => v.Parent,
-                        new AncestorLinkInfo<BusinessUnit, BusinessUnitDirectAncestorLink>(link => link.Ancestor, link => link.Child),
-                        new AncestorLinkInfo<BusinessUnit, BusinessUnitUndirectAncestorLink>(view => view.Source, view => view.Target),
-                        v => v.DeepLevel)
+                .AddHierarchicalInfo(
+                    v => v.Parent,
+                    new AncestorLinkInfo<TestHierarchicalObject, TestHierarchicalObjectDirectAncestorLink>(link => link.Ancestor, link => link.Child),
+                    new AncestorLinkInfo<TestHierarchicalObject, TestHierarchicalObjectUndirectAncestorLink>(view => view.Source, view => view.Target),
+                    v => v.DeepLevel))
 
-                    .AddHierarchicalInfo(
-                        v => v.Parent,
-                        new AncestorLinkInfo<TestHierarchicalObject, TestHierarchicalObjectDirectAncestorLink>(link => link.Ancestor, link => link.Child),
-                        new AncestorLinkInfo<TestHierarchicalObject, TestHierarchicalObjectUndirectAncestorLink>(view => view.Source, view => view.Target),
-                        v => v.DeepLevel)))
+            .AddSingleton<ISharedTestDataInitializer, SharedTestDataInitializer>()
 
             .AddDatabaseTesting(dts => dts
                 .SetProvider<SqliteDatabaseTestingProvider>()

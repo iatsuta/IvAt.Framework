@@ -81,7 +81,7 @@ public class GeneralPermissionSource<TPrincipal, TPermission, TPermissionRestric
             .Where(restrictionBindingInfo.Permission.Path.Select(containsPermissionFilter))
             .GenericToArrayAsync(cancellationToken);
 
-        var resultE = Enumerable.GroupJoin<TPermissionIdent, TPermissionRestriction, TPermissionIdent, Dictionary<Type, Array>>(permissionIdents, permissionRestrictions, id => id, restrictionBindingInfo.Permission.Getter.Composite(permissionIdentityInfo.Id.Getter),
+        var resultE = permissionIdents.GroupJoin<TPermissionIdent, TPermissionRestriction, TPermissionIdent, Dictionary<Type, Array>>(permissionRestrictions, id => id, restrictionBindingInfo.Permission.Getter.Composite(permissionIdentityInfo.Id.Getter),
             (_, restrictions) => rawPermissionConverter.ConvertPermission(securityRule, restrictions, securityContextTypes));
 
         foreach (var item in resultE)

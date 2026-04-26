@@ -26,7 +26,7 @@ public class PermissionEqualityComparer<TPermission, TSecurityRole, TPermissionR
     public bool Equals(PermissionData<TPermission, TPermissionRestriction>? permissionData,
         PermissionData<TPermission, TPermissionRestriction>? otherPermissionData)
     {
-        if (object.ReferenceEquals(permissionData, otherPermissionData))
+        if (ReferenceEquals(permissionData, otherPermissionData))
         {
             return true;
         }

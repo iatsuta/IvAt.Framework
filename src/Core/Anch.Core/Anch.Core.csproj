@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <PackageId>Anch</PackageId>
+    <PackageId>Anch.Core</PackageId>
   </PropertyGroup>
 
 </Project>

@@ -16,7 +16,7 @@ public record PropertyAccessors<TSource, TProperty>(
     }
 
     public virtual bool Equals(PropertyAccessors<TSource, TProperty>? other) =>
-        object.ReferenceEquals(this, other)
+        ReferenceEquals(this, other)
         || (other is not null && ExpressionComparer.Default.Equals(this.Path, other.Path));
 
     public override int GetHashCode()

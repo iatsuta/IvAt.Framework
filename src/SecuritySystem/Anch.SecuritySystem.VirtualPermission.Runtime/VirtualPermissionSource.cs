@@ -37,9 +37,9 @@ public class VirtualPermissionSource<TPrincipal, TPermission>(
     {
         var restrictionFilterInfoList = securityRule.GetSafeSecurityContextRestrictionFilters().ToList();
 
-        return AsyncEnumerable
-            .Select<TPermission, Dictionary<Type, Array>>(this.GetPermissionQuery(null)
-                .GenericAsAsyncEnumerable(), permission => this.ConvertPermission(permission, securityContextTypes, restrictionFilterInfoList));
+        return this.GetPermissionQuery(null)
+            .GenericAsAsyncEnumerable()
+            .Select<TPermission, Dictionary<Type, Array>>(permission => this.ConvertPermission(permission, securityContextTypes, restrictionFilterInfoList));
     }
 
     public IQueryable<TPermission> GetPermissionQuery() => this.GetPermissionQuery(null);

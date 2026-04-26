@@ -9,7 +9,7 @@ public record UnaryExpression(UnaryOperation Operation, Expression Operand) : Ex
     public override int GetHashCode() => this.Operation.GetHashCode();
 
     public virtual bool Equals(UnaryExpression? other) =>
-        object.ReferenceEquals(this, other)
+        ReferenceEquals(this, other)
         || (other is not null
             && this.Operation == other.Operation
             && this.Operand == other.Operand);

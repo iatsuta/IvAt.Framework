@@ -8,7 +8,7 @@ public record MethodExpression(Expression Source, MethodExpressionType Type, Imm
     public override string ToString() => $"{this.Source}.{this.Type.ToFormatString()}({this.Arguments.Join(", ")})";
 
     public virtual bool Equals(MethodExpression? other) =>
-        object.ReferenceEquals(this, other)
+        ReferenceEquals(this, other)
         || (other is not null
             && this.Type == other.Type
             && this.Source == other.Source

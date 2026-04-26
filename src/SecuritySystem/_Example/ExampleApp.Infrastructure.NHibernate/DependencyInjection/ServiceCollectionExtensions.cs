@@ -17,7 +17,7 @@ public static class ServiceCollectionExtensions
 
                     .AddSingleton<NHibConfigurationSource>()
                     .AddSingletonFrom((NHibConfigurationSource configurationSource) => configurationSource.BuildConfiguration())
-                    .AddSingletonFrom((global::NHibernate.Cfg.Configuration cfg) => cfg.BuildSessionFactory())
+                    .AddSingletonFrom((NHibernate.Cfg.Configuration cfg) => cfg.BuildSessionFactory())
 
                     .AddSingleton(typeof(IDomainObjectSaveStrategy<>), typeof(DomainObjectSaveStrategy<>))
                     .BindServiceProxy(typeof(IDomainObjectSaveStrategy<>), typeof(DomainObjectSaveStrategyServiceProxyBinder<>))

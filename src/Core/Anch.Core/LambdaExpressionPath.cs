@@ -19,7 +19,7 @@ public sealed record LambdaExpressionPath(ImmutableArray<LambdaExpression> Prope
 
     public bool Equals(LambdaExpressionPath? other) =>
 
-        object.ReferenceEquals(this, other)
+        ReferenceEquals(this, other)
 
         || (other is not null && this.Properties.SequenceEqual(other.Properties, Comparer));
 

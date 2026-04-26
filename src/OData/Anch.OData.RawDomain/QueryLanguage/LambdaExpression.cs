@@ -45,7 +45,7 @@ public record LambdaExpression(Expression Body, ImmutableArray<ParameterExpressi
     public override string ToString() => $"({string.Join(", ", this.Parameters)}) => {this.Body}";
 
     public virtual bool Equals(LambdaExpression? other) =>
-        object.ReferenceEquals(this, other)
+        ReferenceEquals(this, other)
         || (other is not null
             && this.Parameters.SequenceEqual(other.Parameters)
             && this.Body == other.Body);

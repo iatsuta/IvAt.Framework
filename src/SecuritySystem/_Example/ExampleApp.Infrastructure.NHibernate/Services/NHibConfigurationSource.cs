@@ -35,13 +35,13 @@ public class NHibConfigurationSource(IMainConnectionStringSource mainConnectionS
             .ExposeConfiguration(
                 c =>
                 {
-                    c.Properties.Add(global::NHibernate.Cfg.Environment.LinqToHqlGeneratorsRegistry, typeof(DefaultLinqToHqlGeneratorsRegistry).AssemblyQualifiedName);
+                    c.Properties.Add(NHibernate.Cfg.Environment.LinqToHqlGeneratorsRegistry, typeof(DefaultLinqToHqlGeneratorsRegistry).AssemblyQualifiedName);
 
-                    c.Properties.Add(global::NHibernate.Cfg.Environment.CommandTimeout, "1200");
+                    c.Properties.Add(NHibernate.Cfg.Environment.CommandTimeout, "1200");
 
-                    c.Properties.Add(global::NHibernate.Cfg.Environment.SqlTypesKeepDateTime, "true");
+                    c.Properties.Add(NHibernate.Cfg.Environment.SqlTypesKeepDateTime, "true");
 
-                    c.Properties.Add(global::NHibernate.Cfg.Environment.ShowSql, "true");
+                    c.Properties.Add(NHibernate.Cfg.Environment.ShowSql, "true");
                 })
             .BuildConfiguration();
 

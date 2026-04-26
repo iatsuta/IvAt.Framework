@@ -4,5 +4,5 @@ using SExpressions = System.Linq.Expressions;
 
 public interface ILambdaExpressionConverter
 {
-    SExpressions.Expression<TDelegate> Convert<TDelegate>(OData.Domain.QueryLanguage.LambdaExpression expression);
+    SExpressions.Expression<TDelegate> Convert<TDelegate>(Domain.QueryLanguage.LambdaExpression expression);
 }
