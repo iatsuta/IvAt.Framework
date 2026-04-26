@@ -1,5 +1,4 @@
-﻿using Anch.SecuritySystem.Testing;
-using ExampleApp.Api.Controllers;
+﻿using ExampleApp.Api.Controllers;
 using ExampleApp.Domain;
 
 namespace ExampleApp.IntegrationTests;

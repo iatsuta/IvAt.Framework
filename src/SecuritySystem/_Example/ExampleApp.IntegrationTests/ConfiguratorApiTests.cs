@@ -1,6 +1,5 @@
 ﻿using Anch.SecuritySystem;
 using Anch.SecuritySystem.ExternalSystem.Management;
-using Anch.SecuritySystem.Testing;
 
 namespace ExampleApp.IntegrationTests;
 

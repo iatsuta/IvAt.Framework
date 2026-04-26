@@ -1,5 +1,4 @@
-﻿using Anch.SecuritySystem.Testing;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 
 namespace ExampleApp.IntegrationTests;
 

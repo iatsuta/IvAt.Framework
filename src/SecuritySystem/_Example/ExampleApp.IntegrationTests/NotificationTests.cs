@@ -3,12 +3,11 @@ using Anch.SecuritySystem;
 using Anch.SecuritySystem.Notification;
 using Anch.SecuritySystem.Notification.Domain;
 using Anch.SecuritySystem.Services;
-using Anch.SecuritySystem.Testing;
+
 using ExampleApp.Application;
 using ExampleApp.Domain;
 
 using Microsoft.Extensions.DependencyInjection;
-using TestPermission = Anch.SecuritySystem.Testing.TestPermission;
 
 namespace ExampleApp.IntegrationTests;
 

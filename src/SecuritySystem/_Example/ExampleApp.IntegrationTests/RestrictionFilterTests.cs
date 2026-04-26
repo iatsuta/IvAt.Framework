@@ -1,5 +1,4 @@
 ﻿using Anch.SecuritySystem;
-using Anch.SecuritySystem.Testing;
 using Anch.SecuritySystem.Validation;
 using ExampleApp.Application;
 using ExampleApp.Domain;

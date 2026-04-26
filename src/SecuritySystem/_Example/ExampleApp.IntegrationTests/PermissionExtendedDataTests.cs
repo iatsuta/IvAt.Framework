@@ -1,5 +1,4 @@
-﻿using Anch.SecuritySystem.Testing;
-using ExampleApp.Application;
+﻿using ExampleApp.Application;
 
 namespace ExampleApp.IntegrationTests;
 

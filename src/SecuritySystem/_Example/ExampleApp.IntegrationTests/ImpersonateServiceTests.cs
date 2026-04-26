@@ -1,5 +1,4 @@
 ﻿using Anch.Core.Auth;
-using Anch.SecuritySystem.Testing;
 using ExampleApp.Application;
 
 namespace ExampleApp.IntegrationTests;

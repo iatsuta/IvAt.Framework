@@ -1,6 +1,5 @@
 ﻿using Anch.Core.Auth;
 using Anch.SecuritySystem.Services;
-using Anch.SecuritySystem.Testing;
 using Anch.SecuritySystem.UserSource;
 using ExampleApp.Domain.Auth.General;
 
