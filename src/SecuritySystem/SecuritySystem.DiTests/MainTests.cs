@@ -54,7 +54,6 @@ public class MainTests
         this.executeCounter = this.rootServiceProvider.GetRequiredService<BusinessUnitAncestorLinkSourceExecuteCounter>();
     }
 
-
     [CommonFact]
     public async Task TestEmployeesSecurity_EmployeeHasAccessCorrect(CancellationToken ct)
     {
