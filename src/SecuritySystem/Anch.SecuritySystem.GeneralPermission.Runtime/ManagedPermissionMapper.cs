@@ -145,7 +145,7 @@ public class PermissionManagementService<TPrincipal, TPermission, TSecurityRole,
             .Where(restrictionBindingInfo.Permission.Path.Select(p => p == dbPermission))
             .GenericToListAsync(cancellationToken);
 
-        var restrictionMergeResult = EnumerableExtensions.GetMergeResult<TPermissionRestriction, (TypedSecurityIdentity Key, TSecurityContextObjectIdent securityContextId), (TypedSecurityIdentity, TSecurityContextObjectIdent)>(dbRestrictions, managedPermission.Restrictions
+        var restrictionMergeResult = dbRestrictions.GetMergeResult<TPermissionRestriction, (TypedSecurityIdentity Key, TSecurityContextObjectIdent securityContextId), (TypedSecurityIdentity, TSecurityContextObjectIdent)>(managedPermission.Restrictions
                 .ChangeKey(t => securityContextInfoSource.GetSecurityContextInfo(t).Identity)
                 .SelectMany(pair => pair.Value.Cast<TSecurityContextObjectIdent>().Select(securityContextId => (pair.Key, securityContextId))),
             pr => (

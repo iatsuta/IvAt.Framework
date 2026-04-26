@@ -16,64 +16,64 @@ public class TestEnvironment : ITestEnvironment
 {
     public IServiceProvider BuildServiceProvider(IServiceCollection services) =>
 
-        ServiceCollectionServiceExtensions.AddSingleton(services.AddSecuritySystem(settings =>
+        services.AddSecuritySystem(settings =>
 
-                    settings
-                        .SetQueryableSource(sp => ServiceProviderServiceExtensions.GetRequiredService<TestQueryableSource>(sp))
-                        .SetGenericRepository<TestGenericRepository>()
-                        .SetDefaultCancellationTokenSource<XUnitDefaultCancellationTokenSource>()
+                settings
+                    .SetQueryableSource(sp => sp.GetRequiredService<TestQueryableSource>())
+                    .SetGenericRepository<TestGenericRepository>()
+                    .SetDefaultCancellationTokenSource<XUnitDefaultCancellationTokenSource>()
 
-                        .AddPermissionSystem<TestPermissionSystemFactory>()
+                    .AddPermissionSystem<TestPermissionSystemFactory>()
 
-                        .AddDomainSecurity<Employee>(b => b.SetView(ExampleSecurityOperation.EmployeeView)
-                            .SetEdit(ExampleSecurityOperation.EmployeeEdit)
-                            .SetPath(SecurityPath<Employee>.Create(v => v.BusinessUnit)))
+                    .AddDomainSecurity<Employee>(b => b.SetView(ExampleSecurityOperation.EmployeeView)
+                        .SetEdit(ExampleSecurityOperation.EmployeeEdit)
+                        .SetPath(SecurityPath<Employee>.Create(v => v.BusinessUnit)))
 
-                        .AddSecurityContext<BusinessUnit>(Guid.NewGuid(),
-                            scb => scb.SetHierarchicalInfo(
-                                bu => bu.Parent,
-                                new AncestorLinkInfo<BusinessUnit, BusinessUnitDirectAncestorLink>(bu => bu.Ancestor,
-                                    bu => bu.Child),
-                                new AncestorLinkInfo<BusinessUnit, BusinessUnitUndirectAncestorLink>(bu => bu.Source,
-                                    bu => bu.Target)))
+                    .AddSecurityContext<BusinessUnit>(Guid.NewGuid(),
+                        scb => scb.SetHierarchicalInfo(
+                            bu => bu.Parent,
+                            new AncestorLinkInfo<BusinessUnit, BusinessUnitDirectAncestorLink>(bu => bu.Ancestor,
+                                bu => bu.Child),
+                            new AncestorLinkInfo<BusinessUnit, BusinessUnitUndirectAncestorLink>(bu => bu.Source,
+                                bu => bu.Target)))
 
-                        .AddSecurityContext<Location>(Guid.NewGuid())
+                    .AddSecurityContext<Location>(Guid.NewGuid())
 
-                        .AddSecurityRole(
-                            ExampleSecurityRole.TestRole,
-                            new SecurityRoleInfo(Guid.NewGuid())
-                            {
-                                Children = [ExampleSecurityRole.TestRole2],
-                                Operations = [ExampleSecurityOperation.EmployeeView, ExampleSecurityOperation.EmployeeEdit]
-                            })
+                    .AddSecurityRole(
+                        ExampleSecurityRole.TestRole,
+                        new SecurityRoleInfo(Guid.NewGuid())
+                        {
+                            Children = [ExampleSecurityRole.TestRole2],
+                            Operations = [ExampleSecurityOperation.EmployeeView, ExampleSecurityOperation.EmployeeEdit]
+                        })
 
-                        .AddSecurityRole(
-                            ExampleSecurityRole.TestRole2,
-                            new SecurityRoleInfo(Guid.NewGuid()) { Children = [ExampleSecurityRole.TestRole3] })
+                    .AddSecurityRole(
+                        ExampleSecurityRole.TestRole2,
+                        new SecurityRoleInfo(Guid.NewGuid()) { Children = [ExampleSecurityRole.TestRole3] })
 
-                        .AddSecurityRole(
-                            ExampleSecurityRole.TestRole3,
-                            new SecurityRoleInfo(Guid.NewGuid()))
+                    .AddSecurityRole(
+                        ExampleSecurityRole.TestRole3,
+                        new SecurityRoleInfo(Guid.NewGuid()))
 
-                        .AddSecurityRole(
-                            ExampleSecurityRole.TestRole4,
-                            new SecurityRoleInfo(Guid.NewGuid())
-                                { Operations = [ExampleSecurityOperation.BusinessUnitView] })
+                    .AddSecurityRole(
+                        ExampleSecurityRole.TestRole4,
+                        new SecurityRoleInfo(Guid.NewGuid())
+                            { Operations = [ExampleSecurityOperation.BusinessUnitView] })
 
-                        .AddSecurityRole(
-                            ExampleSecurityRole.TestKeyedRole,
-                            new SecurityRoleInfo(Guid.NewGuid())
-                            {
-                                Restriction = SecurityPathRestriction.Create<Location>().Add<BusinessUnit>(key: "testKey")
-                            })
+                    .AddSecurityRole(
+                        ExampleSecurityRole.TestKeyedRole,
+                        new SecurityRoleInfo(Guid.NewGuid())
+                        {
+                            Restriction = SecurityPathRestriction.Create<Location>().Add<BusinessUnit>(key: "testKey")
+                        })
 
-                        .AddSecurityRole(SecurityRole.Administrator, new SecurityRoleInfo(Guid.NewGuid()))
+                    .AddSecurityRole(SecurityRole.Administrator, new SecurityRoleInfo(Guid.NewGuid()))
 
-                        .AddSecurityOperation(
-                            ExampleSecurityOperation.BusinessUnitView,
-                            new SecurityOperationInfo { CustomExpandType = HierarchicalExpandType.None }))
+                    .AddSecurityOperation(
+                        ExampleSecurityOperation.BusinessUnitView,
+                        new SecurityOperationInfo { CustomExpandType = HierarchicalExpandType.None }))
 
-                .AddRelativeDomainPath((Employee employee) => employee), typeof(TestCheckboxConditionFactory<>))
+            .AddRelativeDomainPath((Employee employee) => employee).AddSingleton(typeof(TestCheckboxConditionFactory<>))
 
             .AddSingleton<TestQueryableSource>()
             .AddSingleton<TestPermissionStorge>()

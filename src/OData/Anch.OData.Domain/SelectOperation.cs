@@ -1,12 +1,14 @@
 ﻿using System.Collections.Immutable;
-using System.Linq.Expressions;
+
 using Anch.Core;
-using LambdaExpression = Anch.OData.Domain.QueryLanguage.LambdaExpression;
+using Anch.OData.Domain.QueryLanguage;
+
+using SExpressions = System.Linq.Expressions;
 
 namespace Anch.OData.Domain;
 
 public record SelectOperation<TDomainObject>(
-    Expression<Func<TDomainObject, bool>> Filter,
+    SExpressions.Expression<Func<TDomainObject, bool>> Filter,
     ImmutableArray<SelectOrder<TDomainObject>> Orders,
     int SkipCount,
     int TakeCount) : IDynamicSelectOperation, IQueryableInjector<TDomainObject>
@@ -19,17 +21,17 @@ public record SelectOperation<TDomainObject>(
 
     public SelectOperation<TDomainObject> WithoutPaging() => this.HasPaging ? this with { SkipCount = Default.SkipCount, TakeCount = Default.TakeCount } : this;
 
-    public SelectOperation<TDomainObject> AddFilter(Expression<Func<TDomainObject, bool>> filter) =>
+    public SelectOperation<TDomainObject> AddFilter(SExpressions.Expression<Func<TDomainObject, bool>> filter) =>
 
         this with { Filter = this.Filter.BuildAnd(filter) };
 
-    public SelectOperation<TDomainObject> AddOrder<TOrderKey>(Expression<Func<TDomainObject, TOrderKey>> path, OrderType type) =>
+    public SelectOperation<TDomainObject> AddOrder<TOrderKey>(SExpressions.Expression<Func<TDomainObject, TOrderKey>> path, OrderType type) =>
 
         this with { Orders = [..this.Orders, new SelectOrder<TDomainObject, TOrderKey>(path) { OrderType = type }] };
 
     public SelectOperation<TDomainObject> ToCountOperation() => Default with { Filter = this.Filter };
 
-    public SelectOperation<TDomainObject> Visit(ExpressionVisitor visitor)
+    public SelectOperation<TDomainObject> Visit(SExpressions.ExpressionVisitor visitor)
     {
         var newFilter = this.Filter.UpdateBody(visitor);
 

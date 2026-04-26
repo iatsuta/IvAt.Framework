@@ -47,7 +47,7 @@ public class SecurityRoleInitializer<TPermission, TSecurityRole>(
     {
         var dbRoles = await queryableSource.GetQueryable<TSecurityRole>().GenericToListAsync(cancellationToken);
 
-        var mergeResult = EnumerableExtensions.GetMergeResult<TSecurityRole, FullSecurityRole, TypedSecurityIdentity>(dbRoles, securityRoles, securityIdentityManager.GetIdentity, fsr => fsr.Identity);
+        var mergeResult = dbRoles.GetMergeResult<TSecurityRole, FullSecurityRole, TypedSecurityIdentity>(securityRoles, securityIdentityManager.GetIdentity, fsr => fsr.Identity);
 
         if (mergeResult.RemovingItems.Any())
         {

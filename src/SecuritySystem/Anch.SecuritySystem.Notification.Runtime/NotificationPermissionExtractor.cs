@@ -30,18 +30,18 @@ public class NotificationPermissionExtractor<TPermission>(
             .Aggregate(startPermissionQ, (q, g) => this.ApplyNotificationFilter(q, g, typeArr.IndexOf(g.GetSecurityContextType()))).GenericAsAsyncEnumerable();
 
         var parsedLevelInfoResult =
-            AsyncEnumerable.Select(permissionInfoResult, principalInfo => new
+            permissionInfoResult.Select(principalInfo => new
                 {
                     principalInfo.Permission,
-                    LevelDict = Enumerable
-                        .Select<string, string[]>(principalInfo.LevelInfo
-                            .Split(LevelsSeparator, StringSplitOptions.RemoveEmptyEntries), levelData => levelData.Split(LevelValueSeparator))
+                    LevelDict = principalInfo.LevelInfo
+                        .Split(LevelsSeparator, StringSplitOptions.RemoveEmptyEntries)
+                        .Select<string, string[]>(levelData => levelData.Split(LevelValueSeparator))
                         .ToDictionary(
                             levelParts => typeArr[int.Parse(levelParts[0])],
                             levelParts => int.Parse(levelParts[1]))
                 });
 
-        var optimalRequest = ImmutableArrayExtensions.Aggregate(notificationFilterGroups, parsedLevelInfoResult, (state, notificationFilterGroup) =>
+        var optimalRequest = notificationFilterGroups.Aggregate(parsedLevelInfoResult, (state, notificationFilterGroup) =>
         {
             if (notificationFilterGroup.ExpandType == NotificationExpandType.All)
             {

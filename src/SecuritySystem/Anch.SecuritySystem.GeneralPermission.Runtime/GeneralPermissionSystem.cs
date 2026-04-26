@@ -78,11 +78,11 @@ public class GeneralPermissionSystem<TPermission, TSecurityRole, TSecurityRoleId
 
     public IAsyncEnumerable<SecurityRole> GetAvailableSecurityRoles()
     {
-        return AsyncEnumerable
-            .Select<TSecurityRoleIdent, FullSecurityRole>(availablePermissionSource
-                .GetQueryable(DomainSecurityRule.AnyRole with { CustomCredential = defaultSecurityRuleCredential })
-                .Select(generalBindingInfo.SecurityRole.Path.Select(securityRoleIdentityInfo.Id.Path))
-                .Distinct()
-                .GenericAsAsyncEnumerable(), ident => securityRoleSource.GetSecurityRole(TypedSecurityIdentity.Create<TSecurityRoleIdent>(ident)));
+        return availablePermissionSource
+            .GetQueryable(DomainSecurityRule.AnyRole with { CustomCredential = defaultSecurityRuleCredential })
+            .Select(generalBindingInfo.SecurityRole.Path.Select(securityRoleIdentityInfo.Id.Path))
+            .Distinct()
+            .GenericAsAsyncEnumerable()
+            .Select<TSecurityRoleIdent, FullSecurityRole>(ident => securityRoleSource.GetSecurityRole(TypedSecurityIdentity.Create<TSecurityRoleIdent>(ident)));
     }
 }

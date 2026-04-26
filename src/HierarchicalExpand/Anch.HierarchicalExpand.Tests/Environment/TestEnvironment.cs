@@ -13,16 +13,16 @@ public class TestEnvironment : ITestEnvironment
 {
     public IServiceProvider BuildServiceProvider(IServiceCollection services) =>
 
-        Testing.ServiceProviderExtensions.AddEnvironmentHook(services
-                .AddSingleton<TestQueryableSource>()
-                .AddSingletonFrom<IQueryableSource, TestQueryableSource>()
-                .AddSingleton(Substitute.For<IGenericRepository>())
+        services
+            .AddSingleton<TestQueryableSource>()
+            .AddSingletonFrom<IQueryableSource, TestQueryableSource>()
+            .AddSingleton(Substitute.For<IGenericRepository>())
 
-                .AddHierarchicalExpand(scb => scb
-                    .AddHierarchicalInfo(
-                        v => v.Parent,
-                        new AncestorLinkInfo<DomainObject, DirectAncestorLink>(link => link.From, link => link.To),
-                        new AncestorLinkInfo<DomainObject, UnDirectAncestorLink>(view => view.From, view => view.To))), EnvironmentHookType.After, sp => ServiceProviderServiceExtensions.GetRequiredService<TestQueryableSource>(sp).Reset())
+            .AddHierarchicalExpand(scb => scb
+                .AddHierarchicalInfo(
+                    v => v.Parent,
+                    new AncestorLinkInfo<DomainObject, DirectAncestorLink>(link => link.From, link => link.To),
+                    new AncestorLinkInfo<DomainObject, UnDirectAncestorLink>(view => view.From, view => view.To))).AddEnvironmentHook(EnvironmentHookType.After, sp => sp.GetRequiredService<TestQueryableSource>().Reset())
 
             .AddValidator<DuplicateServiceUsageValidator>()
             .Validate()

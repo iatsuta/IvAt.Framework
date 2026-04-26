@@ -80,7 +80,7 @@ public abstract class DenormalizeTests(IServiceProvider rootServiceProvider)
 
             var root = await q.Where(v => v.Parent == null).GenericSingleAsync(ct);
 
-            var rootChildren = await Queryable.Where(q, v => v.Parent == root).GenericToListAsync(ct);
+            var rootChildren = await q.Where(v => v.Parent == root).GenericToListAsync(ct);
 
             rootChildren[0].Parent = rootChildren[1];
 
@@ -100,10 +100,10 @@ public abstract class DenormalizeTests(IServiceProvider rootServiceProvider)
     {
         return this.ScopeEvaluator.EvaluateAsync(async (IQueryableSource queryableSource) =>
         {
-            return await AsyncEnumerable
-                .AllAsync<TestHierarchicalObject>(queryableSource
-                    .GetQueryable<TestHierarchicalObject>()
-                    .GenericAsAsyncEnumerable(), v => v.DeepLevel == EnumerableExtensions.GetAllElements<TestHierarchicalObject>(v, x => x.Parent, true).Count(), ct);
+            return await queryableSource
+                .GetQueryable<TestHierarchicalObject>()
+                .GenericAsAsyncEnumerable()
+                .AllAsync<TestHierarchicalObject>(v => v.DeepLevel == v.GetAllElements<TestHierarchicalObject>(x => x.Parent, true).Count(), ct);
         });
     }
 

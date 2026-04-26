@@ -3,6 +3,7 @@ using Anch.SecuritySystem;
 using Anch.SecuritySystem.ExternalSystem.Management;
 using Anch.SecuritySystem.GeneralPermission;
 using Anch.SecuritySystem.Services;
+
 using AuthGeneral = ExampleApp.Domain.Auth.General;
 
 namespace ExampleApp.Infrastructure.DependencyInjection;

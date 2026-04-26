@@ -15,14 +15,14 @@ public class NHibTestEnvironment : TestEnvironment
 {
     protected override IServiceCollection AddServices(IServiceCollection services) =>
 
-        ServiceCollectionServiceExtensions
+        services.AddIdentitySource()
+            .AddSingleton<NHibConfigurationSource>()
+            .AddSingletonFrom((NHibConfigurationSource configurationSource) => configurationSource.BuildConfiguration())
+            .AddSingletonFrom((global::NHibernate.Cfg.Configuration cfg) => cfg.BuildSessionFactory())
+            .AddScopedFrom((ISessionFactory sessionFactory) => sessionFactory.OpenSession()).AddSingleton(typeof(IDomainObjectSaveStrategy<>), typeof(DomainObjectSaveStrategy<>))
+            .BindServiceProxy(typeof(IDomainObjectSaveStrategy<>), typeof(DomainObjectSaveStrategyServiceProxyBinder<>))
 
-            .AddScoped<IGenericRepository, NHibGenericRepository>(ServiceCollectionServiceExtensions.AddSingleton(services.AddIdentitySource()
-                    .AddSingleton<NHibConfigurationSource>()
-                    .AddSingletonFrom((NHibConfigurationSource configurationSource) => configurationSource.BuildConfiguration())
-                    .AddSingletonFrom((global::NHibernate.Cfg.Configuration cfg) => cfg.BuildSessionFactory())
-                    .AddScopedFrom((ISessionFactory sessionFactory) => sessionFactory.OpenSession()), typeof(IDomainObjectSaveStrategy<>), typeof(DomainObjectSaveStrategy<>))
-                .BindServiceProxy(typeof(IDomainObjectSaveStrategy<>), typeof(DomainObjectSaveStrategyServiceProxyBinder<>)))
+            .AddScoped<IGenericRepository, NHibGenericRepository>()
             .AddScoped<IQueryableSource, NHibQueryableSource>()
 
             .AddSingleton<IEmptySchemaInitializer, NHibEmptySchemaInitializer>()

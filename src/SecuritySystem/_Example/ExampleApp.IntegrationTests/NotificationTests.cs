@@ -3,12 +3,11 @@ using Anch.SecuritySystem;
 using Anch.SecuritySystem.Notification;
 using Anch.SecuritySystem.Notification.Domain;
 using Anch.SecuritySystem.Services;
-using Anch.SecuritySystem.Testing;
+
 using ExampleApp.Application;
 using ExampleApp.Domain;
 
 using Microsoft.Extensions.DependencyInjection;
-using TestPermission = Anch.SecuritySystem.Testing.TestPermission;
 
 namespace ExampleApp.IntegrationTests;
 
@@ -485,7 +484,7 @@ public abstract class NotificationTests(IServiceProvider rootServiceProvider) : 
             .EvaluateAsync(TestingScopeMode.Read, async sp =>
             {
                 var queryableSource = sp.GetRequiredService<IQueryableSource>();
-                var extractor = sp.GetRequiredService<INotificationPrincipalExtractor<ExampleApp.Domain.Auth.General.Principal>>();
+                var extractor = sp.GetRequiredService<INotificationPrincipalExtractor<Domain.Auth.General.Principal>>();
 
                 var notificationFilterGroup = new TypedNotificationFilterGroup<BusinessUnit>
                 {
@@ -529,7 +528,7 @@ public abstract class NotificationTests(IServiceProvider rootServiceProvider) : 
 
     private Task<string[]> GetNotificationPrincipalsAsync(NotificationFilterGroup[] notificationFilterGroups, CancellationToken ct) =>
 
-        this.GetEvaluator<INotificationPrincipalExtractor<ExampleApp.Domain.Auth.General.Principal>>()
+        this.GetEvaluator<INotificationPrincipalExtractor<Domain.Auth.General.Principal>>()
             .EvaluateAsync(TestingScopeMode.Read, async extractor =>
                 await extractor.GetPrincipalsAsync([this.testSecurityRole], [.. notificationFilterGroups])
                     .Select(p => p.Name)

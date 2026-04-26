@@ -3,7 +3,6 @@ using Anch.GenericRepository;
 using Anch.SecuritySystem;
 using Anch.SecuritySystem.AvailableSecurity;
 using Anch.SecuritySystem.DomainServices;
-using Anch.SecuritySystem.Testing;
 using ExampleApp.Application;
 using ExampleApp.Domain;
 using Microsoft.Extensions.DependencyInjection;

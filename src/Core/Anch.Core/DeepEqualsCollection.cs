@@ -22,7 +22,7 @@ public class DeepEqualsCollection<T>(ImmutableArray<T> baseSource, IEqualityComp
 
     public bool Equals(DeepEqualsCollection<T>? other) =>
 
-        object.ReferenceEquals(this, other)
+        ReferenceEquals(this, other)
 
         || (other is not null && baseSource.SequenceEqual(other, comparer));
 
@@ -47,7 +47,7 @@ public class DeepEqualsCollection<T>(ImmutableArray<T> baseSource, IEqualityComp
 
     public static bool operator ==(DeepEqualsCollection<T>? col1, DeepEqualsCollection<T>? col2)
     {
-        return object.Equals(col1, col2);
+        return Equals(col1, col2);
     }
 
     public static bool operator !=(DeepEqualsCollection<T>? col1, DeepEqualsCollection<T>? col2)

@@ -78,11 +78,11 @@ public class VirtualPrincipalSourceService<TPrincipal, TPermission>(
             var managedPermissions = await virtualBindingInfo
                 .Items
                 .ToAsyncEnumerable()
-                .SelectMany(itemBindingInfo => AsyncEnumerable
-                    .Select<TPermission, ManagedPermission>(queryableSource.GetQueryable<TPermission>()
-                        .Where(itemBindingInfo.Filter(serviceProvider))
-                        .Where(bindingInfo.Principal.Path.Select<TPermission, TPrincipal, bool>(p => p == principal))
-                        .GenericAsAsyncEnumerable(), permission => this.ToManagedPermission(permission, itemBindingInfo.SecurityRole)))
+                .SelectMany(itemBindingInfo => queryableSource.GetQueryable<TPermission>()
+                    .Where(itemBindingInfo.Filter(serviceProvider))
+                    .Where(bindingInfo.Principal.Path.Select<TPermission, TPrincipal, bool>(p => p == principal))
+                    .GenericAsAsyncEnumerable()
+                    .Select<TPermission, ManagedPermission>(permission => this.ToManagedPermission(permission, itemBindingInfo.SecurityRole)))
                 .ToImmutableArrayAsync(cancellationToken);
 
             return new ManagedPrincipal(header, managedPermissions);

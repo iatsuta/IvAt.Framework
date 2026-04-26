@@ -25,7 +25,7 @@ public class AncestorLinkExtractor<TDomainObject, TDirectAncestorLink>(
 
         var existsLinks = await queryableSource.GetQueryable<TDirectAncestorLink>().WithFetch(this.linkFetchRule).GenericToListAsync(cancellationToken);
 
-        var nonExistsDomainObjects = Enumerable.Select<TDirectAncestorLink, AncestorLinkData<TDomainObject>>(existsLinks, this.ToInfo).SelectMany(link => new[] { link.Ancestor, link.Child }).Except(existsDomainObjects);
+        var nonExistsDomainObjects = existsLinks.Select<TDirectAncestorLink, AncestorLinkData<TDomainObject>>(this.ToInfo).SelectMany(link => new[] { link.Ancestor, link.Child }).Except(existsDomainObjects);
 
         return await this.GetSyncResult(existsDomainObjects, nonExistsDomainObjects, cancellationToken);
     }
@@ -65,7 +65,7 @@ public class AncestorLinkExtractor<TDomainObject, TDirectAncestorLink>(
             .Select(this.ancestorLinkInfo.From.Path)
             .GenericToListAsync(cancellationToken);
 
-        var mergeResult = EnumerableExtensions.GetMergeResult(existsParents, expectedParents);
+        var mergeResult = existsParents.GetMergeResult(expectedParents);
 
         if (mergeResult.IsEmpty)
         {
@@ -98,12 +98,12 @@ public class AncestorLinkExtractor<TDomainObject, TDirectAncestorLink>(
         var filter = this.ancestorLinkInfo.From.Path.Select(fromObj => domainObjects.Contains(fromObj))
             .BuildOr(this.ancestorLinkInfo.To.Path.Select(toObj => domainObjects.Contains(toObj)));
 
-        return AsyncEnumerableExtensions
-            .ToImmutableArrayAsync<TDirectAncestorLink>(queryableSource
-                .GetQueryable<TDirectAncestorLink>()
-                .Where(filter)
-                .WithFetch(this.linkFetchRule)
-                .GenericAsAsyncEnumerable(), cancellationToken);
+        return queryableSource
+            .GetQueryable<TDirectAncestorLink>()
+            .Where(filter)
+            .WithFetch(this.linkFetchRule)
+            .GenericAsAsyncEnumerable()
+            .ToImmutableArrayAsync<TDirectAncestorLink>(cancellationToken);
     }
 
     private AncestorLinkData<TDomainObject> ToInfo(TDirectAncestorLink link)
