@@ -1,5 +1,7 @@
 ﻿using Anch.SecuritySystem;
 using Anch.SecuritySystem.Validation;
+using Anch.Testing.Xunit;
+
 using ExampleApp.Application;
 using ExampleApp.Domain;
 

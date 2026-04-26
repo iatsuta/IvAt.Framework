@@ -3,6 +3,8 @@ using Anch.GenericRepository;
 using Anch.SecuritySystem;
 using Anch.SecuritySystem.AvailableSecurity;
 using Anch.SecuritySystem.DomainServices;
+using Anch.Testing.Xunit;
+
 using ExampleApp.Application;
 using ExampleApp.Domain;
 using Microsoft.Extensions.DependencyInjection;

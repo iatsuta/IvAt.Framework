@@ -1,4 +1,6 @@
-﻿using ExampleApp.Application;
+﻿using Anch.Testing.Xunit;
+
+using ExampleApp.Application;
 
 namespace ExampleApp.IntegrationTests;
 

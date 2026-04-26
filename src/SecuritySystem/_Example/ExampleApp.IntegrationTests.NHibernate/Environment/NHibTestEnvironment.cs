@@ -1,4 +1,6 @@
 ﻿using Anch.Testing;
+using Anch.Testing.Xunit;
+
 using ExampleApp.Infrastructure.DependencyInjection;
 
 using Microsoft.Extensions.Configuration;

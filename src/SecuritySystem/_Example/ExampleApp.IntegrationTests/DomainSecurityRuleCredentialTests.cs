@@ -1,5 +1,7 @@
 ﻿using Anch.GenericQueryable;
 using Anch.SecuritySystem;
+using Anch.Testing.Xunit;
+
 using ExampleApp.Application;
 using ExampleApp.Domain;
 

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 
-namespace Anch.Testing.XunitEngine;
+namespace Anch.Testing.Xunit.Engine;
 
 public static class ServiceProviderExtensions
 {

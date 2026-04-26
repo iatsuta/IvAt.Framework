@@ -4,6 +4,8 @@ using Anch.GenericRepository;
 using Anch.HierarchicalExpand.Denormalization;
 using Anch.HierarchicalExpand.IntegrationTests.Domain;
 using Anch.HierarchicalExpand.IntegrationTests.Environment;
+using Anch.Testing.Xunit;
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Anch.HierarchicalExpand.IntegrationTests;

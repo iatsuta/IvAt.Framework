@@ -1,4 +1,6 @@
 ﻿using Anch.Core.Auth;
+using Anch.Testing.Xunit;
+
 using ExampleApp.Application;
 
 namespace ExampleApp.IntegrationTests;

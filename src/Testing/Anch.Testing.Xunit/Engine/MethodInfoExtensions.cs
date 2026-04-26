@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Reflection;
 
-namespace Anch.Testing.XunitEngine;
+namespace Anch.Testing.Xunit.Engine;
 
 public static class MethodInfoExtensions
 {

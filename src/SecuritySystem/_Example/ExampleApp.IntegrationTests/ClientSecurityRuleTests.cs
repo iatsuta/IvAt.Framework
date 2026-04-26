@@ -1,5 +1,7 @@
 ﻿using Anch.SecuritySystem;
 using Anch.SecuritySystem.AvailableSecurity;
+using Anch.Testing.Xunit;
+
 using ExampleApp.Domain;
 
 namespace ExampleApp.IntegrationTests;

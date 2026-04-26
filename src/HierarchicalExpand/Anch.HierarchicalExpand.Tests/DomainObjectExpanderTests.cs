@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using Anch.GenericRepository;
 using Anch.HierarchicalExpand.Tests.Domain;
+using Anch.Testing.Xunit;
 
 namespace Anch.HierarchicalExpand.Tests;
 

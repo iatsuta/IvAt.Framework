@@ -1,1 +1,3 @@
-﻿[assembly: AnchTestFramework]
+﻿using Anch.Testing.Xunit;
+
+[assembly: AnchTestFramework]

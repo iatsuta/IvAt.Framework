@@ -3,6 +3,8 @@ using Anch.GenericRepository;
 using Anch.HierarchicalExpand.DependencyInjection;
 using Anch.HierarchicalExpand.Tests.Domain;
 using Anch.HierarchicalExpand.Tests.Environment;
+using Anch.Testing.Xunit;
+
 using Microsoft.Extensions.DependencyInjection;
 
 [assembly: AnchTestFramework<TestEnvironment>]
