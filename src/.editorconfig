@@ -1,7 +1,0 @@
-[*.xml]
-indent_style = space
-indent_size = 2
-
-[*.{props,targets,csproj}]
-indent_style = space
-indent_size = 2
