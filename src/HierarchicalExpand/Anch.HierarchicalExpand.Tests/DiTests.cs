@@ -2,6 +2,8 @@
 using Anch.Core;
 using Anch.HierarchicalExpand.Tests.Domain;
 using Anch.HierarchicalExpand.Tests.Environment;
+using Anch.Testing.Xunit;
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Anch.HierarchicalExpand.Tests;

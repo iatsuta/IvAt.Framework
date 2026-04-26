@@ -4,7 +4,7 @@ using Xunit.Internal;
 using Xunit.Sdk;
 using Xunit.v3;
 
-namespace Anch.Testing.XunitEngine;
+namespace Anch.Testing.Xunit.Engine;
 
 public static class AnchRunnerHelper
 {

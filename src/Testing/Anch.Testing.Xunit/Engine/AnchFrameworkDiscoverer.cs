@@ -2,7 +2,7 @@
 using Xunit.Sdk;
 using Xunit.v3;
 
-namespace Anch.Testing.XunitEngine;
+namespace Anch.Testing.Xunit.Engine;
 
 public class AnchFrameworkDiscoverer(IXunitTestAssembly testAssembly, IServiceProviderPool? serviceProviderPool)
     : XunitTestFrameworkDiscoverer(testAssembly)

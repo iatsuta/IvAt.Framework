@@ -1,4 +1,6 @@
-﻿[assembly: AnchTestFramework]
+﻿using Anch.Testing.Xunit;
+
+[assembly: AnchTestFramework]
 
 namespace Anch.GenericQueryable.UnitTests;
 

@@ -1,4 +1,6 @@
-﻿using ExampleApp.Api.Controllers;
+﻿using Anch.Testing.Xunit;
+
+using ExampleApp.Api.Controllers;
 using ExampleApp.Domain;
 
 namespace ExampleApp.IntegrationTests;

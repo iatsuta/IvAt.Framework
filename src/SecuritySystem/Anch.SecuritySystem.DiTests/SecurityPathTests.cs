@@ -5,6 +5,8 @@ using Anch.SecuritySystem.DiTests.Rules;
 using Anch.SecuritySystem.DiTests.Services;
 using Anch.SecuritySystem.Services;
 using Anch.SecuritySystem.Testing;
+using Anch.Testing.Xunit;
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Anch.SecuritySystem.DiTests;

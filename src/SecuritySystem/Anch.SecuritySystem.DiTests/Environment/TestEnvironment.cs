@@ -6,6 +6,8 @@ using Anch.SecuritySystem.DiTests.DomainObjects;
 using Anch.SecuritySystem.DiTests.Environment;
 using Anch.SecuritySystem.DiTests.Rules;
 using Anch.SecuritySystem.DiTests.Services;
+using Anch.Testing.Xunit;
+
 using Microsoft.Extensions.DependencyInjection;
 
 [assembly: AnchTestFramework<TestEnvironment>]

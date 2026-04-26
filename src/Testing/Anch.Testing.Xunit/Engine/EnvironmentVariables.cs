@@ -1,4 +1,4 @@
-﻿namespace Anch.Testing.XunitEngine;
+﻿namespace Anch.Testing.Xunit.Engine;
 
 internal static class EnvironmentVariables
 {

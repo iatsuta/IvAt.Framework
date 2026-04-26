@@ -1,7 +1,7 @@
 ﻿using Xunit.Internal;
 using Xunit.v3;
 
-namespace Anch.Testing.XunitEngine;
+namespace Anch.Testing.Xunit.Engine;
 
 public class AnchTestCaseRunner : XunitTestCaseRunner
 {

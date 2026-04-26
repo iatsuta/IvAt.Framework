@@ -4,6 +4,8 @@ using Anch.GenericQueryable.NHibernate;
 using Anch.GenericRepository;
 using Anch.IdentitySource.DependencyInjection;
 using Anch.Testing;
+using Anch.Testing.Xunit;
+
 using Microsoft.Extensions.DependencyInjection;
 using NHibernate;
 

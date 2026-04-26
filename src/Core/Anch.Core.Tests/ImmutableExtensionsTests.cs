@@ -1,4 +1,6 @@
-﻿namespace Anch.Core.Tests;
+﻿using Anch.Testing.Xunit;
+
+namespace Anch.Core.Tests;
 
 public class ImmutableExtensionsTests
 {

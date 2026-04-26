@@ -1,6 +1,8 @@
 ﻿using Anch.Core.Auth;
 using Anch.SecuritySystem.Services;
 using Anch.SecuritySystem.UserSource;
+using Anch.Testing.Xunit;
+
 using ExampleApp.Domain.Auth.General;
 
 using Microsoft.Extensions.DependencyInjection;

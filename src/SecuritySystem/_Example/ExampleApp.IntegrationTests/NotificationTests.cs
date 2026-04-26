@@ -3,6 +3,7 @@ using Anch.SecuritySystem;
 using Anch.SecuritySystem.Notification;
 using Anch.SecuritySystem.Notification.Domain;
 using Anch.SecuritySystem.Services;
+using Anch.Testing.Xunit;
 
 using ExampleApp.Application;
 using ExampleApp.Domain;
