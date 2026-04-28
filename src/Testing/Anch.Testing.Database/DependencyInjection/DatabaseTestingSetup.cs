@@ -14,7 +14,7 @@ public class DatabaseTestingSetup : IDatabaseTestingSetup, IServiceInitializer
 
     private Action<IServiceCollection>? initEmptySchemaAction;
 
-    private Action<IServiceCollection>? initSharedTestDataAction;
+    private Action<IServiceCollection>? initTestDataAction;
 
     private Action<IServiceCollection>? initSettingsAction;
 
@@ -24,32 +24,26 @@ public class DatabaseTestingSetup : IDatabaseTestingSetup, IServiceInitializer
     {
         services
             .AddSingleton<ITestConnectionStringProvider, TestConnectionStringProvider>()
-            .AddKeyedSingleton<ITestEnvironmentHook, PrepareDatabaseEnvironmentHook>(EnvironmentHookType.Before)
-            .AddKeyedSingleton<ITestEnvironmentHook, CleanDatabaseEnvironmentHook>(EnvironmentHookType.After)
+
+            .AddEnvironmentHook<PrepareDatabaseEnvironmentHook>(EnvironmentHookType.Before)
+            .AddEnvironmentHook<CleanDatabaseEnvironmentHook>(EnvironmentHookType.After)
 
             .AddSingleton(typeof(ISynchronizedInitializer<>), typeof(SynchronizedInitializer<>))
 
             .AddKeyedSingleton<IInitializer, CachedEmptySchemaInitializer>(TestDatabaseInitializer.CachedEmptySchemaKey)
-            .AddKeyedSingleton<IInitializer, CachedSharedTestDataInitializer>(TestDatabaseInitializer.CachedSharedTestDataKey)
+            .AddKeyedSingleton<IInitializer, CachedTestDataInitializer>(TestDatabaseInitializer.CachedTestDataKey)
 
             .AddSingleton<IDatabaseManager, FileDatabaseManager>();
 
         (this.initEmptySchemaAction ?? throw new InvalidOperationException("Empty schema initializer is not set.")).Invoke(services);
 
-        (this.initSharedTestDataAction ?? throw new InvalidOperationException("Shared test data initializer is not set.")).Invoke(services);
+        (this.initTestDataAction ?? throw new InvalidOperationException("Shared test data initializer is not set.")).Invoke(services);
 
         (this.initSettingsAction ?? throw new InvalidOperationException("Settings initializer is not set.")).Invoke(services);
 
         (this.initRebindConnectionStringAction ?? throw new InvalidOperationException("Rebind connection string initializer is not set.")).Invoke(services);
 
-        if (this.databaseTestingProvider == null)
-        {
-            throw new InvalidOperationException("Database testing provider is not set.");
-        }
-        else
-        {
-            this.databaseTestingProvider.AddServices(services);
-        }
+        (this.databaseTestingProvider ?? throw new InvalidOperationException("Database testing provider is not set.")).AddServices(services);
     }
 
     public IDatabaseTestingSetup SetProvider<TDatabaseTestingProvider>()
@@ -60,22 +54,36 @@ public class DatabaseTestingSetup : IDatabaseTestingSetup, IServiceInitializer
         return this;
     }
 
-    public IDatabaseTestingSetup SetEmptySchemaInitializer<TEmptySchemaInitializer>()
-        where TEmptySchemaInitializer : IInitializer
+    public IDatabaseTestingSetup SetEmptySchemaInitializer<TEmptySchemaInitializer>(bool register = true)
+        where TEmptySchemaInitializer : class, IInitializer
     {
-        this.initEmptySchemaAction = sc =>
-            sc.AddKeyedSingleton<IInitializer>(TestDatabaseInitializer.EmptySchemaKey, (sp, _) => sp.GetRequiredService<TEmptySchemaInitializer>());
+        this.initEmptySchemaAction = GetIntiAction<TEmptySchemaInitializer>(TestDatabaseInitializer.EmptySchemaKey, register);
 
         return this;
     }
 
-    public IDatabaseTestingSetup SetSharedTestDataInitializer<TSharedTestDataInitializer>()
-        where TSharedTestDataInitializer : IInitializer
+    public IDatabaseTestingSetup SetTestDataInitializer<TTestDataInitializer>(bool register = true)
+        where TTestDataInitializer : class, IInitializer
     {
-        this.initSharedTestDataAction = sc =>
-            sc.AddKeyedSingleton<IInitializer>(TestDatabaseInitializer.SharedTestDataKey, (sp, _) => sp.GetRequiredService<TSharedTestDataInitializer>());
+        this.initTestDataAction = GetIntiAction<TTestDataInitializer>(TestDatabaseInitializer.TestDataKey, register);
 
         return this;
+    }
+
+    private static Action<IServiceCollection> GetIntiAction<TInitializer>(string key, bool register)
+        where TInitializer : class, IInitializer
+    {
+        return sc =>
+        {
+            if (register)
+            {
+                sc.AddKeyedSingleton<IInitializer, TInitializer>(key);
+            }
+            else
+            {
+                sc.AddKeyedSingleton<IInitializer>(key, (sp, _) => sp.GetRequiredService<TInitializer>());
+            }
+        };
     }
 
     public IDatabaseTestingSetup SetSettings(TestDatabaseSettings testDatabaseSettings)
