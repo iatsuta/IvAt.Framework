@@ -57,17 +57,7 @@ public class DatabaseTestingSetup : IDatabaseTestingSetup, IServiceInitializer
     public IDatabaseTestingSetup SetEmptySchemaInitializer<TEmptySchemaInitializer>(bool register = true)
         where TEmptySchemaInitializer : class, IInitializer
     {
-        this.initSharedTestDataAction = sc =>
-        {
-            if (register)
-            {
-                sc.AddKeyedSingleton<IInitializer, TEmptySchemaInitializer>(TestDatabaseInitializer.EmptySchemaKey);
-            }
-            else
-            {
-                sc.AddKeyedSingleton<IInitializer>(TestDatabaseInitializer.EmptySchemaKey, (sp, _) => sp.GetRequiredService<TEmptySchemaInitializer>());
-            }
-        };
+        this.initEmptySchemaAction = GetIntiAction<TEmptySchemaInitializer>(TestDatabaseInitializer.EmptySchemaKey, register);
 
         return this;
     }
@@ -75,19 +65,25 @@ public class DatabaseTestingSetup : IDatabaseTestingSetup, IServiceInitializer
     public IDatabaseTestingSetup SetSharedTestDataInitializer<TSharedTestDataInitializer>(bool register = true)
         where TSharedTestDataInitializer : class, IInitializer
     {
-        this.initSharedTestDataAction = sc =>
+        this.initSharedTestDataAction = GetIntiAction<TSharedTestDataInitializer>(TestDatabaseInitializer.SharedTestDataKey, register);
+
+        return this;
+    }
+
+    private static Action<IServiceCollection> GetIntiAction<TInitializer>(string key, bool register = true)
+        where TInitializer : class, IInitializer
+    {
+        return sc =>
         {
             if (register)
             {
-                sc.AddKeyedSingleton<IInitializer, TSharedTestDataInitializer>(TestDatabaseInitializer.SharedTestDataKey);
+                sc.AddKeyedSingleton<IInitializer, TInitializer>(key);
             }
             else
             {
-                sc.AddKeyedSingleton<IInitializer>(TestDatabaseInitializer.SharedTestDataKey, (sp, _) => sp.GetRequiredService<TSharedTestDataInitializer>());
+                sc.AddKeyedSingleton<IInitializer>(key, (sp, _) => sp.GetRequiredService<TInitializer>());
             }
         };
-
-        return this;
     }
 
     public IDatabaseTestingSetup SetSettings(TestDatabaseSettings testDatabaseSettings)
