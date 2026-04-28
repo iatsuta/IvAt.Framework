@@ -17,10 +17,10 @@ public class SynchronizedInitializer<T> : ISynchronizedInitializer<T>
                 if (!this.initialized)
                 {
                     await action();
+
+                    this.initialized = true;
                 }
             }
-
-            this.initialized = true;
         }
     }
 }
