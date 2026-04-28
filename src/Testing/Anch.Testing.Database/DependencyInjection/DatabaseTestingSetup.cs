@@ -70,7 +70,7 @@ public class DatabaseTestingSetup : IDatabaseTestingSetup, IServiceInitializer
         return this;
     }
 
-    private static Action<IServiceCollection> GetIntiAction<TInitializer>(string key, bool register = true)
+    private static Action<IServiceCollection> GetIntiAction<TInitializer>(string key, bool register)
         where TInitializer : class, IInitializer
     {
         return sc =>
