@@ -6,7 +6,7 @@ namespace Anch.Workflow.Tests.Parallell;
 public class ParallelWorkflowTests : SingleScopeWorkflowTestBase<ParallelWorkflowObject, ParallelWorkflow>
 {
     [Fact]
-    public async System.Threading.Tasks.Task Parallel_SendApprove_RejectBranchTerminated()
+    public async Task Parallel_SendApprove_RejectBranchTerminated()
     {
         // Arrange
         var wfObj = new ParallelWorkflowObject();

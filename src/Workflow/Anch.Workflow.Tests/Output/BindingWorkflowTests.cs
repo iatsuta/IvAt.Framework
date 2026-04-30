@@ -8,7 +8,7 @@ public class BindingWorkflowTests : SingleScopeWorkflowTestBase<BindingWorkflowO
     [Theory]
     [InlineData(2, 3, 5)]
     [InlineData(6, 7, 13)]
-    public async System.Threading.Tasks.Task BindingInputAndOutputPropsByState_ResultEquals(int v1, int v2, int expectedResult)
+    public async Task BindingInputAndOutputPropsByState_ResultEquals(int v1, int v2, int expectedResult)
     {
         // Arrange
         var ct = TestContext.Current.CancellationToken;
