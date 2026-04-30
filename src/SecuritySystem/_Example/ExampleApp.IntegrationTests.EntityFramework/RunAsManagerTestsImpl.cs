@@ -1,5 +1,3 @@
-﻿using ExampleApp.IntegrationTests.Environment;
+﻿namespace ExampleApp.IntegrationTests;
 
-namespace ExampleApp.IntegrationTests;
-
-public class RunAsManagerTestsImpl() : RunAsManagerTests(TestEnvironmentImpl.Instance.RootServiceProvider);
+public class RunAsManagerTestsImpl(IServiceProvider rootServiceProvider) : RunAsManagerTests(rootServiceProvider);

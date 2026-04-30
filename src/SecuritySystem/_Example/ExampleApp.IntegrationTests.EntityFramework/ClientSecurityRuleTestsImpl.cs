@@ -1,5 +1,3 @@
-﻿using ExampleApp.IntegrationTests.Environment;
+﻿namespace ExampleApp.IntegrationTests;
 
-namespace ExampleApp.IntegrationTests;
-
-public class ClientSecurityRuleTestsImpl() : ClientSecurityRuleTests(TestEnvironmentImpl.Instance.RootServiceProvider);
+public class ClientSecurityRuleTestsImpl(IServiceProvider rootServiceProvider) : ClientSecurityRuleTests(rootServiceProvider);

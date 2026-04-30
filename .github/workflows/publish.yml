@@ -9,26 +9,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v5
+
+      - name: Set up node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 18
+          cache: "npm"
+          cache-dependency-path: ./src/SecuritySystem/Anch.SecuritySystem.Configurator/configurator-ui
+
+      - name: Build UI
+        working-directory: ./src/SecuritySystem/Anch.SecuritySystem.Configurator/configurator-ui
+        run: |
+          npm ci
+          npm run ng build
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
+        uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
 
       - name: Restore dependencies
-        working-directory: ./src
         run: |
-          dotnet restore
+          dotnet restore src/Anch.Framework.slnx
 
       - name: Build and Pack
         working-directory: ./src
         run: |
-          dotnet pack IvAt.Framework.slnx --no-restore /p:PackageVersion=${{ github.event.release.tag_name }} /p:InformationalVersion=${{ github.sha }} -c Release -o out
+          dotnet pack Anch.Framework.slnx --no-restore /p:PackageVersion=${{ github.event.release.tag_name }} /p:InformationalVersion=${{ github.sha }} -c Release -o out
 
       - name: Publish
         working-directory: ./src/out
         run: |
           dotnet nuget push *.nupkg -s https://api.nuget.org/v3/index.json --api-key ${NUGET_TOKEN}
         env:
-          NUGET_TOKEN: ${{ secrets.NUGET_IvAt }}
+          NUGET_TOKEN: ${{ secrets.NUGET_Anch }}

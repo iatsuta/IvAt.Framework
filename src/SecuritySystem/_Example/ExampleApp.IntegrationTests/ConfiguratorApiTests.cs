@@ -1,19 +1,20 @@
-﻿using SecuritySystem;
-using SecuritySystem.ExternalSystem.Management;
+﻿using Anch.SecuritySystem;
+using Anch.SecuritySystem.ExternalSystem.Management;
+using Anch.Testing.Xunit;
 
 namespace ExampleApp.IntegrationTests;
 
 public abstract class ConfiguratorApiTests(IServiceProvider rootServiceProvider) : TestBase(rootServiceProvider)
 {
-    [Fact]
-    public async Task GetLinkedPrincipalsAsync_ReturnsAllPrincipalsLinkedToRole()
+    [AnchFact]
+    public async Task GetLinkedPrincipalsAsync_ReturnsAllPrincipalsLinkedToRole(CancellationToken ct)
     {
         // Arrange
         var securityRole = SecurityRole.Administrator;
 
-        var additionalAdmin = nameof(GetLinkedPrincipalsAsync_ReturnsAllPrincipalsLinkedToRole);
+        var additionalAdmin = nameof(this.GetLinkedPrincipalsAsync_ReturnsAllPrincipalsLinkedToRole);
 
-        await this.AuthManager.For(additionalAdmin).AddRoleAsync(securityRole, this.CancellationToken);
+        await this.AuthManager.For(additionalAdmin).AddRoleAsync(securityRole, ct);
 
         var expectedResults = new[] { additionalAdmin, this.AuthManager.RootUserName }.OrderBy(v => v);
 
@@ -21,14 +22,14 @@ public abstract class ConfiguratorApiTests(IServiceProvider rootServiceProvider)
         var principalNames = await this.GetEvaluator<IRootPrincipalSourceService>()
             .EvaluateAsync(
                 TestingScopeMode.Read,
-                async service => await service.GetLinkedPrincipalsAsync([securityRole]).ToListAsync(this.CancellationToken));
+                async service => await service.GetLinkedPrincipalsAsync([securityRole]).ToListAsync(ct));
 
         // Assert
-        principalNames.OrderBy(v => v).Should().BeEquivalentTo(expectedResults);
+        Assert.Equivalent(expectedResults, principalNames.OrderBy(v => v));
     }
 
-    [Fact]
-    public async Task GetPrincipalsAsync_ReturnsRootUserForRootPrincipal()
+    [AnchFact]
+    public async Task GetPrincipalsAsync_ReturnsRootUserForRootPrincipal(CancellationToken ct)
     {
         // Arrange
 
@@ -37,10 +38,10 @@ public abstract class ConfiguratorApiTests(IServiceProvider rootServiceProvider)
         {
             return await service
                 .GetPrincipalsAsync(this.AuthManager.RootUserName, 100).Select(ph => ph.Name)
-                .ToListAsync(this.CancellationToken);
+                .ToListAsync(ct);
         });
 
         // Assert
-        result.Should().BeEquivalentTo(this.AuthManager.RootUserName);
+        Assert.Equivalent(new[] { this.AuthManager.RootUserName }, result);
     }
 }

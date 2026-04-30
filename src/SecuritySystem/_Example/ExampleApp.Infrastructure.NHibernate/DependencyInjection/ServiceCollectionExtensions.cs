@@ -1,8 +1,7 @@
-﻿using CommonFramework.DependencyInjection;
+﻿using Anch.DependencyInjection;
 
+using ExampleApp.Infrastructure.DependencyInjection.UndirectView;
 using ExampleApp.Infrastructure.Services;
-
-using GenericQueryable.NHibernate;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -15,22 +14,21 @@ public static class ServiceCollectionExtensions
     {
         public IServiceCollection AddNHibernateInfrastructure(IConfiguration configuration)
         {
-            return services
-                .AddSingleton(new ViewSchema("app"))
+            return Anch.GenericQueryable.NHibernate.ServiceCollectionExtensions.AddNHibernateGenericQueryable(services
+                    .AddSingleton(new ViewSchema("app"))
 
-                .AddSingleton(BuildConfigurationHelper.BuildConfiguration(configuration.GetConnectionString("DefaultConnection")!))
-                .AddSingletonFrom((global::NHibernate.Cfg.Configuration cfg) => cfg.BuildSessionFactory())
+                    .AddSingleton<NHibConfigurationSource>()
+                    .AddSingletonFrom((NHibConfigurationSource configurationSource) => configurationSource.BuildConfiguration())
+                    .AddSingletonFrom((NHibernate.Cfg.Configuration cfg) => cfg.BuildSessionFactory())
 
-                .AddSingleton(typeof(IDomainObjectSaveStrategy<>), typeof(DomainObjectSaveStrategy<>))
-                .BindServiceProxy(typeof(IDomainObjectSaveStrategy<>), typeof(DomainObjectSaveStrategyServiceProxyBinder<>))
+                    .AddSingleton(typeof(IDomainObjectSaveStrategy<>), typeof(DomainObjectSaveStrategy<>))
+                    .BindServiceProxy(typeof(IDomainObjectSaveStrategy<>), typeof(DomainObjectSaveStrategyServiceProxyBinder<>))
 
-                .AddScoped(typeof(IDal<>), typeof(NHibDal<>))
-                .AddScoped<AutoCommitSession>()
-                .AddScoped<IDbSchemeInitializer, DbSchemeInitializer>()
+                    .AddScoped(typeof(IDal<>), typeof(NHibDal<>))
+                    .AddScoped<NHibAutoCommitSession>()
+                    .AddSingleton<IEmptySchemaInitializer, NHibEmptySchemaInitializer>()
 
-                .AddSingleton<INHibExpressionVisitorSource, NHibExpressionVisitorSource>()
-
-                .AddNHibernateGenericQueryable();
+                    .AddSingleton<INHibExpressionVisitorSource, NHibExpressionVisitorSource>());
         }
     }
 }

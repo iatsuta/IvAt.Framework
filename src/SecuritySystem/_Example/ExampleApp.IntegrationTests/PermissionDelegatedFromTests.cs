@@ -1,15 +1,16 @@
-﻿using ExampleApp.Application;
-using ExampleApp.Domain;
+﻿using Anch.SecuritySystem;
+using Anch.SecuritySystem.Validation;
+using Anch.Testing.Xunit;
 
-using SecuritySystem;
-using SecuritySystem.Validation;
+using ExampleApp.Application;
+using ExampleApp.Domain;
 
 namespace ExampleApp.IntegrationTests;
 
 public abstract class PermissionDelegationFromTests(IServiceProvider rootServiceProvider) : TestBase(rootServiceProvider)
 {
-    [Fact]
-    public async Task SetRoleAsync_ShouldPreserveDelegatedFromIdentity()
+    [AnchFact]
+    public async Task SetRoleAsync_ShouldPreserveDelegatedFromIdentity(CancellationToken ct)
     {
         // Arrange
         var sourcePrincipalName = "DelegatedFromPrincipal";
@@ -19,23 +20,22 @@ public abstract class PermissionDelegationFromTests(IServiceProvider rootService
         var subPermission = new TestPermission(ExampleSecurityRole.DefaultRole)
             { Identity = TypedSecurityIdentity.Create(Guid.NewGuid()), DelegatedFrom = delegatedFromPermission.Identity };
 
-
-        await this.AuthManager.For(sourcePrincipalName).SetRoleAsync(delegatedFromPermission, this.CancellationToken);
+        await this.AuthManager.For(sourcePrincipalName).SetRoleAsync(delegatedFromPermission, ct);
 
         // Act
-        var principalIdentity = await this.AuthManager.For(targetPrincipalName).SetRoleAsync(subPermission, this.CancellationToken);
+        var principalIdentity = await this.AuthManager.For(targetPrincipalName).SetRoleAsync(subPermission, ct);
 
         // Assert
-        var managedPrincipal = await this.AuthManager.For(principalIdentity).GetPrincipalAsync(this.CancellationToken);
+        var managedPrincipal = await this.AuthManager.For(principalIdentity).GetPrincipalAsync(ct);
 
-        var managedPermission = managedPrincipal.Permissions.Should().ContainSingle().Subject;
+        var managedPermission = Assert.Single(managedPrincipal.Permissions);
 
-        managedPermission.Identity.Should().Be(subPermission.Identity);
-        managedPermission.DelegatedFrom.Should().Be(subPermission.DelegatedFrom);
+        Assert.Equal(subPermission.Identity, managedPermission.Identity);
+        Assert.Equal(subPermission.DelegatedFrom, managedPermission.DelegatedFrom);
     }
 
-    [Fact]
-    public async Task AddRoleAsync_ShouldThrow_WhenDelegatingToOriginalPrincipal()
+    [AnchFact]
+    public async Task AddRoleAsync_ShouldThrow_WhenDelegatingToOriginalPrincipal(CancellationToken ct)
     {
         // Arrange
         var delegatedFromPermission = new TestPermission(SecurityRole.Administrator)
@@ -44,25 +44,25 @@ public abstract class PermissionDelegationFromTests(IServiceProvider rootService
         var subPermission = new TestPermission(ExampleSecurityRole.DefaultRole) { DelegatedFrom = delegatedFromPermission.Identity };
 
 
-        var principalIdentity = await this.AuthManager.For("DelegatedFromPrincipal").SetRoleAsync(delegatedFromPermission, this.CancellationToken);
+        var principalIdentity = await this.AuthManager.For("DelegatedFromPrincipal").SetRoleAsync(delegatedFromPermission, ct);
 
         // Act
-        var action = () => this.AuthManager.For(principalIdentity).AddRoleAsync(subPermission, this.CancellationToken);
+        var error = await Assert.ThrowsAsync<SecuritySystemValidationException>(async () =>
+            await this.AuthManager.For(principalIdentity).AddRoleAsync(subPermission, ct));
 
         // Assert
-        var error = await action.Should().ThrowAsync<SecuritySystemValidationException>();
 
-        error.And.Message.Should().Be("Invalid delegation target: the permission cannot be delegated to its original principal");
+        Assert.Equal("Invalid delegation target: the permission cannot be delegated to its original principal", error.Message);
     }
 
-    [Fact]
-    public async Task SetRoleAsync_ShouldPreserveDelegatedFrom_WhenAssigningToChildBusinessUnit()
+    [AnchFact]
+    public async Task SetRoleAsync_ShouldPreserveDelegatedFrom_WhenAssigningToChildBusinessUnit(CancellationToken ct)
     {
         // Arrange
         var sourcePrincipalName = "DelegatedFromPrincipal";
         var targetPrincipalName = "TargetPrincipal";
-        var sourceBuIdentity = await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>("TestRootBu", this.CancellationToken);
-        var targetBuIdentity = await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>($"Test{nameof(BusinessUnit)}1", this.CancellationToken);
+        var sourceBuIdentity = await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>("TestRootBu", ct);
+        var targetBuIdentity = await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>($"Test{nameof(BusinessUnit)}1", ct);
 
         var delegatedFromPermission = new TestPermission(ExampleSecurityRole.DefaultRole)
             { Identity = TypedSecurityIdentity.Create(Guid.NewGuid()), BusinessUnit = sourceBuIdentity };
@@ -71,28 +71,28 @@ public abstract class PermissionDelegationFromTests(IServiceProvider rootService
             { Identity = TypedSecurityIdentity.Create(Guid.NewGuid()), BusinessUnit = targetBuIdentity, DelegatedFrom = delegatedFromPermission.Identity };
 
 
-        await this.AuthManager.For(sourcePrincipalName).SetRoleAsync(delegatedFromPermission, this.CancellationToken);
+        await this.AuthManager.For(sourcePrincipalName).SetRoleAsync(delegatedFromPermission, ct);
 
         // Act
-        var principalIdentity = await this.AuthManager.For(targetPrincipalName).SetRoleAsync(subPermission, this.CancellationToken);
+        var principalIdentity = await this.AuthManager.For(targetPrincipalName).SetRoleAsync(subPermission, ct);
 
         // Assert
-        var managedPrincipal = await this.AuthManager.For(principalIdentity).GetPrincipalAsync(this.CancellationToken);
+        var managedPrincipal = await this.AuthManager.For(principalIdentity).GetPrincipalAsync(ct);
 
-        var managedPermission = managedPrincipal.Permissions.Should().ContainSingle().Subject;
+        var managedPermission = Assert.Single(managedPrincipal.Permissions);
 
-        managedPermission.Identity.Should().Be(subPermission.Identity);
-        managedPermission.DelegatedFrom.Should().Be(subPermission.DelegatedFrom);
-        managedPermission.Restrictions.Should().BeEquivalentTo(subPermission.Restrictions);
+        Assert.Equal(subPermission.Identity, managedPermission.Identity);
+        Assert.Equal(subPermission.DelegatedFrom, managedPermission.DelegatedFrom);
+        Assert.Equivalent(subPermission.Restrictions, managedPermission.Restrictions);
     }
 
-    [Fact]
-    public async Task SetRoleAsync_ShouldThrow_WhenDelegationExceedsSourceBusinessUnit()
+    [AnchFact]
+    public async Task SetRoleAsync_ShouldThrow_WhenDelegationExceedsSourceBusinessUnit(CancellationToken ct)
     {
         // Arrange
         var sourcePrincipalName = "DelegatedFromPrincipal";
         var targetPrincipalName = "TargetPrincipal";
-        var sourceBuIdentity = await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>("TestRootBu", this.CancellationToken);
+        var sourceBuIdentity = await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>("TestRootBu", ct);
         var invalidObjects = $"{nameof(BusinessUnit)}: Unrestricted";
 
         var delegatedFromPermission = new TestPermission(ExampleSecurityRole.DefaultRole)
@@ -101,27 +101,27 @@ public abstract class PermissionDelegationFromTests(IServiceProvider rootService
         var subPermission = new TestPermission(ExampleSecurityRole.DefaultRole) { DelegatedFrom = delegatedFromPermission.Identity };
 
 
-        await this.AuthManager.For(sourcePrincipalName).SetRoleAsync(delegatedFromPermission, this.CancellationToken);
+        await this.AuthManager.For(sourcePrincipalName).SetRoleAsync(delegatedFromPermission, ct);
 
         // Act
-        var action = () => this.AuthManager.For(targetPrincipalName).SetRoleAsync(subPermission, this.CancellationToken);
+        var error = await Assert.ThrowsAsync<SecuritySystemValidationException>(async () =>
+            await this.AuthManager.For(targetPrincipalName).SetRoleAsync(subPermission, ct));
 
         // Assert
-        var error = await action.Should().ThrowAsync<SecuritySystemValidationException>();
 
-        error.And.Message.Should()
-            .Be(
-                $"Invalid security context delegation: the security contexts of \"{targetPrincipalName}\" exceed those granted by \"{sourcePrincipalName}\": {invalidObjects}");
+        Assert.Equal(
+            $"Invalid security context delegation: the security contexts of \"{targetPrincipalName}\" exceed those granted by \"{sourcePrincipalName}\": {invalidObjects}",
+            error.Message);
     }
 
-    [Fact]
-    public async Task SetRoleAsync_WhenTargetBusinessUnitExceedsSource_ShouldFail()
+    [AnchFact]
+    public async Task SetRoleAsync_WhenTargetBusinessUnitExceedsSource_ShouldFail(CancellationToken ct)
     {
         // Arrange
         var sourcePrincipalName = "DelegatedFromPrincipal";
         var targetPrincipalName = "TargetPrincipal";
-        var sourceBuIdentity = await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>($"Test{nameof(BusinessUnit)}1", this.CancellationToken);
-        var targetBuIdentity = await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>($"Test{nameof(BusinessUnit)}2", this.CancellationToken);
+        var sourceBuIdentity = await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>($"Test{nameof(BusinessUnit)}1", ct);
+        var targetBuIdentity = await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>($"Test{nameof(BusinessUnit)}2", ct);
         var invalidObjects = $"{nameof(BusinessUnit)}: {targetBuIdentity.Id}";
 
         var delegatedFromPermission = new TestPermission(ExampleSecurityRole.DefaultRole)
@@ -130,21 +130,21 @@ public abstract class PermissionDelegationFromTests(IServiceProvider rootService
         var subPermission = new TestPermission(ExampleSecurityRole.DefaultRole) { BusinessUnit = targetBuIdentity, DelegatedFrom = delegatedFromPermission.Identity };
 
 
-        await this.AuthManager.For(sourcePrincipalName).SetRoleAsync(delegatedFromPermission, this.CancellationToken);
+        await this.AuthManager.For(sourcePrincipalName).SetRoleAsync(delegatedFromPermission, ct);
 
         // Act
-        var action = () => this.AuthManager.For(targetPrincipalName).SetRoleAsync(subPermission, this.CancellationToken);
+        var error = await Assert.ThrowsAsync<SecuritySystemValidationException>(async () =>
+            await this.AuthManager.For(targetPrincipalName).SetRoleAsync(subPermission, ct));
 
         // Assert
-        var error = await action.Should().ThrowAsync<SecuritySystemValidationException>();
 
-        error.And.Message.Should()
-            .Be(
-                $"Invalid security context delegation: the security contexts of \"{targetPrincipalName}\" exceed those granted by \"{sourcePrincipalName}\": {invalidObjects}");
+        Assert.Equal(
+            $"Invalid security context delegation: the security contexts of \"{targetPrincipalName}\" exceed those granted by \"{sourcePrincipalName}\": {invalidObjects}",
+            error.Message);
     }
 
-    [Fact]
-    public async Task SetRoleAsync_ShouldThrow_WhenDelegatedRoleIsNotSubsetOfSource()
+    [AnchFact]
+    public async Task SetRoleAsync_ShouldThrow_WhenDelegatedRoleIsNotSubsetOfSource(CancellationToken ct)
     {
         // Arrange
         var sourcePrincipalName = "DelegatedFromPrincipal";
@@ -158,21 +158,21 @@ public abstract class PermissionDelegationFromTests(IServiceProvider rootService
 
         var subPermission = new TestPermission(targetRole) { DelegatedFrom = delegatedFromPermission.Identity };
 
-        await this.AuthManager.For(sourcePrincipalName).SetRoleAsync(delegatedFromPermission, this.CancellationToken);
+        await this.AuthManager.For(sourcePrincipalName).SetRoleAsync(delegatedFromPermission, ct);
 
         // Act
-        var action = () => this.AuthManager.For(targetPrincipalName).SetRoleAsync(subPermission, this.CancellationToken);
+        var error = await Assert.ThrowsAsync<SecuritySystemValidationException>(async () =>
+            await this.AuthManager.For(targetPrincipalName).SetRoleAsync(subPermission, ct));
 
         // Assert
-        var error = await action.Should().ThrowAsync<SecuritySystemValidationException>();
 
-        error.And.Message.Should()
-            .Be(
-                $"Invalid delegated permission role: the selected role \"{targetRole}\" is not a subset of \"{sourceRole}\"");
+        Assert.Equal(
+            $"Invalid delegated permission role: the selected role \"{targetRole}\" is not a subset of \"{sourceRole}\"",
+            error.Message);
     }
 
-    [Fact]
-    public async Task SetRoleAsync_ShouldThrow_WhenDelegatedPeriodIsNotSubsetOfSource()
+    [AnchFact]
+    public async Task SetRoleAsync_ShouldThrow_WhenDelegatedPeriodIsNotSubsetOfSource(CancellationToken ct)
     {
         // Arrange
         var sourcePrincipalName = "DelegatedFromPrincipal";
@@ -190,14 +190,14 @@ public abstract class PermissionDelegationFromTests(IServiceProvider rootService
 
         var subPermission = new TestPermission(ExampleSecurityRole.DefaultRole) { Period = targetPeriod, DelegatedFrom = delegatedFromPermission.Identity };
 
-        await this.AuthManager.For(sourcePrincipalName).SetRoleAsync(delegatedFromPermission, this.CancellationToken);
+        await this.AuthManager.For(sourcePrincipalName).SetRoleAsync(delegatedFromPermission, ct);
 
         // Act
-        var action = () => this.AuthManager.For(targetPrincipalName).SetRoleAsync(subPermission, this.CancellationToken);
+        var error = await Assert.ThrowsAsync<SecuritySystemValidationException>(async () =>
+            await this.AuthManager.For(targetPrincipalName).SetRoleAsync(subPermission, ct));
 
         // Assert
-        var error = await action.Should().ThrowAsync<SecuritySystemValidationException>();
 
-        error.And.Message.Should().Be(expectedErrorMessage);
+        Assert.Equal(expectedErrorMessage, error.Message);
     }
 }

@@ -1,5 +1,3 @@
-﻿using ExampleApp.IntegrationTests.Environment;
+﻿namespace ExampleApp.IntegrationTests;
 
-namespace ExampleApp.IntegrationTests;
-
-public class DuplicatePermissionValidationTestsImpl() : DuplicatePermissionValidationTests(TestEnvironmentImpl.Instance.RootServiceProvider);
+public class DuplicatePermissionValidationTestsImpl(IServiceProvider rootServiceProvider) : DuplicatePermissionValidationTests(rootServiceProvider);

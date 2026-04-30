@@ -1,11 +1,13 @@
-﻿using ExampleApp.Application;
+﻿using Anch.Testing.Xunit;
+
+using ExampleApp.Application;
 
 namespace ExampleApp.IntegrationTests;
 
 public abstract class PermissionExtendedDataTests(IServiceProvider rootServiceProvider) : TestBase(rootServiceProvider)
 {
-    [Fact]
-    public async Task SetRoleAsync_WithExtendedValue_ShouldPersistExtendedData()
+    [AnchFact]
+    public async Task SetRoleAsync_WithExtendedValue_ShouldPersistExtendedData(CancellationToken ct)
     {
         // Arrange
         var principalName = "TestPrincipal";
@@ -15,14 +17,15 @@ public abstract class PermissionExtendedDataTests(IServiceProvider rootServicePr
         var testPermission = new TestPermission(ExampleSecurityRole.DefaultRole) { ExtendedValue = extendedValue };
 
         // Act
-        var principalIdentity = await this.AuthManager.For(principalName).SetRoleAsync(testPermission, this.CancellationToken);
+        var principalIdentity = await this.AuthManager.For(principalName).SetRoleAsync(testPermission, ct);
 
         // Assert
-        var managedPrincipal = await this.AuthManager.For(principalIdentity).GetPrincipalAsync(this.CancellationToken);
+        var managedPrincipal = await this.AuthManager.For(principalIdentity).GetPrincipalAsync(ct);
 
-        var managedPermission = managedPrincipal.Permissions.Should().ContainSingle().Subject;
+        var managedPermission = Assert.Single(managedPrincipal.Permissions);
 
-        managedPermission.ExtendedData.GetValueOrDefault(TestPermissionExtensions.ExtendedKey)
-            .Should().Be(extendedValue);
+        Assert.Equal(
+            extendedValue,
+            managedPermission.ExtendedData.GetValueOrDefault(TestPermissionExtensions.ExtendedKey));
     }
 }

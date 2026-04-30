@@ -1,51 +1,51 @@
-﻿using ExampleApp.Application;
-using ExampleApp.Domain;
+﻿using Anch.SecuritySystem;
+using Anch.SecuritySystem.Validation;
+using Anch.Testing.Xunit;
 
-using SecuritySystem;
-using SecuritySystem.Validation;
+using ExampleApp.Application;
+using ExampleApp.Domain;
 
 namespace ExampleApp.IntegrationTests;
 
 public abstract class DuplicatePermissionValidationTests(IServiceProvider rootServiceProvider) : TestBase(rootServiceProvider)
 {
-    [Fact]
-    public async Task AddRoleAsync_WhenDuplicatePermissionExists_ShouldThrowValidationException()
+    [AnchFact]
+    public async Task AddRoleAsync_WhenDuplicatePermissionExists_ShouldThrowValidationException(CancellationToken ct)
     {
         // Arrange
         var principalName = "TestPrincipal";
-        var buIdentity = await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>("TestRootBu", this.CancellationToken);
+        var buIdentity = await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>("TestRootBu", ct);
 
         Task<SecurityIdentity> Assign() => this.AuthManager.For(principalName)
-            .AddRoleAsync(new TestPermission(ExampleSecurityRole.BuManager) { BusinessUnit = buIdentity }, this.CancellationToken);
+            .AddRoleAsync(new TestPermission(ExampleSecurityRole.BuManager) { BusinessUnit = buIdentity }, ct);
 
         await Assign();
 
         // Act
-        var action = Assign;
+        var error = await Assert.ThrowsAsync<SecuritySystemValidationException>(async () => await Assign());
 
         // Assert
-        var error = await action.Should().ThrowAsync<SecuritySystemValidationException>();
 
-        error.And.Message.Should().Contain($"Principal \"{principalName}\" has duplicate permissions");
+        Assert.Contains($"Principal \"{principalName}\" has duplicate permissions", error.Message);
     }
 
 
-    [Fact]
-    public async Task AddRoleAsync_WhenPermissionPeriodsDoNotIntersect_ShouldNotThrow()
+    [AnchFact]
+    public async Task AddRoleAsync_WhenPermissionPeriodsDoNotIntersect_ShouldNotThrow(CancellationToken ct)
     {
         // Arrange
         var principalName = "TestPrincipal";
-        var buIdentity = await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>("TestRootBu", this.CancellationToken);
+        var buIdentity = await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>("TestRootBu", ct);
 
         Task<SecurityIdentity> Assign(PermissionPeriod period) => this.AuthManager.For(principalName)
-            .AddRoleAsync(new TestPermission(ExampleSecurityRole.BuManager) { BusinessUnit = buIdentity, Period = period }, this.CancellationToken);
+            .AddRoleAsync(new TestPermission(ExampleSecurityRole.BuManager) { BusinessUnit = buIdentity, Period = period }, ct);
 
         await Assign(new PermissionPeriod(new DateTime(2000, 1, 1), new DateTime(2009, 1, 1)));
 
         // Act
-        var action = () => Assign(new PermissionPeriod(new DateTime(2010, 1, 1), new DateTime(2019, 1, 1)));
+        var ex = await Record.ExceptionAsync(async () => await Assign(new PermissionPeriod(new DateTime(2010, 1, 1), new DateTime(2019, 1, 1))));
 
         // Assert
-        await action.Should().NotThrowAsync();
+        Assert.Null(ex);
     }
 }

@@ -1,33 +1,48 @@
-﻿using CommonFramework;
-using CommonFramework.DependencyInjection;
+﻿using Anch.Core;
+using Anch.DependencyInjection;
+using Anch.SecuritySystem.Testing.DependencyInjection;
+using Anch.Testing.Database;
+using Anch.Testing.Database.DependencyInjection;
+using Anch.Testing.Database.Sqlite;
 
 using ExampleApp.Api.Controllers;
 using ExampleApp.Infrastructure.DependencyInjection;
+using ExampleApp.Infrastructure.Services;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-using SecuritySystem.Testing.DependencyInjection;
-
 namespace ExampleApp.IntegrationTests.Environment;
 
-public abstract class TestEnvironment
+public abstract class TestEnvironment : ITestEnvironment
 {
-    public IServiceProvider RootServiceProvider => field ??= BuildServiceProvider();
-
-    protected IServiceProvider BuildServiceProvider()
+    public IServiceProvider BuildServiceProvider(IServiceCollection services)
     {
         var configuration = new ConfigurationBuilder().AddJsonFile("testAppSettings.json", false, true).Build();
 
-        return new ServiceCollection()
+        return services
+            .AddSingleton(configuration)
+            .AddSingleton(TimeProvider.System)
             .AddInfrastructure(configuration)
-            .Pipe(services => this.InitializeServices(services, configuration))
+            .Pipe(s => this.InitializeServices(s, configuration))
 
             .AddScoped<TestController>()
-            .AddSingleton(TimeProvider.System)
-            //.ReplaceSingleton<IDefaultCancellationTokenSource, XUnitDefaultCancellationTokenSource>()
+            .ReplaceSingleton<IDefaultCancellationTokenSource, XUnitDefaultCancellationTokenSource>()
 
             .AddSecuritySystemTesting()
+
+            .AddDatabaseTesting(dts => dts
+                .SetProvider<SqliteDatabaseTestingProvider>()
+                .SetEmptySchemaInitializer<IEmptySchemaInitializer>(register: false)
+                .SetTestDataInitializer<ITestDataInitializer>(register: false)
+                .SetSettings(new TestDatabaseSettings
+                {
+                    InitMode = DatabaseInitModeHelper.DatabaseInitMode,
+                    DefaultConnectionString = new (configuration.GetRequiredConnectionString(MainConnectionStringSource.DefaultName))
+                })
+                .RebindActualConnection<IMainConnectionStringSource>(connectionString => new ManualMainConnectionStringSource(connectionString.Value)))
+
+            .AddEnvironmentHook(EnvironmentHookType.After, sp => sp.GetRequiredService<RootImpersonateServiceState>().Reset())
 
             .AddValidator<DuplicateServiceUsageValidator>()
             .Validate()

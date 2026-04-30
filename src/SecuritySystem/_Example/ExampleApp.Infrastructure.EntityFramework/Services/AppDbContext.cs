@@ -1,4 +1,6 @@
-﻿using ExampleApp.Domain;
+﻿using Anch.GenericQueryable.EntityFramework;
+
+using ExampleApp.Domain;
 using ExampleApp.Domain.Auth.General;
 using ExampleApp.Domain.Auth.Virtual;
 
@@ -6,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ExampleApp.Infrastructure.Services;
 
-public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
+public class AppDbContext(DbContextOptions<AppDbContext> options, IMainConnectionStringSource mainConnectionStringSource) : DbContext(options)
 {
     private const string DefaultIdPostfix = "Id";
 
@@ -15,6 +17,13 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     private const string AuthSchema = "auth";
 
 	private const int DefaultMaxLength = 255;
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseSqlite(mainConnectionStringSource.ConnectionString)
+            .UseLazyLoadingProxies()
+            .UseGenericQueryable();
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -1,6 +1,6 @@
-﻿using ExampleApp.Domain;
+﻿using Anch.SecuritySystem;
 
-using SecuritySystem;
+using ExampleApp.Domain;
 
 namespace ExampleApp.IntegrationTests;
 

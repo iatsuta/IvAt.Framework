@@ -11,81 +11,89 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - run: git config --global core.autocrlf true
+
       - uses: actions/checkout@v5
+
+      - name: Set up node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 18
+          cache: "npm"
+          cache-dependency-path: ./src/SecuritySystem/Anch.SecuritySystem.Configurator/configurator-ui
+
+      - name: Build UI
+        working-directory: ./src/SecuritySystem/Anch.SecuritySystem.Configurator/configurator-ui
+        run: |
+          npm ci
+          npm run ng build
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
-      
+
       - name: Restore dependencies
-        working-directory: ./src
         run: |
-          dotnet restore IvAt.Framework.slnx
+          dotnet restore src/Anch.Framework.slnx
 
       - name: Build solution
-        working-directory: ./src
         run: |
-          dotnet build IvAt.Framework.slnx --no-restore --verbosity minimal
-          
+          dotnet build src/Anch.Framework.slnx --no-restore --verbosity minimal -c Release
+
       - name: CommonFramework Unit tests
-        working-directory: ./src/CommonFramework
         run: |
-          dotnet test CommonFramework.Tests --no-build --verbosity normal
+          dotnet test src/Core/Anch.Core.Tests --no-build --verbosity normal -c Release
 
       - name: CommonFramework Di unit tests
-        working-directory: ./src/CommonFramework
         run: |
-          dotnet test CommonFramework.DependencyInjection.Tests --no-build --verbosity normal
+          dotnet test src/DependencyInjection/Anch.DependencyInjection.Tests --no-build --verbosity normal -c Release
 
       - name: CommonFramework IdentitySource unit tests
-        working-directory: ./src/CommonFramework
         run: |
-          dotnet test CommonFramework.IdentitySource.Tests --no-build --verbosity normal
+          dotnet test src/IdentitySource/Anch.IdentitySource.Tests --no-build --verbosity normal -c Release
 
       - name: CommonFramework VisualIdentitySource unit tests
-        working-directory: ./src/CommonFramework
         run: |
-          dotnet test CommonFramework.VisualIdentitySource.Tests --no-build --verbosity normal
-          
+          dotnet test src/VisualIdentitySource/Anch.VisualIdentitySource.Tests --no-build --verbosity normal -c Release
+
       - name: GenericQueryable Unit tests
         run: |
-          dotnet test src/GenericQueryable/GenericQueryable.UnitTests --no-build --verbosity normal
-          
+          dotnet test src/GenericQueryable/Anch.GenericQueryable.UnitTests --no-build --verbosity normal -c Release
+
       - name: GenericQueryable NHibernate Integration Tests
         run: |
-          dotnet test --blame src/GenericQueryable/GenericQueryable.IntegrationTests.NHibernate --no-build --verbosity normal
-          
+          dotnet test --blame src/GenericQueryable/Anch.GenericQueryable.IntegrationTests.NHibernate --no-build --verbosity normal -c Release
+
       - name: GenericQueryable EntityFramework Integration Tests
         run: |
-          dotnet test --blame src/GenericQueryable/GenericQueryable.IntegrationTests.EntityFramework --no-build --verbosity normal
-          
+          dotnet test --blame src/GenericQueryable/Anch.GenericQueryable.IntegrationTests.EntityFramework --no-build --verbosity normal -c Release
+
       - name: HierarchicalExpand Unit tests
         run: |
-          dotnet test src/HierarchicalExpand/HierarchicalExpand.Tests --no-build --verbosity normal
-          
+          dotnet test src/HierarchicalExpand/Anch.HierarchicalExpand.Tests --no-build --verbosity normal -c Release
+
       - name: HierarchicalExpand NHibernate Integration Tests
         run: |
-          dotnet test --blame src/HierarchicalExpand/HierarchicalExpand.IntegrationTests.NHibernate --no-build --verbosity normal
-          
+          dotnet test --blame src/HierarchicalExpand/Anch.HierarchicalExpand.IntegrationTests.NHibernate --no-build --verbosity normal -c Release
+
       - name: HierarchicalExpand EntityFramework Integration Tests
         run: |
-          dotnet test --blame src/HierarchicalExpand/HierarchicalExpand.IntegrationTests.EntityFramework --no-build --verbosity normal
-          
+          dotnet test --blame src/HierarchicalExpand/Anch.HierarchicalExpand.IntegrationTests.EntityFramework --no-build --verbosity normal -c Release
+
       - name: SecuritySystem Unit tests
         run: |
-          dotnet test src/SecuritySystem/SecuritySystem.DiTests --no-build --verbosity normal
-          
+          dotnet test src/SecuritySystem/Anch.SecuritySystem.DiTests --no-build --verbosity normal -c Release
+
       - name: SecuritySystem NHibernate Integration Tests
         run: |
-          dotnet test --blame src/SecuritySystem/_Example/ExampleApp.IntegrationTests.NHibernate --no-build --verbosity normal
+          dotnet test --blame src/SecuritySystem/_Example/ExampleApp.IntegrationTests.NHibernate --no-build --verbosity normal -c Release
 
       - name: SecuritySystem EntityFramework Integration Tests
         run: |
-          dotnet test --blame src/SecuritySystem/_Example/ExampleApp.IntegrationTests.EntityFramework --no-build --verbosity normal
-          
+          dotnet test --blame src/SecuritySystem/_Example/ExampleApp.IntegrationTests.EntityFramework --no-build --verbosity normal -c Release
+
       - name: OData Unit tests
         run: |
-          dotnet test src/OData/OData.Tests --no-build --verbosity normal
+          dotnet test src/OData/Anch.OData.Tests --no-build --verbosity normal -c Release

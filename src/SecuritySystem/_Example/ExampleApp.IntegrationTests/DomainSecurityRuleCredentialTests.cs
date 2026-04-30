@@ -1,17 +1,17 @@
-﻿using ExampleApp.Application;
+﻿using Anch.GenericQueryable;
+using Anch.SecuritySystem;
+using Anch.Testing.Xunit;
+
+using ExampleApp.Application;
 using ExampleApp.Domain;
-
-using GenericQueryable;
-
-using SecuritySystem;
 
 namespace ExampleApp.IntegrationTests;
 
 public abstract class DomainSecurityRuleCredentialTests(IServiceProvider rootServiceProvider) : TestBase(rootServiceProvider)
 {
     [Theory]
-    [MemberData(nameof(GetEmployees_ReturnsExpectedUsers_Cases))]
-    public async Task GetEmployees_ReturnsExpectedUsers(SecurityRule securityRule, string?[] expectedUsers)
+    [AnchMemberData(nameof(GetEmployees_ReturnsExpectedUsers_Cases))]
+    public async Task GetEmployees_ReturnsExpectedUsers(SecurityRule securityRule, string?[] expectedUsers, CancellationToken ct)
     {
         // Arrange
         var realExpectedUsers = expectedUsers.Select(userName => userName ?? this.AuthManager.RootUserName);
@@ -19,13 +19,13 @@ public abstract class DomainSecurityRuleCredentialTests(IServiceProvider rootSer
         // Act
         var employees = await this.GetEvaluator<IRepositoryFactory<Employee>>().EvaluateAsync(TestingScopeMode.Read,
             async rep =>
-                await rep.Create(securityRule).GetQueryable().GenericToListAsync(this.CancellationToken));
+                await rep.Create(securityRule).GetQueryable().GenericToListAsync(ct));
 
         // Assert
-        realExpectedUsers.OrderBy(v => v).Should().BeEquivalentTo(employees.Select(e => e.Login));
+        Assert.Equivalent(realExpectedUsers.OrderBy(v => v), employees.Select(e => e.Login));
     }
 
-    public static IEnumerable<object?[]> GetEmployees_ReturnsExpectedUsers_Cases()
+    public IEnumerable<object?[]> GetEmployees_ReturnsExpectedUsers_Cases()
     {
         string? user0 = null;
         string? user1 = "TestEmployee1";

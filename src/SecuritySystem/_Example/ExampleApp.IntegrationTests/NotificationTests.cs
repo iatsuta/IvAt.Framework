@@ -1,14 +1,14 @@
-﻿using CommonFramework.GenericRepository;
+﻿using Anch.GenericRepository;
+using Anch.SecuritySystem;
+using Anch.SecuritySystem.Notification;
+using Anch.SecuritySystem.Notification.Domain;
+using Anch.SecuritySystem.Services;
+using Anch.Testing.Xunit;
 
 using ExampleApp.Application;
 using ExampleApp.Domain;
 
 using Microsoft.Extensions.DependencyInjection;
-
-using SecuritySystem;
-using SecuritySystem.Notification;
-using SecuritySystem.Notification.Domain;
-using SecuritySystem.Services;
 
 namespace ExampleApp.IntegrationTests;
 
@@ -42,43 +42,43 @@ public abstract class NotificationTests(IServiceProvider rootServiceProvider) : 
 
     private readonly string searchNotificationEmployeeLogin2 = nameof(searchNotificationEmployeeLogin2);
 
-    public override async ValueTask InitializeAsync()
+    protected override async ValueTask InitializeAsync(CancellationToken ct)
     {
-        await base.InitializeAsync();
+        await base.InitializeAsync(ct);
 
-        this.rootBusinessUnit = await this.SaveBusinessUnit(nameof(this.rootBusinessUnit));
-        this.child_1_0_BusinessUnit = await this.SaveBusinessUnit(nameof(child_1_0_BusinessUnit), this.rootBusinessUnit);
-        this.child_1_1_BusinessUnit = await this.SaveBusinessUnit(nameof(child_1_1_BusinessUnit), this.child_1_0_BusinessUnit);
-        this.child_2_0_BusinessUnit = await this.SaveBusinessUnit(nameof(child_2_0_BusinessUnit), this.rootBusinessUnit);
-        this.child_2_1_BusinessUnit = await this.SaveBusinessUnit(nameof(child_2_1_BusinessUnit), this.child_2_0_BusinessUnit);
+        this.rootBusinessUnit = await this.SaveBusinessUnit(nameof(this.rootBusinessUnit), null, ct);
+        this.child_1_0_BusinessUnit = await this.SaveBusinessUnit(nameof(this.child_1_0_BusinessUnit), this.rootBusinessUnit, ct);
+		this.child_1_1_BusinessUnit = await this.SaveBusinessUnit(nameof(this.child_1_1_BusinessUnit), this.child_1_0_BusinessUnit, ct);
+		this.child_2_0_BusinessUnit = await this.SaveBusinessUnit(nameof(this.child_2_0_BusinessUnit), this.rootBusinessUnit, ct);
+		this.child_2_1_BusinessUnit = await this.SaveBusinessUnit(nameof(this.child_2_1_BusinessUnit), this.child_2_0_BusinessUnit, ct);
 
-        this.rootManagementUnit = await this.SaveManagementUnit(nameof(this.rootManagementUnit));
-        this.child_1_0_ManagementUnit = await this.SaveManagementUnit(nameof(child_1_0_ManagementUnit), this.rootManagementUnit);
-        this.child_1_1_ManagementUnit = await this.SaveManagementUnit(nameof(child_1_1_ManagementUnit), this.child_1_0_ManagementUnit);
-        this.child_2_0_ManagementUnit = await this.SaveManagementUnit(nameof(child_2_0_ManagementUnit), this.rootManagementUnit);
-        this.child_2_1_ManagementUnit = await this.SaveManagementUnit(nameof(child_2_1_ManagementUnit), this.child_2_0_ManagementUnit);
+		this.rootManagementUnit = await this.SaveManagementUnit(nameof(this.rootManagementUnit), null, ct);
+		this.child_1_0_ManagementUnit = await this.SaveManagementUnit(nameof(this.child_1_0_ManagementUnit), this.rootManagementUnit, ct);
+		this.child_1_1_ManagementUnit = await this.SaveManagementUnit(nameof(this.child_1_1_ManagementUnit), this.child_1_0_ManagementUnit, ct);
+		this.child_2_0_ManagementUnit = await this.SaveManagementUnit(nameof(this.child_2_0_ManagementUnit), this.rootManagementUnit, ct);
+		this.child_2_1_ManagementUnit = await this.SaveManagementUnit(nameof(this.child_2_1_ManagementUnit), this.child_2_0_ManagementUnit, ct);
 
-        this.rootEmployee = await this.SaveEmployee(nameof(this.rootEmployee));
-    }
+		this.rootEmployee = await this.SaveEmployee(nameof(this.rootEmployee), ct);
+	}
 
-    [Fact]
-    public async Task GetPrincipals_Direct_Test1_Searched()
+    [AnchFact]
+    public async Task GetPrincipals_Direct_Test1_Searched(CancellationToken ct)
     {
         // Arrange
         await this.AuthManager.For(this.searchNotificationEmployeeLogin1).SetRoleAsync(
-            new TestPermission(testSecurityRole)
+            new TestPermission(this.testSecurityRole)
             {
                 BusinessUnit = this.child_1_1_BusinessUnit,
                 ManagementUnit = this.child_1_1_ManagementUnit,
                 Employee = this.rootEmployee
-            }, this.CancellationToken);
+            }, ct);
 
         await this.AuthManager.For(this.searchNotificationEmployeeLogin2).SetRoleAsync(
-            new TestPermission(testSecurityRole)
+            new TestPermission(this.testSecurityRole)
             {
                 BusinessUnit = this.rootBusinessUnit,
                 ManagementUnit = this.child_1_1_ManagementUnit
-            }, this.CancellationToken);
+            }, ct);
 
         var fbuChildFilter = new NotificationFilterGroup<Guid>
         {
@@ -102,24 +102,24 @@ public abstract class NotificationTests(IServiceProvider rootServiceProvider) : 
         };
 
         // Act
-        var result = await this.GetNotificationPrincipalsAsync(fbuChildFilter, mbuChildFilter, employeeFilter);
+        var result = await this.GetNotificationPrincipalsAsync([fbuChildFilter, mbuChildFilter, employeeFilter], ct);
 
         // Assert
-        result.Length.Should().Be(1);
-        result.Single().Should().Be(this.searchNotificationEmployeeLogin1);
+        Assert.Single(result);
+        Assert.Equal(this.searchNotificationEmployeeLogin1, result.Single());
     }
 
-    [Fact]
-    public async Task GetPrincipals_Direct_Test2_Missed()
+    [AnchFact]
+    public async Task GetPrincipals_Direct_Test2_Missed(CancellationToken ct)
     {
         // Arrange
         await this.AuthManager.For(
             this.searchNotificationEmployeeLogin1).SetRoleAsync(
-            new TestPermission(testSecurityRole)
+            new TestPermission(this.testSecurityRole)
             {
                 BusinessUnit = this.rootBusinessUnit,
                 ManagementUnit = this.child_1_1_ManagementUnit
-            }, this.CancellationToken);
+            }, ct);
 
         var fbuChildFilter = new NotificationFilterGroup<Guid>
         {
@@ -136,23 +136,23 @@ public abstract class NotificationTests(IServiceProvider rootServiceProvider) : 
         };
 
         // Act
-        var result = await this.GetNotificationPrincipalsAsync(fbuChildFilter, mbuChildFilter);
+        var result = await this.GetNotificationPrincipalsAsync([fbuChildFilter, mbuChildFilter], ct);
 
         // Assert
-        result.Length.Should().Be(0);
+        Assert.Empty(result);
     }
 
-    [Fact]
-    public async Task GetPrincipals_Direct_Test3_Missed()
+    [AnchFact]
+    public async Task GetPrincipals_Direct_Test3_Missed(CancellationToken ct)
     {
         // Arrange
         await this.AuthManager.For(
             this.searchNotificationEmployeeLogin1).SetRoleAsync(
-            new TestPermission(testSecurityRole)
+            new TestPermission(this.testSecurityRole)
             {
                 BusinessUnit = this.rootBusinessUnit,
                 ManagementUnit = this.child_1_1_ManagementUnit
-            }, this.CancellationToken);
+            }, ct);
 
         var fbuChildFilter = new NotificationFilterGroup<Guid>
         {
@@ -177,24 +177,24 @@ public abstract class NotificationTests(IServiceProvider rootServiceProvider) : 
         };
 
         // Act
-        var result = await this.GetNotificationPrincipalsAsync(fbuChildFilter, mbuChildFilter, employeeChildFilter);
+        var result = await this.GetNotificationPrincipalsAsync([fbuChildFilter, mbuChildFilter, employeeChildFilter], ct);
 
         // Assert
-        result.Length.Should().Be(0);
+        Assert.Empty(result);
     }
 
-    [Fact]
-    public async Task GetPrincipals_Direct_Test4_Searched()
+    [AnchFact]
+    public async Task GetPrincipals_Direct_Test4_Searched(CancellationToken ct)
     {
         // Arrange
         await this.AuthManager.For(
             this.searchNotificationEmployeeLogin1).SetRoleAsync(
-            new TestPermission(testSecurityRole)
+            new TestPermission(this.testSecurityRole)
             {
                 BusinessUnit = this.rootBusinessUnit,
                 ManagementUnit = this.child_1_1_ManagementUnit,
                 Employee = this.rootEmployee
-            }, this.CancellationToken);
+            }, ct);
 
         var fbuChildFilter = new NotificationFilterGroup<Guid>
         {
@@ -219,30 +219,30 @@ public abstract class NotificationTests(IServiceProvider rootServiceProvider) : 
         };
 
         // Act
-        var result = await this.GetNotificationPrincipalsAsync(fbuChildFilter, mbuChildFilter, employeeChildFilter);
+        var result = await this.GetNotificationPrincipalsAsync([fbuChildFilter, mbuChildFilter, employeeChildFilter], ct);
 
         // Assert
-        result.Length.Should().Be(1);
+        Assert.Single(result);
     }
 
-    [Fact]
-    public async Task GetPrincipals_DirectOrEmpty_Test1_Searched()
+    [AnchFact]
+    public async Task GetPrincipals_DirectOrEmpty_Test1_Searched(CancellationToken ct)
     {
         // Arrange
         await this.AuthManager.For(
             this.searchNotificationEmployeeLogin1).SetRoleAsync(
-            new TestPermission(testSecurityRole)
+            new TestPermission(this.testSecurityRole)
             {
                 ManagementUnit = this.child_1_1_ManagementUnit
-            }, this.CancellationToken);
+            }, ct);
 
         await this.AuthManager.For(
             this.searchNotificationEmployeeLogin2).SetRoleAsync(
-            new TestPermission(testSecurityRole)
+            new TestPermission(this.testSecurityRole)
             {
                 BusinessUnit = this.rootBusinessUnit,
                 ManagementUnit = this.child_1_1_ManagementUnit
-            }, this.CancellationToken);
+            }, ct);
 
         var fbuChildFilter = new NotificationFilterGroup<Guid>
         {
@@ -259,32 +259,32 @@ public abstract class NotificationTests(IServiceProvider rootServiceProvider) : 
         };
 
         // Act
-        var result = await this.GetNotificationPrincipalsAsync(fbuChildFilter, mbuChildFilter);
+        var result = await this.GetNotificationPrincipalsAsync([fbuChildFilter, mbuChildFilter], ct);
 
         // Assert
-        result.Length.Should().Be(1);
-        result.Single().Should().Be(this.searchNotificationEmployeeLogin1);
+        Assert.Single(result);
+        Assert.Equal(this.searchNotificationEmployeeLogin1, result.Single());
     }
 
-    [Fact]
-    public async Task GetPrincipals_DirectOrFirstParentOrEmpty_Test1_Searched()
+    [AnchFact]
+    public async Task GetPrincipals_DirectOrFirstParentOrEmpty_Test1_Searched(CancellationToken ct)
     {
         // Arrange
         await this.AuthManager.For(
             this.searchNotificationEmployeeLogin1).SetRoleAsync(
-            new TestPermission(testSecurityRole)
+            new TestPermission(this.testSecurityRole)
             {
                 BusinessUnit = this.child_1_0_BusinessUnit,
                 ManagementUnit = this.child_1_1_ManagementUnit
-            }, this.CancellationToken);
+            }, ct);
 
         await this.AuthManager.For(
             this.searchNotificationEmployeeLogin2).SetRoleAsync(
-            new TestPermission(testSecurityRole)
+            new TestPermission(this.testSecurityRole)
             {
                 BusinessUnit = this.rootBusinessUnit,
                 ManagementUnit = this.child_1_1_ManagementUnit
-            }, this.CancellationToken);
+            }, ct);
 
         var fbuChildFilter = new NotificationFilterGroup<Guid>
         {
@@ -301,32 +301,32 @@ public abstract class NotificationTests(IServiceProvider rootServiceProvider) : 
         };
 
         // Act
-        var result = await this.GetNotificationPrincipalsAsync(fbuChildFilter, mbuChildFilter);
+        var result = await this.GetNotificationPrincipalsAsync([fbuChildFilter, mbuChildFilter], ct);
 
         // Assert
-        result.Length.Should().Be(1);
-        result.Single().Should().Be(this.searchNotificationEmployeeLogin1);
+        Assert.Single(result);
+        Assert.Equal(this.searchNotificationEmployeeLogin1, result.Single());
     }
 
-    [Fact]
-    public async Task GetPrincipals_DirectOrFirstParentOrEmpty_Test2_Searched()
+    [AnchFact]
+    public async Task GetPrincipals_DirectOrFirstParentOrEmpty_Test2_Searched(CancellationToken ct)
     {
         // Arrange
         await this.AuthManager.For(
             this.searchNotificationEmployeeLogin1).SetRoleAsync(
-            new TestPermission(testSecurityRole)
+            new TestPermission(this.testSecurityRole)
             {
                 BusinessUnit = this.rootBusinessUnit,
                 ManagementUnit = this.child_1_0_ManagementUnit
-            }, this.CancellationToken);
+            }, ct);
 
         await this.AuthManager.For(
             this.searchNotificationEmployeeLogin2).SetRoleAsync(
-            new TestPermission(testSecurityRole)
+            new TestPermission(this.testSecurityRole)
             {
                 BusinessUnit = this.rootBusinessUnit,
                 ManagementUnit = this.rootManagementUnit
-            }, this.CancellationToken);
+            }, ct);
 
         var fbuChildFilter = new NotificationFilterGroup<Guid>
         {
@@ -342,34 +342,34 @@ public abstract class NotificationTests(IServiceProvider rootServiceProvider) : 
             Idents = [this.child_1_1_ManagementUnit.Id]
         };
         // Act
-        var result = await this.GetNotificationPrincipalsAsync(fbuChildFilter, mbuChildFilter);
+        var result = await this.GetNotificationPrincipalsAsync([fbuChildFilter, mbuChildFilter], ct);
 
         // Assert
-        result.Length.Should().Be(1);
-        result.Single().Should().Be(this.searchNotificationEmployeeLogin1);
+        Assert.Single(result);
+        Assert.Equal(this.searchNotificationEmployeeLogin1, result.Single());
     }
 
     [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task GetPrincipals_DirectOrFirstParentOrEmpty_Test3_Searched(bool swapPriority)
+    [AnchInlineData(true)]
+    [AnchInlineData(false)]
+    public async Task GetPrincipals_DirectOrFirstParentOrEmpty_Test3_Searched(bool swapPriority, CancellationToken ct)
     {
         // Arrange
         await this.AuthManager.For(
             this.searchNotificationEmployeeLogin1).SetRoleAsync(
-            new TestPermission(testSecurityRole)
+            new TestPermission(this.testSecurityRole)
             {
                 BusinessUnit = this.child_1_0_BusinessUnit,
                 ManagementUnit = this.rootManagementUnit
-            }, this.CancellationToken);
+            }, ct);
 
         await this.AuthManager.For(
             this.searchNotificationEmployeeLogin2).SetRoleAsync(
-            new TestPermission(testSecurityRole)
+            new TestPermission(this.testSecurityRole)
             {
                 BusinessUnit = this.rootBusinessUnit,
                 ManagementUnit = this.child_1_0_ManagementUnit
-            }, this.CancellationToken);
+            }, ct);
 
         var fbuChildFilter = new NotificationFilterGroup<Guid>
         {
@@ -384,35 +384,34 @@ public abstract class NotificationTests(IServiceProvider rootServiceProvider) : 
             ExpandType = NotificationExpandType.DirectOrFirstParentOrEmpty,
             Idents = [this.child_1_1_ManagementUnit.Id]
         };
+
         // Act
-        var result = swapPriority
-                         ? await this.GetNotificationPrincipalsAsync(mbuChildFilter, fbuChildFilter)
-                         : await this.GetNotificationPrincipalsAsync(fbuChildFilter, mbuChildFilter);
+        var result = await this.GetNotificationPrincipalsAsync(swapPriority ? [mbuChildFilter, fbuChildFilter] : [fbuChildFilter, mbuChildFilter], ct);
 
         // Assert
-        result.Length.Should().Be(1);
-        result.Single().Should().Be(swapPriority ? this.searchNotificationEmployeeLogin2 : this.searchNotificationEmployeeLogin1);
+        Assert.Single(result);
+        Assert.Equal(swapPriority ? this.searchNotificationEmployeeLogin2 : this.searchNotificationEmployeeLogin1, result.Single());
     }
 
-    [Fact]
-    public async Task GetPrincipals_All_Test1_Searched()
+    [AnchFact]
+    public async Task GetPrincipals_All_Test1_Searched(CancellationToken ct)
     {
         // Arrange
         await this.AuthManager.For(
             this.searchNotificationEmployeeLogin1).SetRoleAsync(
-            new TestPermission(testSecurityRole)
+            new TestPermission(this.testSecurityRole)
             {
                 BusinessUnit = this.child_1_0_BusinessUnit,
                 ManagementUnit = this.child_1_1_ManagementUnit
-            }, this.CancellationToken);
+            }, ct);
 
         await this.AuthManager.For(
             this.searchNotificationEmployeeLogin2).SetRoleAsync(
-            new TestPermission(testSecurityRole)
+            new TestPermission(this.testSecurityRole)
             {
                 BusinessUnit = this.rootBusinessUnit,
                 ManagementUnit = this.child_1_1_ManagementUnit
-            }, this.CancellationToken);
+            }, ct);
 
 
         var fbuChildFilter = new NotificationFilterGroup<Guid>
@@ -430,23 +429,23 @@ public abstract class NotificationTests(IServiceProvider rootServiceProvider) : 
         };
 
         // Act
-        var result = await this.GetNotificationPrincipalsAsync(fbuChildFilter, mbuChildFilter);
+        var result = await this.GetNotificationPrincipalsAsync([fbuChildFilter, mbuChildFilter], ct);
 
         // Assert
-        result.Length.Should().Be(2);
-        result.Should().Contain(this.searchNotificationEmployeeLogin1);
-        result.Should().Contain(this.searchNotificationEmployeeLogin2);
+        Assert.Equal(2, result.Length);
+        Assert.Contains(this.searchNotificationEmployeeLogin1, result);
+        Assert.Contains(this.searchNotificationEmployeeLogin2, result);
     }
 
-    [Fact]
-    public async Task NotificationPrincipalExtractor_ReturnsUser_ForAssignedRoleAndBusinessUnit()
+    [AnchFact]
+    public async Task NotificationPrincipalExtractor_ReturnsUser_ForAssignedRoleAndBusinessUnit(CancellationToken ct)
     {
         // Arrange
         var permissionBuIdentity =
-            await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>($"Test{nameof(BusinessUnit)}2", this.CancellationToken);
+            await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>($"Test{nameof(BusinessUnit)}2", ct);
 
         var searchBuIdentity =
-            await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>($"Test{nameof(BusinessUnit)}2-Child", this.CancellationToken);
+            await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>($"Test{nameof(BusinessUnit)}2-Child", ct);
 
         var notificationFilterGroup = new NotificationFilterGroup<Guid>
         {
@@ -455,38 +454,38 @@ public abstract class NotificationTests(IServiceProvider rootServiceProvider) : 
             ExpandType = NotificationExpandType.DirectOrFirstParent
         };
 
-        var testUserName = nameof(NotificationPrincipalExtractor_ReturnsUser_ForAssignedRoleAndBusinessUnit);
+        var testUserName = nameof(this.NotificationPrincipalExtractor_ReturnsUser_ForAssignedRoleAndBusinessUnit);
 
-        await this.AuthManager.For(testUserName).AddRoleAsync(new TestPermission(testSecurityRole) { BusinessUnit = permissionBuIdentity }, this.CancellationToken);
+        await this.AuthManager.For(testUserName).AddRoleAsync(new TestPermission(this.testSecurityRole) { BusinessUnit = permissionBuIdentity }, ct);
 
         // Act
-        var principalNames = await this.GetNotificationPrincipalsAsync(notificationFilterGroup);
+        var principalNames = await this.GetNotificationPrincipalsAsync([notificationFilterGroup], ct);
 
         // Assert
-        principalNames.Should().BeEquivalentTo(testUserName);
+        Assert.Equivalent(new[] { testUserName }, principalNames);
     }
 
-    [Fact]
-    public async Task NotificationPrincipalExtractor_ReturnsUser_ForTypedFilterGroup()
+    [AnchFact]
+    public async Task NotificationPrincipalExtractor_ReturnsUser_ForTypedFilterGroup(CancellationToken ct)
     {
         // Arrange
         var permissionBuIdentity =
-            await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>($"Test{nameof(BusinessUnit)}2", this.CancellationToken);
+            await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>($"Test{nameof(BusinessUnit)}2", ct);
 
         var searchBuIdentity =
-            await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>($"Test{nameof(BusinessUnit)}2-Child", this.CancellationToken);
+            await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>($"Test{nameof(BusinessUnit)}2-Child", ct);
 
 
-        var testUserName = nameof(NotificationPrincipalExtractor_ReturnsUser_ForAssignedRoleAndBusinessUnit);
+        var testUserName = nameof(this.NotificationPrincipalExtractor_ReturnsUser_ForAssignedRoleAndBusinessUnit);
 
-        await this.AuthManager.For(testUserName).AddRoleAsync(new TestPermission(testSecurityRole) { BusinessUnit = permissionBuIdentity }, this.CancellationToken);
+        await this.AuthManager.For(testUserName).AddRoleAsync(new TestPermission(this.testSecurityRole) { BusinessUnit = permissionBuIdentity }, ct);
 
         // Act
         var principalNames = await this.GetEvaluator<IServiceProvider>()
             .EvaluateAsync(TestingScopeMode.Read, async sp =>
             {
                 var queryableSource = sp.GetRequiredService<IQueryableSource>();
-                var extractor = sp.GetRequiredService<INotificationPrincipalExtractor<ExampleApp.Domain.Auth.General.Principal>>();
+                var extractor = sp.GetRequiredService<INotificationPrincipalExtractor<Domain.Auth.General.Principal>>();
 
                 var notificationFilterGroup = new TypedNotificationFilterGroup<BusinessUnit>
                 {
@@ -494,18 +493,18 @@ public abstract class NotificationTests(IServiceProvider rootServiceProvider) : 
                     ExpandType = NotificationExpandType.DirectOrFirstParent
                 };
 
-                return await extractor.GetPrincipalsAsync([testSecurityRole], [notificationFilterGroup]).Select(p => p.Name).ToArrayAsync(this.CancellationToken);
+                return await extractor.GetPrincipalsAsync([this.testSecurityRole], [notificationFilterGroup]).Select(p => p.Name).ToArrayAsync(ct);
             });
 
         // Assert
-        principalNames.Should().BeEquivalentTo(testUserName);
+        Assert.Equivalent(new[] { testUserName }, principalNames);
     }
 
-    //[Fact]
+    //[AnchFact]
     //public async Task VirtualPermissionTest()
     //{
     //    // Arrange
-    //    var buIdentity = await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>($"Test{nameof(BusinessUnit)}2", this.CancellationToken);
+    //    var buIdentity = await this.AuthManager.GetSecurityContextIdentityAsync<BusinessUnit, Guid>($"Test{nameof(BusinessUnit)}2", ct);
 
     //    var notificationFilterGroup = new NotificationFilterGroup<Guid>
     //    {
@@ -519,43 +518,43 @@ public abstract class NotificationTests(IServiceProvider rootServiceProvider) : 
     //        .EvaluateAsync(TestingScopeMode.Read, async extractor =>
     //            await extractor.GetPrincipalsAsync([testSecurityRole], [notificationFilterGroup])
     //                .Select(employee => employee.Login)
-    //                .ToArrayAsync(this.CancellationToken));
+    //                .ToArrayAsync(ct));
 
     //    // Assert
 
     //    return;
 
-    //    //result.OrderBy(v => v.Name).Should().BeEquivalentTo(expectedResult);
+    //    //Assert.Equivalent(expectedResult, result.OrderBy(v => v.Name));
     //}
 
-    private Task<string[]> GetNotificationPrincipalsAsync(params NotificationFilterGroup[] notificationFilterGroups) =>
+    private Task<string[]> GetNotificationPrincipalsAsync(NotificationFilterGroup[] notificationFilterGroups, CancellationToken ct) =>
 
-        this.GetEvaluator<INotificationPrincipalExtractor<ExampleApp.Domain.Auth.General.Principal>>()
+        this.GetEvaluator<INotificationPrincipalExtractor<Domain.Auth.General.Principal>>()
             .EvaluateAsync(TestingScopeMode.Read, async extractor =>
-                await extractor.GetPrincipalsAsync([testSecurityRole], [.. notificationFilterGroups])
+                await extractor.GetPrincipalsAsync([this.testSecurityRole], [.. notificationFilterGroups])
                     .Select(p => p.Name)
-                    .ToArrayAsync(this.CancellationToken));
+                    .ToArrayAsync(ct));
 
-    private Task<TypedSecurityIdentity<Guid>> SaveBusinessUnit(string name, TypedSecurityIdentity<Guid>? parent = null) =>
+    private Task<TypedSecurityIdentity<Guid>> SaveBusinessUnit(string name, TypedSecurityIdentity<Guid>? parent, CancellationToken ct) =>
 
         this.AuthManager.SaveSecurityContextAsync<BusinessUnit, Guid>(async sp => new BusinessUnit
         {
             Name = name,
-            Parent = parent == null ? null : await sp.GetRequiredService<ISecurityRepository<BusinessUnit>>().GetObjectAsync(parent, this.CancellationToken)
-        }, this.CancellationToken);
+            Parent = parent == null ? null : await sp.GetRequiredService<ISecurityRepository<BusinessUnit>>().GetObjectAsync(parent, ct)
+        }, ct);
 
-    private Task<TypedSecurityIdentity<Guid>> SaveManagementUnit(string name, TypedSecurityIdentity<Guid>? parent = null) =>
+    private Task<TypedSecurityIdentity<Guid>> SaveManagementUnit(string name, TypedSecurityIdentity<Guid>? parent, CancellationToken ct) =>
 
         this.AuthManager.SaveSecurityContextAsync<ManagementUnit, Guid>(async sp => new ManagementUnit
         {
             Name = name,
-            Parent = parent == null ? null : await sp.GetRequiredService<ISecurityRepository<ManagementUnit>>().GetObjectAsync(parent, this.CancellationToken)
-        }, this.CancellationToken);
+            Parent = parent == null ? null : await sp.GetRequiredService<ISecurityRepository<ManagementUnit>>().GetObjectAsync(parent, ct)
+        }, ct);
 
-    private Task<TypedSecurityIdentity<Guid>> SaveEmployee(string login) =>
+    private Task<TypedSecurityIdentity<Guid>> SaveEmployee(string login, CancellationToken ct) =>
 
         this.AuthManager.SaveSecurityContextAsync<Employee, Guid>(() => new Employee
         {
             Login = login
-        }, this.CancellationToken);
+        }, ct);
 }

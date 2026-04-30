@@ -1,22 +1,21 @@
-﻿using CommonFramework;
+﻿using Anch.Core;
+using Anch.HierarchicalExpand;
+using Anch.SecuritySystem;
+using Anch.SecuritySystem.DependencyInjection;
+using Anch.SecuritySystem.GeneralPermission.DependencyInjection;
+using Anch.SecuritySystem.Notification.DependencyInjection;
+using Anch.SecuritySystem.UserSource;
+using Anch.SecuritySystem.VirtualPermission.DependencyInjection;
 
+using AuthGeneral = ExampleApp.Domain.Auth.General;
 using ExampleApp.Application;
 using ExampleApp.Domain;
 using ExampleApp.Domain.Auth.Virtual;
+using ExampleApp.Infrastructure.DependencyInjection.UndirectView;
 using ExampleApp.Infrastructure.Services;
-using AuthGeneral = ExampleApp.Domain.Auth.General;
-
-using HierarchicalExpand;
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
-using SecuritySystem;
-using SecuritySystem.DependencyInjection;
-using SecuritySystem.GeneralPermission.DependencyInjection;
-using SecuritySystem.Notification.DependencyInjection;
-using SecuritySystem.UserSource;
-using SecuritySystem.VirtualPermission.DependencyInjection;
 
 namespace ExampleApp.Infrastructure.DependencyInjection;
 
@@ -27,11 +26,13 @@ public static class ServiceCollectionExtensions
         public IServiceCollection AddInfrastructure(IConfiguration configuration)
         {
             return services
-                .AddViews()
+                .AddSingleton<IMainConnectionStringSource, MainConnectionStringSource>()
+                .AddSingleton<IUndirectedAncestorViewScriptGenerator, UndirectedAncestorViewScriptGenerator>()
+                .AddSingleton<IViewCreationScriptProvider, UndirectedAncestorViewScriptProvider>()
                 .AddLogging()
                 .AddHttpContextAccessor()
+                .AddSingleton<ITestDataInitializer, TestDataInitializer>()
                 .AddKeyedScoped<IInitializer, ExampleDataInitializer>(ExampleDataInitializer.Key)
-                .AddKeyedSingleton<IInitializer, RootAppInitializer>(RootAppInitializer.Key)
                 .AddSecuritySystem()
                 .AddRepository();
         }
@@ -66,8 +67,10 @@ public static class ServiceCollectionExtensions
                             scb => scb
                                 .SetHierarchicalInfo(
                                     v => v.Parent,
-                                    new AncestorLinkInfo<BusinessUnit, BusinessUnitDirectAncestorLink>(link => link.Ancestor, link => link.Child),
-                                    new AncestorLinkInfo<BusinessUnit, BusinessUnitUndirectAncestorLink>(view => view.Source, view => view.Target),
+                                    new AncestorLinkInfo<BusinessUnit, BusinessUnitDirectAncestorLink>(
+                                        link => link.Ancestor, link => link.Child),
+                                    new AncestorLinkInfo<BusinessUnit, BusinessUnitUndirectAncestorLink>(
+                                        view => view.Source, view => view.Target),
                                     v => v.DeepLevel))
 
                         .AddSecurityContext<ManagementUnit>(
@@ -75,8 +78,10 @@ public static class ServiceCollectionExtensions
                             scb => scb
                                 .SetHierarchicalInfo(
                                     v => v.Parent,
-                                    new AncestorLinkInfo<ManagementUnit, ManagementUnitDirectAncestorLink>(link => link.Ancestor, link => link.Child),
-                                    new AncestorLinkInfo<ManagementUnit, ManagementUnitUndirectAncestorLink>(view => view.Source, view => view.Target),
+                                    new AncestorLinkInfo<ManagementUnit, ManagementUnitDirectAncestorLink>(
+                                        link => link.Ancestor, link => link.Child),
+                                    new AncestorLinkInfo<ManagementUnit, ManagementUnitUndirectAncestorLink>(
+                                        view => view.Source, view => view.Target),
                                     v => v.DeepLevel))
 
                         .AddSecurityContext<Employee>(
@@ -88,7 +93,8 @@ public static class ServiceCollectionExtensions
 
                         .AddDomainSecurity<TestObject>(b => b
                             .SetView(new[] { ExampleSecurityRole.TestManager, ExampleSecurityRole.BuManager })
-                            .SetPath(SecurityPath<TestObject>.Create(testObj => testObj.BusinessUnit).And(testObj => testObj.ManagementUnit)
+                            .SetPath(SecurityPath<TestObject>.Create(testObj => testObj.BusinessUnit)
+                                .And(testObj => testObj.ManagementUnit)
                                 .And(testObj => testObj.Location)))
 
                         .AddDomainSecurity<Employee>(b => b
@@ -102,7 +108,8 @@ public static class ServiceCollectionExtensions
                             new SecurityRoleInfo(new Guid("{2573CFDC-91CD-4729-AE97-82AB2F235E23}")))
 
                         .AddSecurityRole(ExampleSecurityRole.TestManager,
-                            new SecurityRoleInfo(new Guid("{16EBA629-4319-4C15-AED3-032E4E09866D}")) { IsVirtual = true })
+                            new SecurityRoleInfo(new Guid("{16EBA629-4319-4C15-AED3-032E4E09866D}"))
+                                { IsVirtual = true })
 
                         .AddSecurityRole(ExampleSecurityRole.BuManager,
                             new SecurityRoleInfo(new Guid("{72D24BB5-F661-446A-A458-53D301805971}"))
@@ -117,7 +124,8 @@ public static class ServiceCollectionExtensions
                         .AddSecurityRole(ExampleSecurityRole.WithRestrictionFilterRole,
                             new SecurityRoleInfo(new Guid("{00645BD7-2D47-40E4-B542-E9A33EC06CB4}"))
                             {
-                                Restriction = SecurityPathRestriction.Create<BusinessUnit>(required: true, filter: bu => bu.AllowedForFilterRole)
+                                Restriction = SecurityPathRestriction.Create<BusinessUnit>(required: true,
+                                    filter: bu => bu.AllowedForFilterRole)
                             })
 
                         .AddVirtualPermission<Employee, TestManager>(
@@ -143,7 +151,8 @@ public static class ServiceCollectionExtensions
                                     new PropertyAccessors<AuthGeneral.Permission, DateTime?>(
                                         v => v.StartDate,
                                         v => v.StartDate,
-                                        (permission, startDate) => permission.StartDate = startDate ?? DateTime.MinValue),
+                                        (permission, startDate) =>
+                                            permission.StartDate = startDate ?? DateTime.MinValue),
                                     new PropertyAccessors<AuthGeneral.Permission, DateTime?>(v => v.EndDate))
                                 .SetPermissionComment(v => v.Comment)
                                 .SetPermissionDelegation(v => v.DelegatedFrom)
@@ -151,35 +160,5 @@ public static class ServiceCollectionExtensions
 
                         .AddNotification());
         }
-
-        private IServiceCollection AddViews()
-        {
-            return services
-                .AddSingleton(sp => new CreateViewSql(
-                    GetUndirectAncestorLinkTypeView(
-                        typeof(BusinessUnitUndirectAncestorLink),
-                        typeof(BusinessUnitDirectAncestorLink),
-                        sp.GetService<ViewSchema>()?.Name)))
-                .AddSingleton(sp => new CreateViewSql(
-                    GetUndirectAncestorLinkTypeView(
-                        typeof(ManagementUnitUndirectAncestorLink),
-                        typeof(ManagementUnitDirectAncestorLink),
-                        sp.GetService<ViewSchema>()?.Name)));
-        }
-    }
-
-    private static string GetUndirectAncestorLinkTypeView(Type undirectAncestorLinkType, Type directAncestorLinkType, string? schema)
-    {
-        var schemaPrefix = schema == null ? "" : $"{schema}_";
-
-        return @$"
-CREATE VIEW {schemaPrefix}{undirectAncestorLinkType.Name}
-AS
-    SELECT ancestorId as sourceId, childId as targetId, Id AS Id
-    FROM {schemaPrefix}{directAncestorLinkType.Name}
-UNION
-    SELECT
-         childId as sourceId, ancestorId as targetId, Id as Id
-    FROM {schemaPrefix}{directAncestorLinkType.Name}";
     }
 }

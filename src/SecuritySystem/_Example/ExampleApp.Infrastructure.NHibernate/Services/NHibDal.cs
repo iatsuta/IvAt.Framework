@@ -1,10 +1,10 @@
-﻿using GenericQueryable.NHibernate;
-using GenericQueryable.Services;
+﻿using Anch.GenericQueryable.NHibernate;
+using Anch.GenericQueryable.Services;
 
 namespace ExampleApp.Infrastructure.Services;
 
 public class NHibDal<TDomainObject>(
-    AutoCommitSession session,
+    NHibAutoCommitSession session,
     IDomainObjectSaveStrategy<TDomainObject> saveStrategy,
     IGenericQueryableExecutor genericQueryableExecutor,
     INHibExpressionVisitorSource? nhibExpressionVisitorSource = null) : IDal<TDomainObject>
