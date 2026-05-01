@@ -164,16 +164,16 @@ public class WorkflowMachine<TSource>(
 
     private async Task<WorkflowProcessResult> ProcessExecutionResult(IExecutionContext executionContext, PushEventInfo pushEventInfo)
     {
-        if (pushEventInfo.TargetState == null && pushEventInfo.Event.IsGlobal)
+        if (pushEventInfo.TargetState == null && pushEventInfo.Header.IsGlobal)
         {
-            if (pushEventInfo.Event == EventHeader.WorkflowFinished)
+            if (pushEventInfo.Header == EventHeader.WorkflowFinished)
             {
                 if (executionContext.WorkflowInstance.Status.Role != WorkflowStatusRole.Finished)
                 {
                     executionContext.WorkflowInstance.SetStatus(WorkflowStatus.Finished);
                 }
             }
-            else if (pushEventInfo.Event == EventHeader.WorkflowTerminated)
+            else if (pushEventInfo.Header == EventHeader.WorkflowTerminated)
             {
                 executionContext.WorkflowInstance.SetStatus(WorkflowStatus.Terminated);
             }
@@ -186,7 +186,7 @@ public class WorkflowMachine<TSource>(
         }
         else
         {
-            var transition = executionContext.StateInstance.Definition.Transitions.Single(tr => tr.Event.Header == pushEventInfo.Event);
+            var transition = executionContext.StateInstance.Definition.Transitions.Single(tr => tr.Event.Header == pushEventInfo.Header);
 
             return await this.SwitchState(transition.To, executionContext.CancellationToken);
         }

@@ -25,11 +25,11 @@ public class ParallelForeachWorkflowTests : SingleScopeWorkflowTestBase<Parallel
 
         var preWiStatus = wi.Status;
 
-        var waitUserEvents = (await this.Storage.GetWaitEvents()).Where(ei => ei.Event == ParallelForeachItemWorkflow.TestItemWaitEvent).ToList();
+        var waitUserEvents = (await this.Storage.GetWaitEvents()).Where(ei => ei.Header == ParallelForeachItemWorkflow.TestItemWaitEvent).ToList();
 
         foreach (var waitUserEvent in waitUserEvents)
         {
-            await this.Host.PushEvent(waitUserEvent.Event, waitUserEvent.TargetState, pushEventData);
+            await this.Host.PushEvent(waitUserEvent.Header, waitUserEvent.TargetState, pushEventData);
         }
 
         // Assert

@@ -19,7 +19,7 @@ public class StartWorkflowState<TInnerSource>(IWorkflowHost host) : IState
     {
         if (executionContext.IsCallbackEvent)
         {
-            if (executionContext.CallbackEventInfo!.Event == EventHeader.WorkflowFinished
+            if (executionContext.CallbackEventInfo!.Header == EventHeader.WorkflowFinished
                 && executionContext.CallbackEventInfo.SourceWorkflow!.Owner == executionContext.StateInstance)
             {
                 return new Done();

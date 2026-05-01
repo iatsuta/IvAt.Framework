@@ -22,19 +22,19 @@ public class ParallelForeachApproveWorkflowTests : SingleScopeWorkflowTestBase<P
 
         var startStatus = wfObj.Status;
 
-        var waitApproveEvents = (await this.Storage.GetWaitEvents()).Where(ei => ei.Event == ParallelForeachApproveItemWorkflow.ApproveWaitEvent).ToList();
+        var waitApproveEvents = (await this.Storage.GetWaitEvents()).Where(ei => ei.Header == ParallelForeachApproveItemWorkflow.ApproveWaitEvent).ToList();
 
-        var waitRejectEvents = (await this.Storage.GetWaitEvents()).Where(ei => ei.Event == ParallelForeachApproveItemWorkflow.RejectWaitEvent).ToList();
+        var waitRejectEvents = (await this.Storage.GetWaitEvents()).Where(ei => ei.Header == ParallelForeachApproveItemWorkflow.RejectWaitEvent).ToList();
 
         var approvingInstances = waitApproveEvents.Select(e => e.TargetState.Workflow.Owner!.Workflow).ToArray();
 
         var exampleApproveEvent = waitApproveEvents.First();
 
-        await this.Host.PushEvent(exampleApproveEvent.Event, exampleApproveEvent.TargetState);
+        await this.Host.PushEvent(exampleApproveEvent.Header, exampleApproveEvent.TargetState);
 
         var exampleRejectEvent = waitRejectEvents.First(e => e.TargetState.Workflow.Source != exampleApproveEvent.TargetState.Workflow.Source);
 
-        await this.Host.PushEvent(exampleRejectEvent.Event, exampleRejectEvent.TargetState);
+        await this.Host.PushEvent(exampleRejectEvent.Header, exampleRejectEvent.TargetState);
 
         // Assert
 
@@ -74,13 +74,13 @@ public class ParallelForeachApproveWorkflowTests : SingleScopeWorkflowTestBase<P
 
         var startStatus = wfObj.Status;
 
-        var waitApproveEvents = (await this.Storage.GetWaitEvents()).Where(ei => ei.Event == ParallelForeachApproveItemWorkflow.ApproveWaitEvent).ToList();
+        var waitApproveEvents = (await this.Storage.GetWaitEvents()).Where(ei => ei.Header == ParallelForeachApproveItemWorkflow.ApproveWaitEvent).ToList();
 
         var approvingInstances = waitApproveEvents.Select(e => e.TargetState.Workflow.Owner!.Workflow).ToArray();
 
         foreach (var waitApproveEvent in waitApproveEvents)
         {
-            await this.Host.PushEvent(waitApproveEvent.Event, waitApproveEvent.TargetState);
+            await this.Host.PushEvent(waitApproveEvent.Header, waitApproveEvent.TargetState);
         }
 
         // Assert
@@ -112,7 +112,7 @@ public class ParallelForeachApproveWorkflowTests : SingleScopeWorkflowTestBase<P
 
         var startStatus = wfObj.Status;
 
-        var waitApproveEvents = (await this.Storage.GetWaitEvents()).Where(ei => ei.Event == ParallelForeachApproveItemWorkflow.ApproveWaitEvent).ToList();
+        var waitApproveEvents = (await this.Storage.GetWaitEvents()).Where(ei => ei.Header == ParallelForeachApproveItemWorkflow.ApproveWaitEvent).ToList();
 
         var approvingInstances = waitApproveEvents.Select(e => e.TargetState.Workflow.Owner!.Workflow).ToArray();
 

@@ -14,7 +14,7 @@ public class TaskState : IState
         {
             executionContext.StateInstance.ReleaseWaitEvents();
 
-            return new PushEventResult(executionContext.CallbackEventInfo!.Event, null, executionContext.CallbackEventInfo!.Data);
+            return new PushEventResult(executionContext.CallbackEventInfo!.Header, null, executionContext.CallbackEventInfo!.Data);
         }
         else
         {

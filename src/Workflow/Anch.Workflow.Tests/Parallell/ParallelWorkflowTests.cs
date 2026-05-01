@@ -18,11 +18,11 @@ public class ParallelWorkflowTests : SingleScopeWorkflowTestBase<ParallelWorkflo
 
         var waitEvents = (await this.Storage.GetWaitEvents());
 
-        var approveEvent = waitEvents.Single(ei => ei.Event == ParallelWorkflow.ApproveWaitEvent);
+        var approveEvent = waitEvents.Single(ei => ei.Header == ParallelWorkflow.ApproveWaitEvent);
 
-        var rejectEvent = waitEvents.Single(ei => ei.Event == ParallelWorkflow.RejectWaitEvent);
+        var rejectEvent = waitEvents.Single(ei => ei.Header == ParallelWorkflow.RejectWaitEvent);
 
-        await this.Host.PushEvent(approveEvent.Event, approveEvent.TargetState);
+        await this.Host.PushEvent(approveEvent.Header, approveEvent.TargetState);
 
         // Assert
         preWfObjStatus.Should().Be(ParallelApproveStatus.Approving);
