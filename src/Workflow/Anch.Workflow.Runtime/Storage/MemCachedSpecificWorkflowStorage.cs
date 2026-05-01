@@ -7,7 +7,6 @@ public class MemCachedSpecificWorkflowStorage(ISpecificWorkflowExternalStorage e
 {
     private readonly Dictionary<WorkflowInstanceIdentity, WorkflowInstance> cache = new();
 
-
     public IWorkflow Workflow { get; } = workflow;
 
     public virtual async Task SaveWorkflowInstance(WorkflowInstance workflowInstance, CancellationToken cancellationToken = default)

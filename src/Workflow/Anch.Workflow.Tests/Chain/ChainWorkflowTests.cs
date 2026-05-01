@@ -18,9 +18,9 @@ public class ChainWorkflowTests : SingleScopeWorkflowTestBase<ChainWorkflowObjec
         var wi = await this.StartWorkflow(wfObj, ct);
 
         // Assert
-        wi.Status.Should().Be(WorkflowStatus.Finished);
-        wfObj.Result.Should().Be(expectedResult);
+        Assert.Equal(WorkflowStatus.Finished, wi.Status);
+        Assert.Equal(expectedResult, wfObj.Result);
 
-        (await this.Storage.GetWaitEvents(ct)).Should().BeEmpty();
+        Assert.Empty(await this.Storage.GetWaitEvents(ct));
     }
 }

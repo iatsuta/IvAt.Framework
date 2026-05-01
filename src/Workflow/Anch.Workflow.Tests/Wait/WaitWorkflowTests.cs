@@ -1,3 +1,4 @@
+using Anch.Testing.Xunit;
 using Anch.Workflow.Engine;
 using Anch.Workflow.Tests._Base;
 
@@ -5,23 +6,25 @@ namespace Anch.Workflow.Tests.Wait;
 
 public class WaitWorkflowTests : SingleScopeWorkflowTestBase<WaitWorkflowSource, WaitWorkflow>
 {
-    [Fact]
-    public async Task SendWaitedEvent_TestPassed()
+    [AnchFact]
+    public async Task SendWaitedEvent_TestPassed(CancellationToken ct)
     {
         // Arrange
 
         // Act
-        var wi = await this.StartWorkflow(new WaitWorkflowSource());
+        var wi = await this.StartWorkflow(new WaitWorkflowSource(), ct);
 
         var preWiStatus = wi.Status;
 
-        var processedWorkflowInstances = await this.Host.PushEvent(new EventHeader(WaitWorkflow.WaitEventName), wi.CurrentState, WaitWorkflow.WaitEventData);
+        var pushResult = await this.Host.CreateExecutor(WorkflowExecutionPolicy.Full)
+            .PushEvent(new EventHeader(WaitWorkflow.WaitEventName), wi.CurrentState, WaitWorkflow.WaitEventData, ct);
 
+        var processedWorkflowInstances = pushResult.Started.Select(wm => wm.WorkflowInstance).ToArray();
         // Assert
-        preWiStatus.Should().Be(WorkflowStatus.WaitEvent);
-        processedWorkflowInstances.Should().Contain(wi);
-        wi.Status.Should().Be(WorkflowStatus.Finished);
+        Assert.Equal(WorkflowStatus.WaitEvent, preWiStatus);
+        Assert.Contains(wi, processedWorkflowInstances);
+        Assert.Equal(WorkflowStatus.Finished, wi.Status);
 
-        (await this.Storage.GetWaitEvents()).Should().BeEmpty();
+        Assert.Empty(await this.Storage.GetWaitEvents(ct));
     }
 }

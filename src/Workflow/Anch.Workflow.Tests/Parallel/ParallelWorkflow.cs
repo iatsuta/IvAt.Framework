@@ -2,7 +2,7 @@ using Anch.Workflow.Builder;
 using Anch.Workflow.Builder.Default;
 using Anch.Workflow.States;
 
-namespace Anch.Workflow.Tests.Parallell;
+namespace Anch.Workflow.Tests.Parallel;
 
 public class ParallelWorkflow : BuildWorkflow<ParallelWorkflowObject>
 {

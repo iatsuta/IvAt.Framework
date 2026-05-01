@@ -16,4 +16,9 @@ public static class ServiceProviderExtensions
     {
         return serviceProvider.GetRequiredService<IWorkflowStorage>();
     }
+
+    public static IWorkflowMachineFactory GetWorkflowMachineFactory(this IServiceProvider serviceProvider)
+    {
+        return serviceProvider.GetRequiredService<IWorkflowMachineFactory>();
+    }
 }

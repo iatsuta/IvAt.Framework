@@ -46,15 +46,23 @@ public interface IWorkflowBuilder<TSource>
         where TInnerSource : notnull;
 
     IStateBuilder<TSource, StartWorkflowsState<TSource, TInnerSource>> StartWorkflows<TInnerSource, TWorkflow>(Func<TSource, IEnumerable<TInnerSource>> getElements)
-        where TWorkflow : IWorkflow<TInnerSource>;
+        where TWorkflow : IWorkflow<TInnerSource>
+        where TInnerSource : notnull;
 
     IStateBuilder<TSource, IfState> If(
         Func<TSource, bool> condition,
         Action<IWorkflowBuilder<TSource>> trueSetupWorkflowBuilder,
+        Action<IWorkflowBuilder<TSource>>? falseSetupWorkflowBuilder = null) =>
+
+        this.If<IServiceProvider>((source, _) => condition(source), trueSetupWorkflowBuilder, falseSetupWorkflowBuilder);
+
+    IStateBuilder<TSource, IfState> If<TService>(
+        Func<TSource, TService, bool> condition,
+        Action<IWorkflowBuilder<TSource>> trueSetupWorkflowBuilder,
         Action<IWorkflowBuilder<TSource>>? falseSetupWorkflowBuilder = null)
-    {
-        return this.If<IServiceProvider>(async (source, _, _) => condition(source), trueSetupWorkflowBuilder, falseSetupWorkflowBuilder);
-    }
+        where TService : notnull =>
+
+        this.If<TService>(async (source, service, _) => condition(source, service), trueSetupWorkflowBuilder, falseSetupWorkflowBuilder);
 
     IStateBuilder<TSource, IfState> If<TService>(
        Func<TSource, TService, CancellationToken, Task<bool>> condition,
@@ -119,7 +127,7 @@ public interface IWorkflowBuilder<TSource>
         Func<TSource, TService, CancellationToken, Task<IEnumerable<TElement>>> getElements,
         Action<IWorkflowBuilder<(TSource Source, TElement Element)>> setupIteratorBuilder)
         where TService : notnull;
-    
+
 
         IStateBuilder<TSource, FinalState> Finish(object? result = null)
     {

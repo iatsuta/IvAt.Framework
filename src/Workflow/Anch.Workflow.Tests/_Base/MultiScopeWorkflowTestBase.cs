@@ -1,3 +1,4 @@
+using Anch.DependencyInjection;
 using Anch.Workflow.DependencyInjection;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -23,7 +24,8 @@ public abstract class MultiScopeWorkflowTestBase
     private IServiceProvider BuildServiceProvider()
     {
         return this.CreateServices()
-            .ValidateDuplicateDeclaration()
+            .AddValidator<DuplicateServiceUsageValidator>()
+            .Validate()
             .BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
     }
 }

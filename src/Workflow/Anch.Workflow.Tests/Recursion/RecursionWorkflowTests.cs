@@ -1,3 +1,4 @@
+using Anch.Testing.Xunit;
 using Anch.Workflow.Engine;
 using Anch.Workflow.Tests._Base;
 
@@ -6,20 +7,20 @@ namespace Anch.Workflow.Tests.Recursion;
 public class RecursionWorkflowTests : SingleScopeWorkflowTestBase<RecursionWorkflowObject, RecursionWorkflow>
 {
     [Theory]
-    [InlineData(4, 1000, 1006)]
-    [InlineData(11, 1000, 1055)]
-    public async Task SumNumbersByRecurse_ResultEquals(int limit, int extraAddToResult, int result)
+    [AnchInlineData(4, 1000, 1006)]
+    [AnchInlineData(11, 1000, 1055)]
+    public async Task SumNumbersByRecurse_ResultEquals(int limit, int extraAddToResult, int result, CancellationToken ct)
     {
         // Arrange
         var wfObj = new RecursionWorkflowObject { Limit = limit, ExtraAddToResult = extraAddToResult };
 
         // Act
-        var wi = await this.StartWorkflow(wfObj);
+        var wi = await this.StartWorkflow(wfObj, ct);
 
         // Assert
-        wi.Status.Should().Be(WorkflowStatus.Finished);
-        wfObj.Result.Should().Be(result);
+        Assert.Equal(WorkflowStatus.Finished, wi.Status);
+        Assert.Equal(result, wfObj.Result);
 
-        (await this.Storage.GetWaitEvents()).Should().BeEmpty();
+        Assert.Empty(await this.Storage.GetWaitEvents(ct));
     }
 }

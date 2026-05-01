@@ -18,16 +18,16 @@ public class TaskWorkflowTests : SingleScopeWorkflowTestBase<TaskWorkflowObject,
         var preWfObjStatus = wfObj.Status;
 
         var approveEvent = (await this.Storage.GetWaitEvents(ct)).Single(ei => ei.Header == TaskWorkflow.ApproveEventHeader);
-        await this.Host.PushEvent(approveEvent.Header, approveEvent.TargetState);
+        await this.Host.CreateExecutor(WorkflowExecutionPolicy.Full).PushEvent(approveEvent.Header, approveEvent.TargetState, cancellationToken: ct);
 
         // Assert
-        preWfObjStatus.Should().Be(TaskApproveStatus.Approving);
-        wfObj.Status.Should().Be(TaskApproveStatus.Approved);
+        Assert.Equal(TaskApproveStatus.Approving, preWfObjStatus);
+        Assert.Equal(TaskApproveStatus.Approved, wfObj.Status);
 
-        wfObj.PostProcessWork.Should().BeTrue();
+        Assert.True(wfObj.PostProcessWork);
 
-        wi.Status.Should().Be(WorkflowStatus.Finished);
+        Assert.Equal(WorkflowStatus.Finished, wi.Status);
 
-        (await this.Storage.GetWaitEvents()).Should().BeEmpty();
+        Assert.Empty(await this.Storage.GetWaitEvents(ct));
     }
 }

@@ -1,3 +1,4 @@
+using Anch.Testing.Xunit;
 using Anch.Workflow.DependencyInjection;
 using Anch.Workflow.Engine;
 using Anch.Workflow.Tests._Base;
@@ -9,33 +10,38 @@ namespace Anch.Workflow.Tests.StartWorkflow;
 
 public class StartWorkflowWorkflowTests : SingleScopeWorkflowTestBase<WaitWorkflowSource, RootWorkflow>
 {
-    [Fact]
-    public async Task StartRootWf_SendPushEventToChild_WorkflowFinished()
+    [AnchFact]
+    public async Task StartRootWf_SendPushEventToChild_WorkflowFinished(CancellationToken ct)
     {
         // Arrange
 
         // Act
-        var rootWi = await this.StartWorkflow(new WaitWorkflowSource());
+        var rootWi = await this.StartWorkflow(new WaitWorkflowSource(), ct);
 
-        var allWi = await this.Storage.GetWorkflowInstances();
+        var allWi = await this.Storage.GetWorkflowInstances(ct);
 
         var subWf = allWi.Except([rootWi]).Single();
 
         var preWiStatus = rootWi.Status;
         var preChildWfStatus = subWf.Status;
 
-        var processedWorkflowInstances = await this.Host.PushEvent(new EventHeader(WaitWorkflow.WaitEventName), subWf.CurrentState, WaitWorkflow.WaitEventData);
+        var pushResult = await this.Host
+            .CreateExecutor(WorkflowExecutionPolicy.Full)
+            .PushEvent(new EventHeader(WaitWorkflow.WaitEventName), subWf.CurrentState, WaitWorkflow.WaitEventData, ct);
+
+        var processedWorkflowInstances = pushResult.Started.Select(wm => wm.WorkflowInstance).ToArray();
 
         // Assert
-        preWiStatus.Should().Be(WorkflowStatus.WaitEvent);
-        preChildWfStatus.Should().Be(WorkflowStatus.WaitEvent);
+        Assert.Equal(WorkflowStatus.WaitEvent, preWiStatus);
+        Assert.Equal(WorkflowStatus.WaitEvent, preChildWfStatus);
 
-        processedWorkflowInstances.Should().HaveCount(1).And.Equal(subWf);
+        Assert.Single(processedWorkflowInstances);
+        Assert.Contains(subWf, processedWorkflowInstances);
 
-        rootWi.Status.Should().Be(WorkflowStatus.Finished);
-        subWf.Status.Should().Be(WorkflowStatus.Finished);
+        Assert.Equal(WorkflowStatus.Finished, rootWi.Status);
+        Assert.Equal(WorkflowStatus.Finished, subWf.Status);
 
-        (await this.Storage.GetWaitEvents()).Should().BeEmpty();
+        Assert.Empty(await this.Storage.GetWaitEvents(ct));
     }
 
     protected override IServiceCollection CreateServices()

@@ -1,5 +1,6 @@
 using System.Text;
 
+using Anch.Testing.Xunit;
 using Anch.Workflow.Engine;
 using Anch.Workflow.States.Output;
 using Anch.Workflow.Tests._Base;
@@ -19,22 +20,22 @@ public class WriteLineWorkflowTests : SingleScopeWorkflowTestBase<object, WriteL
         this.writer = new StringWriter(this.stringBuilder);
     }
 
-    [Fact]
-    public async Task WriteText_TextReceived()
+    [AnchFact]
+    public async Task WriteText_TextReceived(CancellationToken ct)
     {
         // Arrange
 
         // Act
-        var wi = await this.StartWorkflow(new object());
+        var wi = await this.StartWorkflow(new object(), ct);
 
         await this.writer.FlushAsync();
 
         // Assert
-        wi.Status.Should().Be(WorkflowStatus.Finished);
+        Assert.Equal(WorkflowStatus.Finished, wi.Status);
 
-        this.stringBuilder.ToString().Should().StartWith(WriteLineWorkflow.Message);
+        Assert.StartsWith(WriteLineWorkflow.Message, this.stringBuilder.ToString());
 
-        (await this.Storage.GetWaitEvents()).Should().BeEmpty();
+        Assert.Empty(await this.Storage.GetWaitEvents(ct));
     }
 
     protected override IServiceCollection CreateServices()

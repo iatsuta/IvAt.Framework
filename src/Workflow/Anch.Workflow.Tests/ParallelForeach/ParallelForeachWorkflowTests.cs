@@ -1,3 +1,4 @@
+using Anch.Testing.Xunit;
 using Anch.Workflow.DependencyInjection;
 using Anch.Workflow.Engine;
 using Anch.Workflow.Tests._Base;
@@ -9,9 +10,9 @@ namespace Anch.Workflow.Tests.ParallelForeach;
 public class ParallelForeachWorkflowTests : SingleScopeWorkflowTestBase<ParallelForeachWorkflowObject, ParallelForeachWorkflow>
 {
     [Theory]
-    [InlineData(10, 100, 123, 760)]
-    [InlineData(3, 100, 5, 113)]
-    public async Task ParallelSum_ResultEquals(int wfCount, int extraAddToResult, int pushEventData, int expectedResult)
+    [AnchInlineData(10, 100, 123, 760)]
+    [AnchInlineData(3, 100, 5, 113)]
+    public async Task ParallelSum_ResultEquals(int wfCount, int extraAddToResult, int pushEventData, int expectedResult, CancellationToken ct)
     {
         // Arrange
         var wfObj = new ParallelForeachWorkflowObject
@@ -21,25 +22,25 @@ public class ParallelForeachWorkflowTests : SingleScopeWorkflowTestBase<Parallel
         };
 
         // Act
-        var wi = await this.StartWorkflow(wfObj);
+        var wi = await this.StartWorkflow(wfObj, ct);
 
         var preWiStatus = wi.Status;
 
-        var waitUserEvents = (await this.Storage.GetWaitEvents()).Where(ei => ei.Header == ParallelForeachItemWorkflow.TestItemWaitEvent).ToList();
+        var waitUserEvents = (await this.Storage.GetWaitEvents(ct)).Where(ei => ei.Header == ParallelForeachItemWorkflow.TestItemWaitEvent).ToList();
 
         foreach (var waitUserEvent in waitUserEvents)
         {
-            await this.Host.PushEvent(waitUserEvent.Header, waitUserEvent.TargetState, pushEventData);
+            await this.Host.CreateExecutor(WorkflowExecutionPolicy.Full).PushEvent(waitUserEvent.Header, waitUserEvent.TargetState, pushEventData, ct);
         }
 
         // Assert
-        preWiStatus.Should().Be(WorkflowStatus.WaitEvent);
+        Assert.Equal(WorkflowStatus.WaitEvent, preWiStatus);
 
-        waitUserEvents.Count.Should().Be((wfCount + 1) / 2);
-        wi.Status.Should().Be(WorkflowStatus.Finished);
-        wfObj.Result.Should().Be(expectedResult);
+        Assert.Equal((wfCount + 1) / 2, waitUserEvents.Count);
+        Assert.Equal(WorkflowStatus.Finished, wi.Status);
+        Assert.Equal(expectedResult, wfObj.Result);
 
-        (await this.Storage.GetWaitEvents()).Should().BeEmpty();
+        Assert.Empty(await this.Storage.GetWaitEvents(ct));
     }
 
     protected override IServiceCollection CreateServices()

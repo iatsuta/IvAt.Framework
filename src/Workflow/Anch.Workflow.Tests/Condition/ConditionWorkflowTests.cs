@@ -1,3 +1,4 @@
+using Anch.Testing.Xunit;
 using Anch.Workflow.Engine;
 using Anch.Workflow.Tests._Base;
 
@@ -8,9 +9,9 @@ namespace Anch.Workflow.Tests.Condition;
 public class ConditionWorkflowTests : SingleScopeWorkflowTestBase<ConditionWorkflowObject, ConditionWorkflow>
 {
     [Theory]
-    [InlineData(100, true)]
-    [InlineData(101, false)]
-    public async Task UseIf_CodeSwitched_Cases(int value, bool isEven)
+    [AnchInlineData(100, true)]
+    [AnchInlineData(101, false)]
+    public async Task UseIf_CodeSwitched_Cases(int value, bool isEven, CancellationToken ct)
     {
         // Arrange
         var wfObj = new ConditionWorkflowObject { Value = value };
@@ -18,13 +19,13 @@ public class ConditionWorkflowTests : SingleScopeWorkflowTestBase<ConditionWorkf
         var expectedResult = ConditionWorkflow.BuildResult(wfObj.Value, isEven);
 
         // Act
-        var wi = await this.StartWorkflow(wfObj);
+        var wi = await this.StartWorkflow(wfObj, ct);
 
         // Assert
-        wi.Status.Should().Be(WorkflowStatus.Finished);
-        wfObj.Result.Should().Be(expectedResult);
+        Assert.Equal(WorkflowStatus.Finished, wi.Status);
+        Assert.Equal(expectedResult, wfObj.Result);
 
-        (await this.Storage.GetWaitEvents()).Should().BeEmpty();
+        Assert.Empty(await this.Storage.GetWaitEvents(ct));
     }
 
     protected override IServiceCollection CreateServices()

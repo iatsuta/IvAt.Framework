@@ -13,7 +13,7 @@
 
 //public class WaitWorkflowWithInlineStorageTests : MultiScopeWorkflowTestBase
 //{
-//    [Fact]
+//    [AnchFact]
 //    public async Task SendWaitedEvent_TestPassed()
 //    {
 //        // Arrange
@@ -118,7 +118,7 @@
 
 //public class WaitWorkflowPersistSource : IInlineStorage<WaitWorkflowSource>
 //{
-//    public Task Save(WaitWorkflowSource source, CancellationToken cancellationToken = default)
+//    public Task Save(WaitWorkflowSource source, CancellationToken cancellationToken)
 //    {
 //        throw new NotImplementedException();
 //    }

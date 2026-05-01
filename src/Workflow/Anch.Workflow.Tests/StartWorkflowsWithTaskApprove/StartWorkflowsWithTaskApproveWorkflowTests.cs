@@ -1,3 +1,4 @@
+using Anch.Testing.Xunit;
 using Anch.Workflow.DependencyInjection;
 using Anch.Workflow.Engine;
 using Anch.Workflow.Tests._Base;
@@ -6,10 +7,11 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Anch.Workflow.Tests.StartWorkflowsWithTaskApprove;
 
-public class StartWorkflowsWithTaskApproveWorkflowTests : SingleScopeWorkflowTestBase<StartWorkflowsWithTaskApproveWorkflowObject, StartWorkflowsWithTaskApproveWorkflow>
+public class StartWorkflowsWithTaskApproveWorkflowTests : SingleScopeWorkflowTestBase<StartWorkflowsWithTaskApproveWorkflowObject,
+    StartWorkflowsWithTaskApproveWorkflow>
 {
-    [Fact]
-    public async Task SomeOneRejected_ApprovingItemsTerminated()
+    [AnchFact]
+    public async Task SomeOneRejected_ApprovingItemsTerminated(CancellationToken ct)
     {
         // Arrange
         var wfObj = new StartWorkflowsWithTaskApproveWorkflowObject
@@ -18,50 +20,54 @@ public class StartWorkflowsWithTaskApproveWorkflowTests : SingleScopeWorkflowTes
         };
 
         // Act
-        var wi = await this.StartWorkflow(wfObj);
+        await this.StartWorkflow(wfObj, ct);
 
         var startStatus = wfObj.Status;
 
-        var waitApproveEvents = (await this.Storage.GetWaitEvents()).Where(ei => ei.Header == StartWorkflowsWithTaskApproveItemWorkflow.ApproveWaitEvent).ToList();
+        var waitApproveEvents = (await this.Storage.GetWaitEvents(ct)).Where(ei => ei.Header == StartWorkflowsWithTaskApproveItemWorkflow.ApproveWaitEvent)
+            .ToList();
 
-        var waitRejectEvents = (await this.Storage.GetWaitEvents()).Where(ei => ei.Header == StartWorkflowsWithTaskApproveItemWorkflow.RejectWaitEvent).ToList();
+        var waitRejectEvents = (await this.Storage.GetWaitEvents(ct)).Where(ei => ei.Header == StartWorkflowsWithTaskApproveItemWorkflow.RejectWaitEvent)
+            .ToList();
 
         var approvingInstances = waitApproveEvents.Select(e => e.TargetState.Workflow).ToArray();
 
         var exampleApproveEvent = waitApproveEvents.First();
 
-        await this.Host.PushEvent(exampleApproveEvent.Header, exampleApproveEvent.TargetState);
+        await this.Host.CreateExecutor(WorkflowExecutionPolicy.Full)
+            .PushEvent(exampleApproveEvent.Header, exampleApproveEvent.TargetState, cancellationToken: ct);
 
         var exampleRejectEvent = waitRejectEvents.First(e => e.TargetState.Workflow.Source != exampleApproveEvent.TargetState.Workflow.Source);
 
-        await this.Host.PushEvent(exampleRejectEvent.Header, exampleRejectEvent.TargetState);
+        await this.Host.CreateExecutor(WorkflowExecutionPolicy.Full)
+            .PushEvent(exampleRejectEvent.Header, exampleRejectEvent.TargetState, cancellationToken: ct);
 
         // Assert
 
-        var usedWfObjs = new[] { exampleApproveEvent.TargetState.Workflow.Source, exampleRejectEvent.TargetState.Workflow.Source };
+        var usedWfObjects = new[] { exampleApproveEvent.TargetState.Workflow.Source, exampleRejectEvent.TargetState.Workflow.Source };
 
         var approvedWf = approvingInstances.Single(wf => wf.Source == exampleApproveEvent.TargetState.Workflow.Source);
         var rejectedWf = approvingInstances.Single(wf => wf.Source == exampleRejectEvent.TargetState.Workflow.Source);
 
-        var notUsedApprovingInstances = approvingInstances.Where(wf => !usedWfObjs.Contains(wf.Source)).ToArray();
+        var notUsedApprovingInstances = approvingInstances.Where(wf => !usedWfObjects.Contains(wf.Source)).ToArray();
 
-        startStatus.Should().Be(StartWorkflowsWithTaskApproveStatus.Approving);
+        Assert.Equal(StartWorkflowsWithTaskApproveStatus.Approving, startStatus);
 
-        approvedWf.Status.Should().Be(WorkflowStatus.Finished);
-        rejectedWf.Status.Should().Be(WorkflowStatus.Finished);
+        Assert.Equal(WorkflowStatus.Finished, approvedWf.Status);
+        Assert.Equal(WorkflowStatus.Finished, rejectedWf.Status);
 
-        notUsedApprovingInstances.Length.Should().Be(3);
-        notUsedApprovingInstances[0].Status.Should().Be(WorkflowStatus.Terminated);
-        notUsedApprovingInstances[1].Status.Should().Be(WorkflowStatus.Terminated);
-        notUsedApprovingInstances[2].Status.Should().Be(WorkflowStatus.Terminated);
+        Assert.Equal(3, notUsedApprovingInstances.Length);
+        Assert.Equal(WorkflowStatus.Terminated, notUsedApprovingInstances[0].Status);
+        Assert.Equal(WorkflowStatus.Terminated, notUsedApprovingInstances[1].Status);
+        Assert.Equal(WorkflowStatus.Terminated, notUsedApprovingInstances[2].Status);
 
-        wfObj.Status.Should().Be(StartWorkflowsWithTaskApproveStatus.Rejected);
+        Assert.Equal(StartWorkflowsWithTaskApproveStatus.Rejected, wfObj.Status);
 
-        (await this.Storage.GetWaitEvents()).Should().BeEmpty();
+        Assert.Empty(await this.Storage.GetWaitEvents(ct));
     }
 
-    [Fact]
-    public async Task AllApproved_RootWfApproved()
+    [AnchFact]
+    public async Task AllApproved_RootWfApproved(CancellationToken ct)
     {
         // Arrange
         var wfObj = new StartWorkflowsWithTaskApproveWorkflowObject
@@ -70,36 +76,38 @@ public class StartWorkflowsWithTaskApproveWorkflowTests : SingleScopeWorkflowTes
         };
 
         // Act
-        var wi = await this.StartWorkflow(wfObj);
+        await this.StartWorkflow(wfObj, ct);
 
         var startStatus = wfObj.Status;
 
-        var waitApproveEvents = (await this.Storage.GetWaitEvents()).Where(ei => ei.Header == StartWorkflowsWithTaskApproveItemWorkflow.ApproveWaitEvent).ToList();
+        var waitApproveEvents = (await this.Storage.GetWaitEvents(ct)).Where(ei => ei.Header == StartWorkflowsWithTaskApproveItemWorkflow.ApproveWaitEvent)
+            .ToList();
 
         var approvingInstances = waitApproveEvents.Select(e => e.TargetState.Workflow).ToArray();
 
         foreach (var waitApproveEvent in waitApproveEvents)
         {
-            await this.Host.PushEvent(waitApproveEvent.Header, waitApproveEvent.TargetState);
+            await this.Host.CreateExecutor(WorkflowExecutionPolicy.Full)
+                .PushEvent(waitApproveEvent.Header, waitApproveEvent.TargetState, cancellationToken: ct);
         }
 
         // Assert
 
-        startStatus.Should().Be(StartWorkflowsWithTaskApproveStatus.Approving);
+        Assert.Equal(StartWorkflowsWithTaskApproveStatus.Approving, startStatus);
 
         foreach (var approvingInstance in approvingInstances)
         {
-            approvingInstance.Status.Should().Be(WorkflowStatus.Finished);
+            Assert.Equal(WorkflowStatus.Finished, approvingInstance.Status);
         }
 
-        wfObj.Status.Should().Be(StartWorkflowsWithTaskApproveStatus.Approved);
+        Assert.Equal(StartWorkflowsWithTaskApproveStatus.Approved, wfObj.Status);
 
-        (await this.Storage.GetWaitEvents()).Should().BeEmpty();
+        Assert.Empty(await this.Storage.GetWaitEvents(ct));
     }
 
 
-    [Fact]
-    public async Task TerminateChildren_RootWf_Rejected()
+    [AnchFact]
+    public async Task TerminateChildren_RootWf_Rejected(CancellationToken ct)
     {
         // Arrange
         var wfObj = new StartWorkflowsWithTaskApproveWorkflowObject
@@ -108,28 +116,29 @@ public class StartWorkflowsWithTaskApproveWorkflowTests : SingleScopeWorkflowTes
         };
 
         // Act
-        var wi = await this.StartWorkflow(wfObj);
+        await this.StartWorkflow(wfObj, ct);
 
         var startStatus = wfObj.Status;
 
-        var waitApproveEvents = (await this.Storage.GetWaitEvents()).Where(ei => ei.Header == StartWorkflowsWithTaskApproveItemWorkflow.ApproveWaitEvent).ToList();
+        var waitApproveEvents = (await this.Storage.GetWaitEvents(ct)).Where(ei => ei.Header == StartWorkflowsWithTaskApproveItemWorkflow.ApproveWaitEvent)
+            .ToList();
 
         var approvingInstances = waitApproveEvents.Select(e => e.TargetState.Workflow).ToArray();
 
-        await this.Host.CreateMachine(approvingInstances[0]).Terminate();
+        await this.WorkflowMachineFactory.Create(approvingInstances[0]).Terminate(ct);
 
         // Assert
 
-        startStatus.Should().Be(StartWorkflowsWithTaskApproveStatus.Approving);
+        Assert.Equal(StartWorkflowsWithTaskApproveStatus.Approving, startStatus);
 
         foreach (var approvingInstance in approvingInstances)
         {
-            approvingInstance.Status.Should().Be(WorkflowStatus.Terminated);
+            Assert.Equal(WorkflowStatus.Terminated, approvingInstance.Status);
         }
 
-        wfObj.Status.Should().Be(StartWorkflowsWithTaskApproveStatus.Rejected);
+        Assert.Equal(StartWorkflowsWithTaskApproveStatus.Rejected, wfObj.Status);
 
-        (await this.Storage.GetWaitEvents()).Should().BeEmpty();
+        Assert.Empty(await this.Storage.GetWaitEvents(ct));
     }
 
     protected override IServiceCollection CreateServices()
