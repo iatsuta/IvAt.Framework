@@ -4,10 +4,8 @@ using Anch.Workflow.States._Base;
 
 namespace Anch.Workflow.States;
 
-public abstract class ParallelStateBase<TSource>(IWorkflowHost host) : IState
+public abstract class ParallelStateBase<TSource> : IState
 {
-    protected readonly IWorkflowHost Host = host;
-
     public StateBreakPolicy BreakPolicy { get; set; } = StateBreakPolicy.WaitAll;
 
     public StateLeavePolicy LeavePolicy { get; set; } = StateLeavePolicy.TerminateChild;

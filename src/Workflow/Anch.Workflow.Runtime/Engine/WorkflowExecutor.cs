@@ -5,7 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Anch.Workflow.Engine;
 
 public class WorkflowExecutor(
-    IWorkflowHost workflowHost,
+    IWorkflowMachineFactory workflowMachineFactory,
     IServiceProvider serviceProvider,
     IWorkflowStorage rootWorkflowStorage,
     WorkflowExecutionPolicy executionPolicy)
@@ -18,12 +18,11 @@ public class WorkflowExecutor(
         return await this.StartWorkflow(source, serviceProvider.GetRequiredService<TWorkflow>(), cancellationToken);
     }
 
-    public async Task<WorkflowProcessResult> StartWorkflow<TSource, TWorkflow>(TSource source, TWorkflow workflow,
+    public async Task<WorkflowProcessResult> StartWorkflow<TSource>(TSource source, IWorkflow<TSource> workflow,
         CancellationToken cancellationToken = default)
         where TSource : notnull
-        where TWorkflow : IWorkflow<TSource>
     {
-        var machine = workflowHost.CreateMachine(source, workflow);
+        var machine = workflowMachineFactory.Create(source, workflow);
 
         await machine.Save(cancellationToken);
 
@@ -42,8 +41,8 @@ public class WorkflowExecutor(
         }
 
         return await waitEvents
-            .Select(waitEventInfo => workflowHost
-                .CreateMachine(waitEventInfo.TargetState.Workflow)
+            .Select(waitEventInfo => workflowMachineFactory
+                .Create(waitEventInfo.TargetState.Workflow)
                 .PushReleasedEvent(waitEventInfo with { Data = pushEventInfo.Data }, cancellationToken))
             .Aggregate()
             .ApplyPolicy(executionPolicy);

@@ -2,7 +2,7 @@
 
 namespace Anch.Workflow.States;
 
-public class ParallelState<TSource>(IWorkflowHost host) : ParallelStateBase<TSource>(host)
+public class ParallelState<TSource>(IWorkflowMachineFactory workflowMachineFactory) : ParallelStateBase<TSource>
     where TSource : notnull
 {
     private List<IWorkflow<TSource>> forks = [];
@@ -16,6 +16,6 @@ public class ParallelState<TSource>(IWorkflowHost host) : ParallelStateBase<TSou
 
     protected override IEnumerable<IWorkflowMachine> CreateChildMachines(TSource source)
     {
-        return this.Forks.Select(fork => this.Host.CreateMachine(source, fork));
+        return this.Forks.Select(fork => workflowMachineFactory.Create(source, fork));
     }
 }

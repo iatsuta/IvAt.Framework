@@ -117,7 +117,7 @@ public class WorkflowMachine<TSource>(
                     .BindOutput(codeState, serviceProvider, executionContext.Source, executionContext.CancellationToken);
 
                 var leaveResult = await codeState.LeavePolicy.Leave(serviceProvider, executionContext);
-                
+
                 return leaveResult + new WorkflowProcessResult(() => this.ProcessExecutionResult(executionContext, executionResult));
             }
             else

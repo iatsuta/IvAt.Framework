@@ -16,15 +16,15 @@ public class StateLeavePolicy(Func<IServiceProvider, IExecutionContext, Task<Wor
 
     public static StateLeavePolicy TerminateChild { get; } = new(async (serviceProvider, executionContext) =>
     {
-        var host = serviceProvider.GetRequiredService<IWorkflowHost>();
+        var workflowMachineFactory = serviceProvider.GetRequiredService<IWorkflowMachineFactory>();
 
         var notFinishedInstances = executionContext.StateInstance.Child.Where(wi => wi.Status.Role != WorkflowStatusRole.Finished).ToList();
 
         var result = new List<WorkflowProcessResult>();
-        
+
         foreach (var wi in notFinishedInstances)
         {
-            result.Add(await host.CreateMachine(wi).Terminate(executionContext.CancellationToken));
+            result.Add(await workflowMachineFactory.Create(wi).Terminate(executionContext.CancellationToken));
         }
 
         return result.Aggregate();

@@ -2,7 +2,7 @@
 
 namespace Anch.Workflow.States;
 
-public class ParallelForeachState<TSource, TElement>(IWorkflowHost host) : ParallelStateBase<TSource>(host)
+public class ParallelForeachState<TSource, TElement>(IWorkflowMachineFactory workflowMachineFactory) : ParallelStateBase<TSource>
 {
     private List<TElement> elements = [];
 
@@ -18,6 +18,6 @@ public class ParallelForeachState<TSource, TElement>(IWorkflowHost host) : Paral
 
     protected override IEnumerable<IWorkflowMachine> CreateChildMachines(TSource source)
     {
-        return this.Elements.Select(childrenElement => this.Host.CreateMachine((source, childrenElement), this.ElementWorkflow));
+        return this.Elements.Select(childrenElement => workflowMachineFactory.Create((source, childrenElement), this.ElementWorkflow));
     }
 }

@@ -5,8 +5,7 @@ public record WorkflowProcessResult(
     IReadOnlyList<UnprocessWorkflowData> Unprocessed)
 {
     public WorkflowProcessResult(Func<Task<WorkflowProcessResult>> getResult)
-        : this(Array.Empty<IWorkflowMachine>(),
-            [new UnprocessWorkflowData(getResult)])
+        : this([], [new UnprocessWorkflowData(getResult)])
     {
     }
 
@@ -43,5 +42,3 @@ public record WorkflowProcessResult(
 
     public static WorkflowProcessResult Empty { get; } = new(Started: [], Unprocessed: []);
 }
-
-public record UnprocessWorkflowData(Func<Task<WorkflowProcessResult>> GetResult);

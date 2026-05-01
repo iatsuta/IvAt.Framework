@@ -8,11 +8,11 @@ public interface IWorkflowExecutor
         where TSource : notnull
         where TWorkflow : IWorkflow<TSource>;
 
-    Task<WorkflowProcessResult> StartWorkflow<TSource, TWorkflow>(TSource source, TWorkflow workflow, CancellationToken cancellationToken = default)
-        where TSource : notnull
-        where TWorkflow : IWorkflow<TSource>;
+    Task<WorkflowProcessResult> StartWorkflow<TSource>(TSource source, IWorkflow<TSource> workflow, CancellationToken cancellationToken = default)
+        where TSource : notnull;
 
-    async Task<WorkflowProcessResult> PushEvent(EventHeader @event, StateInstance targetState, object? data = null, CancellationToken cancellationToken = default)
+    async Task<WorkflowProcessResult> PushEvent(EventHeader @event, StateInstance targetState, object? data = null,
+        CancellationToken cancellationToken = default)
     {
         return await this.PushEvent(new PushEventInfo(@event, null, targetState, data), cancellationToken);
     }
