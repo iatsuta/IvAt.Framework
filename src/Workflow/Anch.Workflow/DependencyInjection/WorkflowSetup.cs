@@ -15,6 +15,8 @@ public class WorkflowSetup : IWorkflowSetup, IServiceInitializer
 
     public void Initialize(IServiceCollection services)
     {
+        services.AddServiceProxyFactory();
+
         foreach (var initAction in this.initActions)
         {
             initAction(services);
