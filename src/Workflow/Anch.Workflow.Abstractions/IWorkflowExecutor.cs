@@ -13,10 +13,9 @@ public interface IWorkflowExecutor
         where TSource : notnull;
 
     async Task<WorkflowProcessResult> PushEvent(EventHeader @event, StateInstance targetState, object? data = null,
-        CancellationToken cancellationToken = default)
-    {
-        return await this.PushEvent(new PushEventInfo(@event, null, targetState, data), cancellationToken);
-    }
+        CancellationToken cancellationToken = default) =>
+
+        await this.PushEvent(new PushEventInfo(@event, null, targetState, data), cancellationToken);
 
     Task<WorkflowProcessResult> PushEvent(PushEventInfo pushEventInfo, CancellationToken cancellationToken = default);
 }
