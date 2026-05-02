@@ -1,7 +1,7 @@
 using Anch.Workflow.DependencyInjection;
 using Anch.Workflow.Domain.Runtime;
 using Anch.Workflow.Engine;
-using Anch.Workflow.Storage;
+using Anch.Workflow.Serialization;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -30,7 +30,7 @@ public abstract class SingleScopeWorkflowTestBase<TSource, TWorkflow> : MultiSco
     {
         var wfStartResult = await this.StartWorkflowNative(source, cancellationToken);
 
-        return wfStartResult.Started.Single().WorkflowInstance;
+        return wfStartResult.Started.Single();
     }
 
     protected async Task<WorkflowProcessResult> StartWorkflowNative(TSource source, CancellationToken cancellationToken)

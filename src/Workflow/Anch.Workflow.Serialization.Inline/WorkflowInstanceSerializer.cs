@@ -34,32 +34,34 @@ public class WorkflowInstanceSerializer<TSource>(
 
     private WorkflowStatus GetWorkflowStatus(IStateDefinition currentStateDefinition)
     {
-        var isFinished = currentStateDefinition.StateType == typeof(FinalState);
-        var isTerminated = currentStateDefinition.StateType == typeof(TerminateState);
+        throw new NotImplementedException();
 
-        if (isTerminated)
-        {
-            return WorkflowStatus.Terminated;
-        }
-        else if (isFinished)
-        {
-            return WorkflowStatus.Finished;
-        }
-        else if (currentStateDefinition.StateType == typeof(TaskState))
-            //&& currentStateDefinition.AdditionalInfo.TryGetValue(TaskState.CommandsKey, out var untypedEventHeaders)
-            //&& untypedEventHeaders is IReadOnlyList<EventHeader> eventHeaders)
-        {
-            //foreach (var eventHeader in eventHeaders)
-            //{
-            //    result.CurrentState.WaitEvents.Add(new WaitEventInfo(eventHeader, null, result.CurrentState));
-            //}
+        //var isFinished = currentStateDefinition.StateType == typeof(FinalState);
+        //var isTerminated = currentStateDefinition.StateType == typeof(TerminateState);
 
-            return WorkflowStatus.WaitEvent;
-        }
-        else
-        {
-            return WorkflowStatus.Runnable;
-        }
+        //if (isTerminated)
+        //{
+        //    return WorkflowStatus.Terminated;
+        //}
+        //else if (isFinished)
+        //{
+        //    return WorkflowStatus.Finished;
+        //}
+        //else if (currentStateDefinition.StateType == typeof(TaskState))
+        //    //&& currentStateDefinition.AdditionalInfo.TryGetValue(TaskState.CommandsKey, out var untypedEventHeaders)
+        //    //&& untypedEventHeaders is IReadOnlyList<EventHeader> eventHeaders)
+        //{
+        //    //foreach (var eventHeader in eventHeaders)
+        //    //{
+        //    //    result.CurrentState.WaitEvents.Add(new WaitEventInfo(eventHeader, null, result.CurrentState));
+        //    //}
+
+        //    return WorkflowStatus.WaitEvent;
+        //}
+        //else
+        //{
+        //    return WorkflowStatus.Runnable;
+        //}
     }
 
     public void Serialize(WorkflowInstance wi)

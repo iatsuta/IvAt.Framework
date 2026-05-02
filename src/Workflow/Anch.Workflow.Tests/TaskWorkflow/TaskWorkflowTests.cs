@@ -2,8 +2,6 @@ using Anch.Testing.Xunit;
 using Anch.Workflow.Domain.Runtime;
 using Anch.Workflow.Tests._Base;
 
-using WorkflowStatus = Anch.Workflow.Engine.WorkflowStatus;
-
 namespace Anch.Workflow.Tests.TaskWorkflow;
 
 public class TaskWorkflowTests : SingleScopeWorkflowTestBase<TaskWorkflowObject, TaskWorkflow>

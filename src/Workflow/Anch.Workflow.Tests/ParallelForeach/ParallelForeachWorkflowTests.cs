@@ -5,8 +5,6 @@ using Anch.Workflow.Tests._Base;
 
 using Microsoft.Extensions.DependencyInjection;
 
-using WorkflowStatus = Anch.Workflow.Engine.WorkflowStatus;
-
 namespace Anch.Workflow.Tests.ParallelForeach;
 
 public class ParallelForeachWorkflowTests : SingleScopeWorkflowTestBase<ParallelForeachWorkflowObject, ParallelForeachWorkflow>

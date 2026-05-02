@@ -1,5 +1,6 @@
 using Anch.Workflow.Builder;
 using Anch.Workflow.Builder.Default;
+using Anch.Workflow.Domain;
 using Anch.Workflow.States;
 
 namespace Anch.Workflow.Tests.ParallelForeach;

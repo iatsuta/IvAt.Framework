@@ -1,12 +1,11 @@
 using Anch.Testing.Xunit;
 using Anch.Workflow.DependencyInjection;
+using Anch.Workflow.Domain;
 using Anch.Workflow.Domain.Runtime;
 using Anch.Workflow.Tests._Base;
 using Anch.Workflow.Tests.Wait;
 
 using Microsoft.Extensions.DependencyInjection;
-
-using WorkflowStatus = Anch.Workflow.Engine.WorkflowStatus;
 
 namespace Anch.Workflow.Tests.StartWorkflow;
 
@@ -31,14 +30,12 @@ public class StartWorkflowWorkflowTests : SingleScopeWorkflowTestBase<WaitWorkfl
             .CreateExecutor(WorkflowExecutionPolicy.Full)
             .PushEvent(new EventHeader(WaitWorkflow.WaitEventName), subWf.CurrentState, WaitWorkflow.WaitEventData, ct);
 
-        var processedWorkflowInstances = pushResult.Started.Select(wm => wm.WorkflowInstance).ToArray();
-
         // Assert
         Assert.Equal(WorkflowStatus.WaitEvent, preWiStatus);
         Assert.Equal(WorkflowStatus.WaitEvent, preChildWfStatus);
 
-        Assert.Single(processedWorkflowInstances);
-        Assert.Contains(subWf, processedWorkflowInstances);
+        Assert.Single(pushResult.Started);
+        Assert.Contains(subWf, pushResult.Started);
 
         Assert.Equal(WorkflowStatus.Finished, rootWi.Status);
         Assert.Equal(WorkflowStatus.Finished, subWf.Status);
