@@ -1,4 +1,5 @@
-﻿using Anch.Workflow.Engine;
+﻿using Anch.Workflow.Domain.Runtime;
+using Anch.Workflow.Engine;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,7 +19,7 @@ public class StateLeavePolicy(Func<IServiceProvider, IExecutionContext, Task<Wor
     {
         var workflowMachineFactory = serviceProvider.GetRequiredService<IWorkflowMachineFactory>();
 
-        var notFinishedInstances = executionContext.StateInstance.Child.Where(wi => wi.Status.Role != WorkflowStatusRole.Finished).ToList();
+        var notFinishedInstances = executionContext.StateInstance.Children.Where(wi => wi.Status.Role != WorkflowStatusRole.Finished).ToList();
 
         var result = new List<WorkflowProcessResult>();
 

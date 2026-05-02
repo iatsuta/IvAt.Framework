@@ -3,7 +3,8 @@ using System.Collections.Immutable;
 using System.Linq.Expressions;
 
 using Anch.Core;
-using Anch.Workflow.Definition;
+using Anch.Workflow.Domain;
+using Anch.Workflow.Domain.Definition;
 using Anch.Workflow.States;
 
 namespace Anch.Workflow.Builder.Default.DomainDefinition;

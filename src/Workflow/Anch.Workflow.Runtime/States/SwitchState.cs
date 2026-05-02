@@ -1,4 +1,5 @@
-﻿using Anch.Workflow.Engine;
+﻿using Anch.Workflow.Domain;
+using Anch.Workflow.Engine;
 using Anch.Workflow.ExecutionResult;
 using Anch.Workflow.States._Base;
 

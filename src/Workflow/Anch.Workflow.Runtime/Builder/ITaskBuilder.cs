@@ -1,4 +1,6 @@
-﻿namespace Anch.Workflow.Builder;
+﻿using Anch.Workflow.Domain;
+
+namespace Anch.Workflow.Builder;
 
 public interface ITaskBuilder<TSource>
     where TSource : notnull

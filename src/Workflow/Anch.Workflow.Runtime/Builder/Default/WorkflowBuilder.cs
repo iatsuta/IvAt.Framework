@@ -1,7 +1,8 @@
 ﻿using System.Linq.Expressions;
 
 using Anch.Workflow.Builder.Default.DomainDefinition;
-using Anch.Workflow.Definition;
+using Anch.Workflow.Domain;
+using Anch.Workflow.Domain.Definition;
 using Anch.Workflow.States;
 using Anch.Workflow.States._Base;
 

@@ -1,4 +1,6 @@
-﻿using Anch.Workflow.Engine;
+﻿using Anch.Workflow.Domain;
+using Anch.Workflow.Domain.Runtime;
+using Anch.Workflow.Engine;
 using Anch.Workflow.ExecutionResult;
 using Anch.Workflow.States._Base;
 
@@ -17,7 +19,7 @@ public abstract class ParallelStateBase<TSource> : IState
             await this.Start(executionContext);
         }
 
-        var notProcessedWorkflow = executionContext.StateInstance.Child.Where(i => i.Status.Role != WorkflowStatusRole.Finished).ToList();
+        var notProcessedWorkflow = executionContext.StateInstance.Children.Where(i => i.Status.Role != WorkflowStatusRole.Finished).ToList();
 
         var isBreak = await this.BreakPolicy.CanBreak(executionContext);
 
@@ -47,7 +49,7 @@ public abstract class ParallelStateBase<TSource> : IState
 
             subWf.Owner = currentState;
 
-            currentState.Child.Add(subWf);
+            currentState.Children.Add(subWf);
 
             await childrenMachine.Save(executionContext.CancellationToken);
         }

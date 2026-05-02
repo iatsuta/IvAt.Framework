@@ -18,7 +18,7 @@ public class StateBreakPolicy(Func<IExecutionContext, Task<bool>> func)
 
     public static StateBreakPolicy CreateCondition(Func<IEnumerable<WorkflowInstance>, bool> condition)
     {
-        return new StateBreakPolicy(async executionContext => condition(executionContext.StateInstance.Child));
+        return new StateBreakPolicy(async executionContext => condition(executionContext.StateInstance.Children));
     }
 
     public static StateBreakPolicy AnyFinishedItem<TElement>(Func<TElement, bool> condition)

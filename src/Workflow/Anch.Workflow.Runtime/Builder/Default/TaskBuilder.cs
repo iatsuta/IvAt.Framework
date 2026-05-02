@@ -1,4 +1,5 @@
 ﻿using Anch.Workflow.Builder.Default.DomainDefinition;
+using Anch.Workflow.Domain;
 using Anch.Workflow.States;
 
 namespace Anch.Workflow.Builder.Default;

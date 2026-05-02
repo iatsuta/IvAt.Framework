@@ -1,7 +1,11 @@
 <Solution>
   <Folder Name="/Workflow/">
     <Project Path="Workflow/Anch.Workflow.Abstractions/Anch.Workflow.Abstractions.csproj" />
+    <Project Path="Workflow/Anch.Workflow.Domain/Anch.Workflow.Domain.csproj" />
     <Project Path="Workflow/Anch.Workflow.Runtime/Anch.Workflow.Runtime.csproj" />
+    <Project Path="Workflow/Anch.Workflow.Serialization.Inline/Anch.Workflow.Serialization.Inline.csproj" />
+    <Project Path="Workflow/Anch.Workflow.Serialization.Memory/Anch.Workflow.Serialization.Memory.csproj" />
+    <Project Path="Workflow/Anch.Workflow.Serialization/Anch.Workflow.Serialization.csproj" />
     <Project Path="Workflow/Anch.Workflow.Tests/Anch.Workflow.Tests.csproj" />
     <Project Path="Workflow/Anch.Workflow/Anch.Workflow.csproj" />
   </Folder>
@@ -15,17 +19,17 @@
   </Folder>
 
   <Folder Name="/Core/">
-    <Project Path="Core/Anch.Core/Anch.Core.csproj" /> 
     <Project Path="Core/Anch.Core.Tests/Anch.Core.Tests.csproj" />
-	<Project Path="Core/Anch.Threading/Anch.Threading.csproj" />
+    <Project Path="Core/Anch.Core/Anch.Core.csproj" />
     <Project Path="Core/Anch.GenericRepository/Anch.GenericRepository.csproj" />
     <Project Path="Core/Anch.Parsing/Anch.Parsing.csproj" />
     <Project Path="Core/Anch.RelativePath/Anch.RelativePath.csproj" />
+    <Project Path="Core/Anch.Threading/Anch.Threading.csproj" />
   </Folder>
   
   <Folder Name="/DependencyInjection/">
+    <Project Path="DependencyInjection/Anch.DependencyInjection.Tests/Anch.DependencyInjection.Tests.csproj" />
     <Project Path="DependencyInjection/Anch.DependencyInjection/Anch.DependencyInjection.csproj" />
-	<Project Path="DependencyInjection/Anch.DependencyInjection.Tests/Anch.DependencyInjection.Tests.csproj" />	
   </Folder>
   
   <Folder Name="/Caching/">
@@ -37,8 +41,8 @@
   <Folder Name="/IdentitySource/">
     <Project Path="IdentitySource/Anch.IdentitySource.Abstractions/Anch.IdentitySource.Abstractions.csproj" />
     <Project Path="IdentitySource/Anch.IdentitySource.Runtime/Anch.IdentitySource.Runtime.csproj" />
-    <Project Path="IdentitySource/Anch.IdentitySource/Anch.IdentitySource.csproj" />
     <Project Path="IdentitySource/Anch.IdentitySource.Tests/Anch.IdentitySource.Tests.csproj" />
+    <Project Path="IdentitySource/Anch.IdentitySource/Anch.IdentitySource.csproj" />
   </Folder>
   
   <Folder Name="/Testing/">
@@ -51,16 +55,16 @@
   <Folder Name="/VisualIdentitySource/">
     <Project Path="VisualIdentitySource/Anch.VisualIdentitySource.Abstractions/Anch.VisualIdentitySource.Abstractions.csproj" />
     <Project Path="VisualIdentitySource/Anch.VisualIdentitySource.Runtime/Anch.VisualIdentitySource.Runtime.csproj" />
-    <Project Path="VisualIdentitySource/Anch.VisualIdentitySource/Anch.VisualIdentitySource.csproj" />
     <Project Path="VisualIdentitySource/Anch.VisualIdentitySource.Tests/Anch.VisualIdentitySource.Tests.csproj" />
+    <Project Path="VisualIdentitySource/Anch.VisualIdentitySource/Anch.VisualIdentitySource.csproj" />
   </Folder>
 
-  <Folder Name="/GenericQueryable/">  
+  <Folder Name="/GenericQueryable/">
+    <Project Path="GenericQueryable/Anch.GenericQueryable.Abstractions/Anch.GenericQueryable.Abstractions.csproj" />
+    <Project Path="GenericQueryable/Anch.GenericQueryable.EntityFramework/Anch.GenericQueryable.EntityFramework.csproj" />
     <Project Path="GenericQueryable/Anch.GenericQueryable.NHibernate/Anch.GenericQueryable.NHibernate.csproj" />
     <Project Path="GenericQueryable/Anch.GenericQueryable.Runtime/Anch.GenericQueryable.Runtime.csproj" />
     <Project Path="GenericQueryable/Anch.GenericQueryable/Anch.GenericQueryable.csproj" />
-    <Project Path="GenericQueryable/Anch.GenericQueryable.Abstractions/Anch.GenericQueryable.Abstractions.csproj" />
-    <Project Path="GenericQueryable/Anch.GenericQueryable.EntityFramework/Anch.GenericQueryable.EntityFramework.csproj" />
   </Folder>
 
   <Folder Name="/GenericQueryable/_Tests/">
@@ -71,10 +75,10 @@
   </Folder>
 
   <Folder Name="/HierarchicalExpand/">
-    <Project Path="HierarchicalExpand/Anch.HierarchicalExpand/Anch.HierarchicalExpand.csproj" />
-    <Project Path="HierarchicalExpand/Anch.HierarchicalExpand.Domain/Anch.HierarchicalExpand.Domain.csproj" />
-    <Project Path="HierarchicalExpand/Anch.HierarchicalExpand.Runtime/Anch.HierarchicalExpand.Runtime.csproj" />  
     <Project Path="HierarchicalExpand/Anch.HierarchicalExpand.Abstractions/Anch.HierarchicalExpand.Abstractions.csproj" />
+    <Project Path="HierarchicalExpand/Anch.HierarchicalExpand.Domain/Anch.HierarchicalExpand.Domain.csproj" />
+    <Project Path="HierarchicalExpand/Anch.HierarchicalExpand.Runtime/Anch.HierarchicalExpand.Runtime.csproj" />
+    <Project Path="HierarchicalExpand/Anch.HierarchicalExpand/Anch.HierarchicalExpand.csproj" />
   </Folder>
 
   <Folder Name="/HierarchicalExpand/_Tests/">

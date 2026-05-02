@@ -1,4 +1,4 @@
-﻿using Anch.Workflow.Definition;
+﻿using Anch.Workflow.Domain.Definition;
 using Anch.Workflow.States._Base;
 
 using Microsoft.Extensions.DependencyInjection;

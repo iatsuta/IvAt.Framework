@@ -1,4 +1,6 @@
-﻿using Anch.Workflow.Engine;
+﻿using Anch.Workflow.Domain;
+using Anch.Workflow.Domain.Runtime;
+using Anch.Workflow.Engine;
 using Anch.Workflow.ExecutionResult;
 using Anch.Workflow.States._Base;
 
@@ -33,11 +35,11 @@ public class StartWorkflowState<TInnerSource>(IWorkflowHost host) : IState
         {
             var startResult = await host.CreateExecutor(WorkflowExecutionPolicy.Head).StartWorkflow(this.InnerSource, this.InnerWorkflow, executionContext.CancellationToken);
 
-            var wi = startResult.Started.First().WorkflowInstance;
+            var wi = startResult.Started.First();
 
             wi.Owner = executionContext.StateInstance;
 
-            executionContext.StateInstance.Child.Add(wi);
+            executionContext.StateInstance.Children.Add(wi);
 
 #if DEBUG
             if (wi.Status == WorkflowStatus.Finished ^ startResult.Unprocessed.Any())
@@ -50,7 +52,7 @@ public class StartWorkflowState<TInnerSource>(IWorkflowHost host) : IState
             {
                 return new Done();
             }
-            else 
+            else
             {
                 switch (this.Mode)
                 {

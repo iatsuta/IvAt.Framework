@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\Anch.Core\Anch.Core.csproj" />
+    <ProjectReference Include="..\Anch.Workflow.Domain\Anch.Workflow.Domain.csproj" />
   </ItemGroup>
 
 </Project>

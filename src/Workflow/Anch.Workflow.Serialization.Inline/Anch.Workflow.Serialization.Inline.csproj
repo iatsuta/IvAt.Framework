@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Anch.Workflow.Serialization.Inline</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\IdentitySource\Anch.IdentitySource.Abstractions\Anch.IdentitySource.Abstractions.csproj" />
+    <ProjectReference Include="..\Anch.Workflow.Serialization\Anch.Workflow.Serialization.csproj" />
+  </ItemGroup>
+
+</Project>

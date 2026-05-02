@@ -1,7 +1,7 @@
 ﻿using System.Collections.Frozen;
 using System.Collections.Immutable;
 
-using Anch.Workflow.Definition;
+using Anch.Workflow.Domain.Definition;
 
 namespace Anch.Workflow.Builder.Default.DomainDefinition;
 
@@ -40,7 +40,7 @@ public class StateDefinition : IStateDefinition
 
     ImmutableList<ITransitionDefinition> IStateDefinition.Transitions => field ??= this.Transitions.ToImmutableList<ITransitionDefinition>();
 
-    ImmutableList<IWorkflow> IStateDefinition.SubWorkflow => field ??= this.SubWorkflows.ToImmutableList<IWorkflow>();
+    ImmutableList<IWorkflowDefinition> IStateDefinition.SubWorkflow => field ??= this.SubWorkflows.Select(bw => bw.Definition).ToImmutableList();
 
 
     public override string ToString()

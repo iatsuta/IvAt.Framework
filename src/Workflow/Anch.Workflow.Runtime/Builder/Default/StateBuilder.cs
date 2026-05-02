@@ -2,6 +2,7 @@
 
 using Anch.Core;
 using Anch.Workflow.Builder.Default.DomainDefinition;
+using Anch.Workflow.Domain;
 using Anch.Workflow.States._Base;
 
 using Microsoft.Extensions.DependencyInjection;

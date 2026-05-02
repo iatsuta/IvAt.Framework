@@ -1,6 +1,6 @@
 ﻿using Anch.Core;
 using Anch.Core.DictionaryCache;
-using Anch.Workflow.Definition;
+using Anch.Workflow.Domain.Definition;
 
 namespace Anch.Workflow.StateFactory;
 

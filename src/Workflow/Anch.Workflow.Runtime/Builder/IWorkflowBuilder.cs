@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-using Anch.Workflow.Definition;
+using Anch.Workflow.Domain.Definition;
 using Anch.Workflow.States;
 using Anch.Workflow.States._Base;
 

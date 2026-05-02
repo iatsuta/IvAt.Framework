@@ -1,8 +1,9 @@
 ﻿using Anch.DependencyInjection;
 using Anch.Workflow.Domain.Runtime;
 using Anch.Workflow.Engine;
+using Anch.Workflow.Serialization;
+using Anch.Workflow.Serialization.Memory;
 using Anch.Workflow.StateFactory;
-using Anch.Workflow.Storage;
 
 using Microsoft.Extensions.DependencyInjection;
 

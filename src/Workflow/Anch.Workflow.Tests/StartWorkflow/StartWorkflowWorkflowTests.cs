@@ -1,10 +1,12 @@
 using Anch.Testing.Xunit;
 using Anch.Workflow.DependencyInjection;
-using Anch.Workflow.Engine;
+using Anch.Workflow.Domain.Runtime;
 using Anch.Workflow.Tests._Base;
 using Anch.Workflow.Tests.Wait;
 
 using Microsoft.Extensions.DependencyInjection;
+
+using WorkflowStatus = Anch.Workflow.Engine.WorkflowStatus;
 
 namespace Anch.Workflow.Tests.StartWorkflow;
 
