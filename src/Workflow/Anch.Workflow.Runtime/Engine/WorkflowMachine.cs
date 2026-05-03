@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.Design;
-
-using Anch.Core;
+﻿using Anch.Core;
 using Anch.Workflow.Domain;
 using Anch.Workflow.Domain.Definition;
 using Anch.Workflow.Domain.Runtime;

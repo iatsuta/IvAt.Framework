@@ -43,7 +43,7 @@ public class StartWorkflowState<TInnerSource>(IWorkflowHost host) : IState
             executionContext.StateInstance.Children.Add(wi);
 
 #if DEBUG
-            if (wi.Status == WorkflowStatus.Finished ^ startResult.Unprocessed.Any())
+            if ((wi.Status == WorkflowStatus.Finished) != (startResult.Unprocessed.Count == 0))
             {
                 throw new InvalidOperationException();
             }

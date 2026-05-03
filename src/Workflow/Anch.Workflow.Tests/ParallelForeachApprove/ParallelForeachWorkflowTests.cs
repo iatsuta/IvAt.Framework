@@ -3,8 +3,6 @@ using Anch.Workflow.DependencyInjection;
 using Anch.Workflow.Domain.Runtime;
 using Anch.Workflow.Tests._Base;
 
-using Microsoft.Extensions.DependencyInjection;
-
 namespace Anch.Workflow.Tests.ParallelForeachApprove;
 
 public class ParallelForeachApproveWorkflowTests : SingleScopeWorkflowTestBase<ParallelForeachApproveWorkflowObject, ParallelForeachApproveWorkflow>

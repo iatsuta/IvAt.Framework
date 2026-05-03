@@ -6,8 +6,3 @@ public class WaitWorkflowSource
 
     public WaitWorkflowStatus Status { get; set; }
 }
-
-public enum WaitWorkflowStatus
-{
-    ExampleWaitEvent
-}

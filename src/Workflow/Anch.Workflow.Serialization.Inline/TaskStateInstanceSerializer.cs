@@ -1,6 +1,4 @@
-﻿using Anch.Workflow.Domain.Runtime;
-
-namespace Anch.Workflow.Serialization.Inline;
+﻿namespace Anch.Workflow.Serialization.Inline;
 
 //public class TaskStateInstanceSerializer : IStateInstanceSerializer<TaskState>
 //{
