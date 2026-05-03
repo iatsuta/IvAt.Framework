@@ -1,7 +1,7 @@
 ﻿using Anch.Workflow.Domain;
 using Anch.Workflow.Domain.Runtime;
 using Anch.Workflow.Engine;
-using Anch.Workflow.ExecutionResult;
+using Anch.Workflow.Execution;
 using Anch.Workflow.States._Base;
 
 namespace Anch.Workflow.States;
@@ -41,10 +41,14 @@ public class WaitEventState<TSource, TData> : IState
     {
         if (executionContext.IsCallbackEvent)
         {
-            throw new NotImplementedException();
-            //this.ReceivedData = executionContext.CallbackEventInfo!.Data;
+            var data = (TData)executionContext.CallbackEventInfo!.Data!;
 
-            //return new Done();
+            if (this.Callback != null)
+            {
+                await this.Callback((TSource)executionContext.Source, data, executionContext.CancellationToken);
+            }
+
+            return new Done();
         }
 
         return new WaitEventResult(this.Event, this.SourceWorkflow);

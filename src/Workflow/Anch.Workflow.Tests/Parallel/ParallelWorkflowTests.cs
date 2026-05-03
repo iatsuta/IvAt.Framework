@@ -17,13 +17,13 @@ public class ParallelWorkflowTests : SingleScopeWorkflowTestBase<ParallelWorkflo
 
         var preWfObjStatus = wfObj.Status;
 
-        var waitEvents = (await this.Storage.GetWaitEvents(ct));
+        var waitEvents = await this.Storage.GetWaitEvents(ct);
 
         var approveEvent = waitEvents.Single(ei => ei.Header == ParallelWorkflow.ApproveWaitEvent);
 
         var rejectEvent = waitEvents.Single(ei => ei.Header == ParallelWorkflow.RejectWaitEvent);
 
-        await this.Host.CreateExecutor(WorkflowExecutionPolicy.Full).PushEvent(approveEvent.Header, approveEvent.TargetState, cancellationToken: ct);
+        await this.Host.CreateExecutor(WorkflowExecutionPolicy.TillTheEnd).PushEvent(approveEvent.Header, approveEvent.TargetState, cancellationToken: ct);
 
         // Assert
         Assert.Equal(ParallelApproveStatus.Approving, preWfObjStatus);

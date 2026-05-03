@@ -14,8 +14,6 @@ public interface IWorkflowBuilder<TSource>
         return this.WithIdentity(new WorkflowDefinitionIdentity(name));
     }
 
-    IWorkflowBuilder<TSource> WithIdProperty(Expression<Func<TSource, Guid>> idPath);
-
     IWorkflowBuilder<TSource> WithStatusProperty<TStatus>(Expression<Func<TSource, TStatus>> statusPath);
 
     IWorkflowBuilder<TSource> WithVersionProperty<TStatus>(Expression<Func<TSource, Guid>> versionPath);

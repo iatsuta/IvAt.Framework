@@ -17,12 +17,12 @@ public class WaitWorkflowTests : SingleScopeWorkflowTestBase<WaitWorkflowSource,
 
         var preWiStatus = wi.Status;
 
-        var pushResult = await this.Host.CreateExecutor(WorkflowExecutionPolicy.Full)
+        var pushResult = await this.Host.CreateExecutor(WorkflowExecutionPolicy.TillTheEnd)
             .PushEvent(new EventHeader(WaitWorkflow.WaitEventName), wi.CurrentState, WaitWorkflow.WaitEventData, ct);
 
         // Assert
         Assert.Equal(WorkflowStatus.WaitEvent, preWiStatus);
-        Assert.Contains(wi, pushResult.Started);
+        Assert.Contains(wi, pushResult.Modified);
         Assert.Equal(WorkflowStatus.Finished, wi.Status);
 
         Assert.Empty(await this.Storage.GetWaitEvents(ct));

@@ -1,17 +1,15 @@
-﻿using Anch.Workflow.Domain.Runtime;
+﻿using Anch.IdentitySource;
+using Anch.Workflow.Domain.Runtime;
 
 namespace Anch.Workflow.Serialization.Inline.IdGenerator;
 
-public class InlineIdGenerator<TElement>(Func<TElement, WorkflowInstance> pathToWi) : IInstanceIdGenerator<TElement>
+public class InlineIdGenerator<TElement>(Func<TElement, WorkflowInstance> pathToWi, IIdentityInfo<TElement, Guid> identityInfo) : IInstanceIdGenerator<TElement>
 {
     public Guid GenerateId(TElement element)
     {
-        var wi = pathToWi(element);
-
         throw new NotImplementedException();
+        //var wi = pathToWi(element);
 
-        //var source = (IIdentityObject)wi.Source;
-
-        //return source.Id;
+        //return (Guid)getIdDelegate.DynamicInvoke(wi.Source)!;
     }
 }

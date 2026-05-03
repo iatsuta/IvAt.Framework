@@ -36,9 +36,16 @@ public class MemorySpecificWorkflowExternalStorage(
         this.Values[workflowInstance.Identity] = workflowInstance;
     }
 
-    public Task<List<WaitEventInfo>> ReleaseWaitEvents(PushEventInfo pushEventInfo, CancellationToken cancellationToken = default)
+    public async Task<List<WaitEventInfo>> ReleaseWaitEvents(PushEventInfo pushEventInfo, CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var waitEvents = await this.GetWaitEvents(pushEventInfo, cancellationToken);
+
+        foreach (var waitEventInfo in waitEvents)
+        {
+            waitEventInfo.Release();
+        }
+
+        return waitEvents;
     }
 
     public async Task<WorkflowInstance> GetWorkflowInstance(WorkflowInstanceIdentity identity, CancellationToken cancellationToken = default)

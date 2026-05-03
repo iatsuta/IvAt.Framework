@@ -1,7 +1,7 @@
 ﻿using Anch.Workflow.Domain;
 using Anch.Workflow.Domain.Runtime;
 using Anch.Workflow.Engine;
-using Anch.Workflow.ExecutionResult;
+using Anch.Workflow.Execution;
 using Anch.Workflow.States._Base;
 
 namespace Anch.Workflow.States;
@@ -33,9 +33,10 @@ public class StartWorkflowState<TInnerSource>(IWorkflowHost host) : IState
         }
         else
         {
-            var startResult = await host.CreateExecutor(WorkflowExecutionPolicy.Head).StartWorkflow(this.InnerSource, this.InnerWorkflow, executionContext.CancellationToken);
+            var startResult = await host.CreateExecutor(WorkflowExecutionPolicy.SingleStep)
+                .Start(this.InnerSource, this.InnerWorkflow, executionContext.CancellationToken);
 
-            var wi = startResult.Started.First();
+            var wi = startResult.Modified.First();
 
             wi.Owner = executionContext.StateInstance;
 
@@ -58,8 +59,10 @@ public class StartWorkflowState<TInnerSource>(IWorkflowHost host) : IState
                 {
                     case StartWorkflowMode.WaitFinish:
                         return new MultiExecutionResult(
+                        [
+                            new WaitEventResult(EventHeader.WorkflowFinished, wi),
                             new WorkflowProcessExecutionResult(startResult, false),
-                            new WaitEventResult(EventHeader.WorkflowFinished, wi));
+                        ]);
 
                     case StartWorkflowMode.FireAndForget:
                         return new WorkflowProcessExecutionResult(startResult, true);

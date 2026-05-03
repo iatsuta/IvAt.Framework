@@ -1,6 +1,4 @@
-﻿using Anch.Workflow.Domain.Runtime;
-
-namespace Anch.Workflow.ExecutionResult;
+﻿namespace Anch.Workflow.Execution;
 
 public record WorkflowProcessExecutionResult(WorkflowProcessResult WorkflowProcessResult, bool LeaveState) : IExecutionResult
 {

@@ -1,7 +1,7 @@
 ﻿using Anch.Workflow.Domain;
 using Anch.Workflow.Domain.Runtime;
 
-namespace Anch.Workflow.ExecutionResult;
+namespace Anch.Workflow.Execution;
 
 public record PushEventResult(EventHeader @Event, StateInstance? TargetState, object? Data = null) : IExecutionResult
 {

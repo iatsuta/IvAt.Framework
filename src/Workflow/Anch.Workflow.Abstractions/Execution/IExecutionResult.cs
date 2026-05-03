@@ -1,4 +1,4 @@
-﻿namespace Anch.Workflow.ExecutionResult;
+﻿namespace Anch.Workflow.Execution;
 
 public interface IExecutionResult
 {

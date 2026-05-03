@@ -6,12 +6,12 @@ public record WorkflowDomainBindingInfo<TSource, TStatus> : WorkflowDomainBindin
 {
     public required PropertyAccessors<TSource, TStatus> Status { get; init; }
 
-    public override Type? StatusType { get; } = typeof(TStatus);
+    public sealed override Type? StatusType { get; } = typeof(TStatus);
 }
 
 public record WorkflowDomainBindingInfo<TSource> : WorkflowDomainBindingInfo
 {
-    public override Type SourceType { get; } = typeof(TSource);
+    public sealed override Type SourceType { get; } = typeof(TSource);
 
     public PropertyAccessors<TSource, long>? Version { get; init; }
 }

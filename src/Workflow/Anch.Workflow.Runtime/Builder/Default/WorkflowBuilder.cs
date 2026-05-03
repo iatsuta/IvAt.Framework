@@ -13,14 +13,6 @@ public class WorkflowBuilder<TSource>(WorkflowDefinition workflow) : IWorkflowBu
 {
     protected readonly WorkflowDefinition Workflow = workflow;
 
-    public IWorkflowBuilder<TSource> WithIdProperty(Expression<Func<TSource, Guid>> idPath)
-    {
-        throw new NotImplementedException();
-        //this.Workflow.IdProperty = idPath;
-
-        return this;
-    }
-
     public IWorkflowBuilder<TSource> WithStatusProperty<TStatus>(Expression<Func<TSource, TStatus>> statusPath)
     {
         this.Workflow.StatusProperty = statusPath;

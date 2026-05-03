@@ -2,7 +2,7 @@
 using Anch.Workflow.Domain;
 using Anch.Workflow.Domain.Definition;
 using Anch.Workflow.Domain.Runtime;
-using Anch.Workflow.ExecutionResult;
+using Anch.Workflow.Execution;
 using Anch.Workflow.Serialization;
 using Anch.Workflow.StateFactory;
 
@@ -37,6 +37,9 @@ public class WorkflowMachine<TSource>(
         return await this.ProcessCurrentState(this.CreateExecutionContext(cancellationToken));
     }
 
+    public Task<WorkflowProcessResult> ProcessWorkflow(IExecutionResult executionResult, CancellationToken cancellationToken) =>
+        this.ProcessExecutionResult(this.WorkflowInstance.CurrentState, executionResult, cancellationToken);
+
     public async Task<WorkflowProcessResult> Terminate(CancellationToken cancellationToken)
     {
         if (this.WorkflowInstance.Status.Role != WorkflowStatusRole.Finished)
@@ -57,7 +60,8 @@ public class WorkflowMachine<TSource>(
             callbackEventInfo);
     }
 
-    protected virtual IExecutionContext CreateExecutionContext(StateInstance stateInstance, CancellationToken cancellationToken, WaitEventInfo? callbackEventInfo = null)
+    protected virtual IExecutionContext CreateExecutionContext(StateInstance stateInstance, CancellationToken cancellationToken,
+        WaitEventInfo? callbackEventInfo = null)
     {
         return new ExecutionContext
         {
@@ -87,12 +91,12 @@ public class WorkflowMachine<TSource>(
 
     private async Task<WorkflowProcessResult> ProcessCurrentState(IExecutionContext executionContext)
     {
-        await this.Save(executionContext.CancellationToken);
-
         if (!executionContext.StateInstance.IsActual)
         {
             return WorkflowProcessResult.Empty;
         }
+
+        await this.Save(executionContext.CancellationToken);
 
         executionContext.WorkflowInstance.SetStatus(WorkflowStatus.Runnable);
 
@@ -103,93 +107,96 @@ public class WorkflowMachine<TSource>(
         {
             currentState.InputProcessed = true;
 
-            await stateFactoryCache.GetStateFactory(currentState.Definition).BindInput(codeState, serviceProvider, executionContext.Source, executionContext.CancellationToken);
+            await stateFactoryCache.GetStateFactory(currentState.Definition)
+                .BindInput(codeState, serviceProvider, executionContext.Source, executionContext.CancellationToken);
         }
 
-        return new WorkflowProcessResult(async () =>
+        var executionResult = await codeState.Run(executionContext);
+
+        var workflowProcessResult = new WorkflowProcessResult([executionContext.WorkflowInstance], [new UnprocessedStateResult(currentState, executionResult)]);
+
+        if (!currentState.OutputProcessed && executionResult.LeaveState)
         {
-            var executionResult = await codeState.Run(executionContext);
+            currentState.OutputProcessed = true;
 
-            if (!currentState.OutputProcessed && executionResult.LeaveState)
-            {
-                currentState.OutputProcessed = true;
+            await stateFactoryCache.GetStateFactory(currentState.Definition)
+                .BindOutput(codeState, serviceProvider, executionContext.Source, executionContext.CancellationToken);
 
-                await stateFactoryCache.GetStateFactory(currentState.Definition)
-                    .BindOutput(codeState, serviceProvider, executionContext.Source, executionContext.CancellationToken);
+            var leaveResult = await codeState.LeavePolicy.Leave(serviceProvider, executionContext);
 
-                var leaveResult = await codeState.LeavePolicy.Leave(serviceProvider, executionContext);
-
-                return leaveResult + new WorkflowProcessResult(() => this.ProcessExecutionResult(executionContext, executionResult));
-            }
-            else
-            {
-                return await this.ProcessExecutionResult(executionContext, executionResult);
-            }
-        });
+            return workflowProcessResult + leaveResult;
+        }
+        else
+        {
+            return workflowProcessResult;
+        }
     }
 
-    protected virtual async Task<WorkflowProcessResult> ProcessExecutionResult(IExecutionContext executionContext, IExecutionResult executionResult)
+    protected virtual async Task<WorkflowProcessResult> ProcessExecutionResult(StateInstance stateInstance, IExecutionResult executionResult,
+        CancellationToken cancellationToken)
     {
         switch (executionResult)
         {
+            case WorkflowProcessExecutionResult workflowProcessExecutionResult: return workflowProcessExecutionResult.WorkflowProcessResult;
+
             case Wait:
-                executionContext.WorkflowInstance.SetStatus(WorkflowStatus.WaitEvent);
+                stateInstance.Workflow.SetStatus(WorkflowStatus.WaitEvent);
                 return WorkflowProcessResult.Empty;
 
             case WaitEventResult waitEventResult:
-                executionContext.WorkflowInstance.SetStatus(WorkflowStatus.WaitEvent);
-
-                executionContext.StateInstance.RegisterWaitEvent(waitEventResult.ToEventInfo(executionContext.StateInstance));
+                stateInstance.Workflow.SetStatus(WorkflowStatus.WaitEvent);
+                stateInstance.RegisterWaitEvent(waitEventResult.ToEventInfo(stateInstance));
                 return WorkflowProcessResult.Empty;
 
             case Done:
-                return await this.ProcessExecutionResult(executionContext, new PushEventResult(EventHeader.StateDone, executionContext.StateInstance));
+                return await this.ProcessExecutionResult(stateInstance, new PushEventResult(EventHeader.StateDone, stateInstance), cancellationToken);
 
             case PushEventResult pushEventResult:
-                return await this.ProcessExecutionResult(executionContext, pushEventResult);
+                return await this.ProcessExecutionResult(stateInstance, pushEventResult, cancellationToken);
 
             case MultiExecutionResult multiExecutionResult:
-                return await multiExecutionResult.ExecutionResults
-                    .Select(subExecutionResult => this.ProcessExecutionResult(executionContext, subExecutionResult))
-                    .Aggregate();
+                return new WorkflowProcessResult([],
+                    [.. multiExecutionResult.ExecutionResults.Select(er => new UnprocessedStateResult(stateInstance, er))]);
 
             default:
                 throw new ArgumentOutOfRangeException(nameof(executionResult));
         }
     }
 
-    private async Task<WorkflowProcessResult> ProcessExecutionResult(IExecutionContext executionContext, PushEventResult pushEventResult)
+    private async Task<WorkflowProcessResult> ProcessExecutionResult(StateInstance stateInstance, PushEventResult pushEventResult,
+        CancellationToken cancellationToken)
     {
-        return await this.ProcessExecutionResult(executionContext, pushEventResult.ToEventInfo(executionContext.WorkflowInstance));
+        return await this.ProcessExecutionResult(stateInstance, pushEventResult.ToEventInfo(stateInstance.Workflow), cancellationToken);
     }
 
-    private async Task<WorkflowProcessResult> ProcessExecutionResult(IExecutionContext executionContext, PushEventInfo pushEventInfo)
+    private async Task<WorkflowProcessResult> ProcessExecutionResult(StateInstance stateInstance, PushEventInfo pushEventInfo,
+        CancellationToken cancellationToken)
     {
         if (pushEventInfo.TargetState == null && pushEventInfo.Header.IsGlobal)
         {
             if (pushEventInfo.Header == EventHeader.WorkflowFinished)
             {
-                if (executionContext.WorkflowInstance.Status.Role != WorkflowStatusRole.Finished)
+                if (stateInstance.Workflow.Status.Role != WorkflowStatusRole.Finished)
                 {
-                    executionContext.WorkflowInstance.SetStatus(WorkflowStatus.Finished);
+                    stateInstance.Workflow.SetStatus(WorkflowStatus.Finished);
                 }
             }
             else if (pushEventInfo.Header == EventHeader.WorkflowTerminated)
             {
-                executionContext.WorkflowInstance.SetStatus(WorkflowStatus.Terminated);
+                stateInstance.Workflow.SetStatus(WorkflowStatus.Terminated);
             }
 
-            return await host.CreateExecutor(WorkflowExecutionPolicy.Head).PushEvent(pushEventInfo, executionContext.CancellationToken);
+            return await host.CreateExecutor(WorkflowExecutionPolicy.SingleStep).PushEvent(pushEventInfo, cancellationToken);
         }
-        else if (pushEventInfo.TargetState.Maybe(s => s.Workflow != executionContext.WorkflowInstance))
+        else if (pushEventInfo.TargetState.Maybe(s => s.Workflow != stateInstance.Workflow))
         {
-            return await host.CreateExecutor(WorkflowExecutionPolicy.Head).PushEvent(pushEventInfo, executionContext.CancellationToken);
+            return await host.CreateExecutor(WorkflowExecutionPolicy.SingleStep).PushEvent(pushEventInfo, cancellationToken);
         }
         else
         {
-            var transition = executionContext.StateInstance.Definition.Transitions.Single(tr => tr.Event.Header == pushEventInfo.Header);
+            var transition = stateInstance.Definition.Transitions.Single(tr => tr.Event.Header == pushEventInfo.Header);
 
-            return await this.SwitchState(transition.To, executionContext.CancellationToken);
+            return await this.SwitchState(transition.To, cancellationToken);
         }
     }
 

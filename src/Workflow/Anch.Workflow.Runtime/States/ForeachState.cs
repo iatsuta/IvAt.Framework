@@ -1,5 +1,7 @@
-﻿using Anch.Workflow.Engine;
-using Anch.Workflow.ExecutionResult;
+﻿using Anch.Workflow.Domain;
+using Anch.Workflow.Domain.Runtime;
+using Anch.Workflow.Engine;
+using Anch.Workflow.Execution;
 using Anch.Workflow.States._Base;
 
 namespace Anch.Workflow.States;
@@ -7,8 +9,6 @@ namespace Anch.Workflow.States;
 public class ForeachState<TSource, TElement>(IWorkflowHost workflowHost) : IState
 {
     private List<TElement> elements = [];
-
-    private readonly IWorkflowHost workflowHost = workflowHost;
 
 
     public IEnumerable<TElement> Elements
@@ -25,8 +25,41 @@ public class ForeachState<TSource, TElement>(IWorkflowHost workflowHost) : IStat
     {
         throw new NotImplementedException();
 
-        //var wi = await this.workflowHost.StartWorkflow(this.elements[this.CurrentIndex], this.ElementWorkflow);
+        //if (executionContext.IsCallbackEvent
+        //    && executionContext.CallbackEventInfo!.Header == EventHeader.WorkflowFinished)
+        //{
+        //    this.CurrentIndex++;
+        //}
 
-        //return new WaitEventResult(new EventInfo(EventHeader.WorkflowFinished) WaitEventInfo<WorkflowInstance>(EventHeader.WorkflowFinished, wi);
+        //if (this.CurrentIndex >= this.elements.Count)
+        //{
+        //    return new Done();
+        //}
+
+        //var startResult = await workflowHost
+        //    .CreateExecutor(WorkflowExecutionPolicy.SingleStep)
+        //    .StartWorkflow(
+        //        ((TSource)executionContext.Source, this.elements[this.CurrentIndex]),
+        //        this.ElementWorkflow,
+        //        executionContext.CancellationToken);
+
+        //var wi = startResult.Modified.First();
+
+        //wi.Owner = executionContext.StateInstance;
+
+        //executionContext.StateInstance.Children.Add(wi);
+
+        //if (wi.Status == WorkflowStatus.Finished)
+        //{
+        //    this.CurrentIndex++;
+
+        //    return await this.Run(executionContext); <--- FIX
+        //}
+
+        //return new MultiExecutionResult(
+        //[
+        //    new WorkflowProcessExecutionResult(startResult, false),
+        //    new WaitEventResult(EventHeader.WorkflowFinished, wi)
+        //]);
     }
 }

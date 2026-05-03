@@ -35,12 +35,12 @@ public class StartWorkflowsWithTaskApproveWorkflowTests : SingleScopeWorkflowTes
 
         var exampleApproveEvent = waitApproveEvents.First();
 
-        await this.Host.CreateExecutor(WorkflowExecutionPolicy.Full)
+        await this.Host.CreateExecutor(WorkflowExecutionPolicy.TillTheEnd)
             .PushEvent(exampleApproveEvent.Header, exampleApproveEvent.TargetState, cancellationToken: ct);
 
         var exampleRejectEvent = waitRejectEvents.First(e => e.TargetState.Workflow.Source != exampleApproveEvent.TargetState.Workflow.Source);
 
-        await this.Host.CreateExecutor(WorkflowExecutionPolicy.Full)
+        await this.Host.CreateExecutor(WorkflowExecutionPolicy.TillTheEnd)
             .PushEvent(exampleRejectEvent.Header, exampleRejectEvent.TargetState, cancellationToken: ct);
 
         // Assert
@@ -88,7 +88,7 @@ public class StartWorkflowsWithTaskApproveWorkflowTests : SingleScopeWorkflowTes
 
         foreach (var waitApproveEvent in waitApproveEvents)
         {
-            await this.Host.CreateExecutor(WorkflowExecutionPolicy.Full)
+            await this.Host.CreateExecutor(WorkflowExecutionPolicy.TillTheEnd)
                 .PushEvent(waitApproveEvent.Header, waitApproveEvent.TargetState, cancellationToken: ct);
         }
 

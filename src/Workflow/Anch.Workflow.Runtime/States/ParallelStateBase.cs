@@ -1,7 +1,7 @@
 ﻿using Anch.Workflow.Domain;
 using Anch.Workflow.Domain.Runtime;
 using Anch.Workflow.Engine;
-using Anch.Workflow.ExecutionResult;
+using Anch.Workflow.Execution;
 using Anch.Workflow.States._Base;
 
 namespace Anch.Workflow.States;
@@ -14,10 +14,7 @@ public abstract class ParallelStateBase<TSource> : IState
 
     public async Task<IExecutionResult> Run(IExecutionContext executionContext)
     {
-        if (!executionContext.IsCallbackEvent)
-        {
-            await this.Start(executionContext);
-        }
+        var startSteps = await this.TryStart(executionContext);
 
         var notProcessedWorkflow = executionContext.StateInstance.Children.Where(i => i.Status.Role != WorkflowStatusRole.Finished).ToList();
 
@@ -26,19 +23,24 @@ public abstract class ParallelStateBase<TSource> : IState
         if (!isBreak && notProcessedWorkflow.Any())
         {
             return executionContext.IsCallbackEvent
-                ? new Wait()
-                : new MultiExecutionResult(notProcessedWorkflow.Select(subWf => new WaitEventResult(EventHeader.WorkflowFinished, subWf)));
+                ? new MultiExecutionResult([new Wait(), new WorkflowProcessExecutionResult(startSteps, false)])
+                : new MultiExecutionResult([.. notProcessedWorkflow.Select(subWf => new WaitEventResult(EventHeader.WorkflowFinished, subWf))]);
         }
         else
         {
-            return new Done();
+            return new WorkflowProcessExecutionResult(startSteps, true);
         }
     }
 
     protected abstract IEnumerable<IWorkflowMachine> CreateChildMachines(TSource source);
 
-    private async Task<WorkflowProcessResult> Start(IExecutionContext executionContext)
+    private async Task<WorkflowProcessResult> TryStart(IExecutionContext executionContext)
     {
+        if (!executionContext.IsCallbackEvent)
+        {
+            return WorkflowProcessResult.Empty;
+        }
+
         var currentState = executionContext.StateInstance;
 
         var childMachines = this.CreateChildMachines((TSource)executionContext.Source).ToList();

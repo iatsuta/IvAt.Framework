@@ -34,7 +34,7 @@ public class WorkflowDefinition : IWorkflowDefinition
 
     public bool IsAutoIdentity { get; set; } = true;
 
-    public WorkflowDomainBindingInfo DomainBindingInfo => throw new NotImplementedException();
+    public WorkflowDomainBindingInfo DomainBindingInfo => field ??= this.BuildDomainBindingInfo();
 
     public bool InTechnical { get; set; }
 
@@ -56,7 +56,7 @@ public class WorkflowDefinition : IWorkflowDefinition
 
     IStateDefinition IWorkflowDefinition.DefaultFinalState => this.DefaultFinalState;
 
-    ImmutableList<IStateDefinition> IWorkflowDefinition.States => field ??= [ .. this.States];
+    ImmutableList<IStateDefinition> IWorkflowDefinition.States => field ??= [.. this.States];
 
     FrozenDictionary<string, object> IWorkflowDefinition.Settings => field ??= this.Settings.ToFrozenDictionary();
 
@@ -136,7 +136,8 @@ public class WorkflowDefinition : IWorkflowDefinition
 
         this.statesWithAutoFinish.Clear();
 
-        if (!newLastStateDefinition.Transitions.Any() && newLastStateDefinition.Events.Count == 1 && newLastStateDefinition.Events[0].Header == EventHeader.StateDone)
+        if (!newLastStateDefinition.Transitions.Any() && newLastStateDefinition.Events.Count == 1 &&
+            newLastStateDefinition.Events[0].Header == EventHeader.StateDone)
         {
             newLastStateDefinition.Transitions.Add(new TransitionDefinition { Event = newLastStateDefinition.Events[0], To = this.DefaultFinalState });
 
@@ -250,8 +251,8 @@ public class WorkflowDefinition : IWorkflowDefinition
         if (this.IsAutoIdentity && ownerInfo != null)
         {
             var newName = $"{ownerInfo.Value.State.Workflow.Identity.Name}-{ownerInfo.Value.State.Name}"
-                        + ownerInfo.Value.Index.MaybeNullable(index => $"-{index}")
-                        + $"-{this.Identity.Name}";
+                          + ownerInfo.Value.Index.MaybeNullable(index => $"-{index}")
+                          + $"-{this.Identity.Name}";
 
             this.Identity = new WorkflowDefinitionIdentity(newName);
             this.IsAutoIdentity = false;
@@ -271,4 +272,39 @@ public class WorkflowDefinition : IWorkflowDefinition
             }
         }
     }
+
+    private WorkflowDomainBindingInfo BuildDomainBindingInfo()
+    {
+        if (this.StatusProperty == null)
+        {
+            return new Func<WorkflowDomainBindingInfo<object>>(this.BuildDomainBindingInfoGeneric<object>)
+                .CreateGenericMethod(this.SourceType)
+                .Invoke<WorkflowDomainBindingInfo>(this);
+        }
+        else
+        {
+            return new Func<WorkflowDomainBindingInfo<object, Ignore>>(this.BuildDomainBindingInfoGeneric<object, Ignore>)
+                .CreateGenericMethod(this.SourceType, this.StatusProperty.ReturnType)
+                .Invoke<WorkflowDomainBindingInfo>(this);
+        }
+    }
+
+    private WorkflowDomainBindingInfo<TSource> BuildDomainBindingInfoGeneric<TSource>() =>
+
+        new() { Version = this.TryGetVersionPropertyAccessors<TSource>() };
+
+    private WorkflowDomainBindingInfo<TSource, TStatus> BuildDomainBindingInfoGeneric<TSource, TStatus>() =>
+
+        new()
+        {
+            Version = this.TryGetVersionPropertyAccessors<TSource>(),
+            Status = new PropertyAccessors<TSource, TStatus>((Expression<Func<TSource, TStatus>>)this.StatusProperty!)
+        };
+
+    private PropertyAccessors<TSource, long>? TryGetVersionPropertyAccessors<TSource>() =>
+
+        this.VersionProperty == null
+            ? null
+            : new PropertyAccessors<TSource, long>(
+                this.VersionProperty as Expression<Func<TSource, long>> ?? throw new InvalidOperationException("Invalid version property"));
 }

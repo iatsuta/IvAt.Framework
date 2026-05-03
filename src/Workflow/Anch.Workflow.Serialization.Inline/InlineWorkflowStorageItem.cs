@@ -91,9 +91,14 @@ public class InlineSpecificWorkflowExternalStorage<TSource>(
         return wi.CurrentState;
     }
 
-    public Task<List<WorkflowInstance>> GetWorkflowInstances(CancellationToken cancellationToken = default)
+    public async Task<List<WorkflowInstance>> GetWorkflowInstances(CancellationToken cancellationToken = default)
     {
-        throw new NotImplementedException();
+        var queryable = persistSource.GetQueryable(cancellationToken);
+
+        return queryable
+            .AsEnumerable()
+            .Select(source => this.workflowInstanceSerializer.Deserialize(source!))
+            .ToList();
     }
 
     public async Task FlushChanges(CancellationToken cancellationToken = default)

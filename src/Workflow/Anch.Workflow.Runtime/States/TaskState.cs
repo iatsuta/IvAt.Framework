@@ -1,6 +1,6 @@
 ﻿using Anch.Workflow.Domain;
 using Anch.Workflow.Engine;
-using Anch.Workflow.ExecutionResult;
+using Anch.Workflow.Execution;
 using Anch.Workflow.States._Base;
 
 namespace Anch.Workflow.States;
@@ -19,7 +19,7 @@ public class TaskState : IState
         }
         else
         {
-            return new MultiExecutionResult(this.CommandHeaders.Select(header => new WaitEventResult(header, null)));
+            return new MultiExecutionResult([.. this.CommandHeaders.Select(header => new WaitEventResult(header, null))]);
         }
     }
 
