@@ -22,9 +22,11 @@ public abstract class ParallelStateBase<TSource> : IState
 
         if (!isBreak && notProcessedWorkflow.Any())
         {
+            var startExecutionResult = new WorkflowProcessExecutionResult(startSteps, false);
+
             return executionContext.IsCallbackEvent
-                ? new MultiExecutionResult([new Wait(), new WorkflowProcessExecutionResult(startSteps, false)])
-                : new MultiExecutionResult([.. notProcessedWorkflow.Select(subWf => new WaitEventResult(EventHeader.WorkflowFinished, subWf))]);
+                ? new MultiExecutionResult([new Wait(), startExecutionResult])
+                : new MultiExecutionResult([startExecutionResult, .. notProcessedWorkflow.Select(subWf => new WaitEventResult(EventHeader.WorkflowFinished, subWf))]);
         }
         else
         {
@@ -36,33 +38,35 @@ public abstract class ParallelStateBase<TSource> : IState
 
     private async Task<WorkflowProcessResult> TryStart(IExecutionContext executionContext)
     {
-        if (!executionContext.IsCallbackEvent)
+        if (executionContext.IsCallbackEvent)
         {
             return WorkflowProcessResult.Empty;
         }
-
-        var currentState = executionContext.StateInstance;
-
-        var childMachines = this.CreateChildMachines((TSource)executionContext.Source).ToList();
-
-        foreach (var childrenMachine in childMachines)
+        else
         {
-            var subWf = childrenMachine.WorkflowInstance;
+            var currentState = executionContext.StateInstance;
 
-            subWf.Owner = currentState;
+            var childMachines = this.CreateChildMachines((TSource)executionContext.Source).ToList();
 
-            currentState.Children.Add(subWf);
+            foreach (var childrenMachine in childMachines)
+            {
+                var subWf = childrenMachine.WorkflowInstance;
 
-            await childrenMachine.Save(executionContext.CancellationToken);
+                subWf.Owner = currentState;
+
+                currentState.Children.Add(subWf);
+
+                await childrenMachine.Save(executionContext.CancellationToken);
+            }
+
+            var result = new List<WorkflowProcessResult>();
+
+            foreach (var childrenMachine in childMachines)
+            {
+                result.Add(await childrenMachine.ProcessWorkflow(executionContext.CancellationToken));
+            }
+
+            return result.Aggregate();
         }
-
-        var result = new List<WorkflowProcessResult>();
-
-        foreach (var childrenMachine in childMachines)
-        {
-            result.Add(await childrenMachine.ProcessWorkflow(executionContext.CancellationToken));
-        }
-
-        return result.Aggregate();
     }
 }

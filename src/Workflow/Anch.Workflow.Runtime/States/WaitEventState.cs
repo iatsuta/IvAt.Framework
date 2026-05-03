@@ -24,8 +24,10 @@ public class WaitEventState : IState
 
             return new Done();
         }
-
-        return new WaitEventResult(this.Event, this.SourceWorkflow, this.ExpectedData);
+        else
+        {
+            return new WaitEventResult(this.Event, this.SourceWorkflow, this.ExpectedData);
+        }
     }
 }
 

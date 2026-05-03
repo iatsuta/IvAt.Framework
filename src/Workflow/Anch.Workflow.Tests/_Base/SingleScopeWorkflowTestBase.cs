@@ -31,7 +31,7 @@ public abstract class SingleScopeWorkflowTestBase<TSource, TWorkflow> : MultiSco
     {
         var wfStartResult = await this.StartWorkflowNative(source, cancellationToken);
 
-        return wfStartResult.Modified.Single();
+        return wfStartResult.Modified.First();
     }
 
     protected async Task<WorkflowProcessResult> StartWorkflowNative(TSource source, CancellationToken cancellationToken)

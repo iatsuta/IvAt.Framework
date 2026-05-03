@@ -52,12 +52,12 @@ public class WorkflowExecutor(
     public Task<WorkflowProcessResult> ProcessUnprocessed(WorkflowProcessResult workflowProcessResult, CancellationToken cancellationToken) =>
         this.ProcessUnprocessed(workflowProcessResult, false, cancellationToken);
 
-    private async Task<WorkflowProcessResult> ProcessUnprocessed(WorkflowProcessResult workflowProcessResult, bool firstStepProcessed,
+    private async Task<WorkflowProcessResult> ProcessUnprocessed(
+        WorkflowProcessResult workflowProcessResult,
+        bool firstStepProcessed,
         CancellationToken cancellationToken)
     {
-        var allowSinge = firstStepProcessed && executionPolicy == WorkflowExecutionPolicy.SingleStep;
-
-        if (workflowProcessResult.Unprocessed.Count == 0 || allowSinge)
+        if (workflowProcessResult.Unprocessed.Count == 0 || this.StopProcess(firstStepProcessed))
         {
             return workflowProcessResult;
         }
@@ -75,11 +75,18 @@ public class WorkflowExecutor(
 
                 var stepResult = await machine.ProcessWorkflow(current.ExecutionResult, cancellationToken);
 
+                firstStepProcessed = true;
+
                 state = tail + stepResult;
 
-            } while (state.Unprocessed.Any());
+            } while (state.Unprocessed.Any() && !this.StopProcess(firstStepProcessed));
 
             return state;
         }
+    }
+
+    private bool StopProcess(bool firstStepProcessed)
+    {
+        return firstStepProcessed && executionPolicy == WorkflowExecutionPolicy.SingleStep;
     }
 }
