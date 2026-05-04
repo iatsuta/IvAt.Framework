@@ -71,14 +71,11 @@ public class WorkflowMachine<TSource>(
 
     protected virtual IExecutionContext CreateExecutionContext(CancellationToken cancellationToken, WaitEventInfo? callbackEventInfo = null)
     {
-        return this.CreateExecutionContext(
-            this.WorkflowInstance.CurrentState,
-            cancellationToken,
-            callbackEventInfo);
+        return this.CreateExecutionContext(this.WorkflowInstance.CurrentState, cancellationToken, callbackEventInfo);
     }
 
     protected virtual IExecutionContext CreateExecutionContext(StateInstance stateInstance, CancellationToken cancellationToken,
-        WaitEventInfo? callbackEventInfo = null)
+        WaitEventInfo? callbackEventInfo)
     {
         return new ExecutionContext
         {
@@ -113,7 +110,7 @@ public class WorkflowMachine<TSource>(
             return WorkflowProcessResult.Empty;
         }
 
-        executionContext.WorkflowInstance.SetStatus(WorkflowStatus.Runnable);
+        executionContext.WorkflowInstance.Status = WorkflowStatus.Runnable;
 
         await this.Save(executionContext.CancellationToken);
 
@@ -171,11 +168,11 @@ public class WorkflowMachine<TSource>(
             }
 
             case Wait:
-                stateInstance.Workflow.SetStatus(WorkflowStatus.WaitEvent);
+                stateInstance.Workflow.Status = WorkflowStatus.WaitEvent;
                 return WorkflowProcessResult.Empty;
 
             case WaitEventResult waitEventResult:
-                stateInstance.Workflow.SetStatus(WorkflowStatus.WaitEvent);
+                stateInstance.Workflow.Status = WorkflowStatus.WaitEvent;
                 stateInstance.RegisterWaitEvent(waitEventResult.ToEventInfo(stateInstance));
                 return WorkflowProcessResult.Empty;
 
@@ -209,12 +206,12 @@ public class WorkflowMachine<TSource>(
             {
                 if (stateInstance.Workflow.Status.Role != WorkflowStatusRole.Finished)
                 {
-                    stateInstance.Workflow.SetStatus(WorkflowStatus.Finished);
+                    stateInstance.Workflow.Status = WorkflowStatus.Finished;
                 }
             }
             else if (pushEventInfo.Header == EventHeader.WorkflowTerminated)
             {
-                stateInstance.Workflow.SetStatus(WorkflowStatus.Terminated);
+                stateInstance.Workflow.Status = WorkflowStatus.Terminated;
             }
 
             return await host.CreateExecutor(WorkflowExecutionPolicy.SingleStep).PushEvent(pushEventInfo, cancellationToken);

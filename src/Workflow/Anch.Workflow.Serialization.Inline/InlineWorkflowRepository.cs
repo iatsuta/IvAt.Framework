@@ -5,7 +5,7 @@ using Anch.Workflow.Domain.Runtime;
 
 namespace Anch.Workflow.Serialization.Inline;
 
-public class InlineSpecificWorkflowExternalStorage<TSource>(
+public class InlineWorkflowRepository<TSource>(
     IWorkflowDefinition workflowDefinition,
     IInstanceIdGenerator<WorkflowInstance> workflowInstanceIdGenerator,
     IInstanceIdGenerator<StateInstance> stateInstanceIdGenerator,
@@ -53,40 +53,70 @@ public class InlineSpecificWorkflowExternalStorage<TSource>(
         throw new NotImplementedException();
     }
 
-    public async ValueTask<WorkflowInstance> TryGetWorkflowInstance(WorkflowInstanceIdentity identity, CancellationToken cancellationToken)
+    public async ValueTask<WorkflowInstance?> TryGetWorkflowInstance(WorkflowInstanceIdentity identity, CancellationToken cancellationToken)
     {
-        var queryable = persistSource.GetQueryable();
+        if (identity.Definition != null && identity.Definition != this.WorkflowDefinition.Identity)
+        {
+            return null;
+        }
+        else
+        {
+            var source = await persistSource
+                .GetQueryable()
+                .Where(persistSource.GetFilter(identity with { Definition = this.WorkflowDefinition.Identity }))
+                .GenericSingleOrDefaultAsync(cancellationToken);
 
-        var source = queryable.Where(persistSource.GetFilter(identity.ToFull(this.WorkflowDefinition.Identity))).Single();
-
-        var wi = this.workflowInstanceSerializer.Deserialize(source);
+            if (source is not null)
+            {
+                var wi = this.workflowInstanceSerializer.Deserialize(source);
 
 #if DEBUG
-        if (identity != wi.Identity)
-        {
-            throw new InvalidOperationException();
-        }
+                if (identity != wi.Identity)
+                {
+                    throw new InvalidOperationException();
+                }
 #endif
 
-        return wi;
+                return wi;
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 
-    public async ValueTask<StateInstance> TryGetStateInstance(StateInstanceIdentity identity, CancellationToken cancellationToken)
+    public async ValueTask<StateInstance?> TryGetStateInstance(StateInstanceIdentity identity, CancellationToken cancellationToken)
     {
-        var queryable = persistSource.GetQueryable();
+        if (identity.Definition != null && identity.Definition != this.WorkflowDefinition.Identity)
+        {
+            return null;
+        }
+        else
+        {
+            var source = await persistSource
+                .GetQueryable()
+                .Where(persistSource.GetFilter(identity with { Definition = this.WorkflowDefinition.Identity }))
+                .GenericSingleOrDefaultAsync(cancellationToken);
 
-        var source = queryable.Where(persistSource.GetFilter(identity.ToFull(this.WorkflowDefinition.Identity))).Single();
-
-        var wi = this.workflowInstanceSerializer.Deserialize(source);
+            if (source is not null)
+            {
+                var wi = this.workflowInstanceSerializer.Deserialize(source);
 
 #if DEBUG
-        if (identity != wi.CurrentState.Identity)
-        {
-            throw new InvalidOperationException();
-        }
+                if (identity != wi.CurrentState.Identity)
+                {
+                    throw new InvalidOperationException();
+                }
 #endif
 
-        return wi.CurrentState;
+                return wi.CurrentState;
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 
     public IAsyncEnumerable<WorkflowInstance> GetWorkflowInstances()

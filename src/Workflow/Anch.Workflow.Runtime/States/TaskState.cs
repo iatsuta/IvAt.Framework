@@ -10,11 +10,11 @@ public class TaskState : IState
 
     public async ValueTask<IExecutionResult> Run(IExecutionContext executionContext)
     {
-        if (executionContext.IsCallbackEvent)
+        if (executionContext.CallbackEventInfo is { } callbackEventInfo)
         {
             executionContext.StateInstance.ReleaseWaitEvents();
 
-            return new PushEventResult(executionContext.CallbackEventInfo!.Header, null, executionContext.CallbackEventInfo!.Data);
+            return new PushEventResult(callbackEventInfo.Header, null, callbackEventInfo.Data);
         }
         else
         {

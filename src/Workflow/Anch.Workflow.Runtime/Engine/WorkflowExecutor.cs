@@ -10,16 +10,16 @@ namespace Anch.Workflow.Engine;
 public class WorkflowExecutor(
     IWorkflowMachineFactory workflowMachineFactory,
     IServiceProvider serviceProvider,
-    [FromKeyedServices(IWorkflowRepository.RootKey)]IWorkflowRepository workflowRootRepository,
+    [FromKeyedServices(IWorkflowRepository.RootKey)]
+    IWorkflowRepository workflowRootRepository,
     WorkflowExecutionPolicy executionPolicy)
     : IWorkflowExecutor
 {
-    public async ValueTask<WorkflowProcessResult> Start<TSource, TWorkflow>(TSource source, CancellationToken cancellationToken)
+    public ValueTask<WorkflowProcessResult> Start<TSource, TWorkflow>(TSource source, CancellationToken cancellationToken)
         where TSource : notnull
-        where TWorkflow : IWorkflow<TSource>
-    {
-        return await this.Start(source, serviceProvider.GetRequiredService<TWorkflow>(), cancellationToken);
-    }
+        where TWorkflow : IWorkflow<TSource> =>
+
+        this.Start(source, serviceProvider.GetRequiredService<TWorkflow>(), cancellationToken);
 
     public async ValueTask<WorkflowProcessResult> Start<TSource>(TSource source, IWorkflow<TSource> workflow, CancellationToken cancellationToken)
         where TSource : notnull
@@ -42,42 +42,36 @@ public class WorkflowExecutor(
 
         var preResult = await waitEvents
             .AggregateAsync((waitEventInfo, ct) => workflowMachineFactory
-            .Create(waitEventInfo.TargetState.Workflow)
-            .PushReleasedEvent(waitEventInfo with { Data = pushEventInfo.Data }, ct), cancellationToken);
+                .Create(waitEventInfo.TargetState.Workflow)
+                .PushReleasedEvent(waitEventInfo with { Data = pushEventInfo.Data }, ct), cancellationToken);
 
         return await this.ProcessUnprocessed(preResult, true, cancellationToken);
     }
 
     public ValueTask<WorkflowProcessResult> ProcessUnprocessed(WorkflowProcessResult workflowProcessResult, CancellationToken cancellationToken) =>
+
         this.ProcessUnprocessed(workflowProcessResult, false, cancellationToken);
 
     private async ValueTask<WorkflowProcessResult> ProcessUnprocessed(
-        WorkflowProcessResult workflowProcessResult,
-        bool firstStepProcessed,
+        WorkflowProcessResult preWorkflowProcessResult,
+        bool preFirstStepProcessed,
         CancellationToken cancellationToken)
     {
-        if (workflowProcessResult.Unprocessed.IsEmpty || this.StopProcess(firstStepProcessed))
+        var workflowProcessResult = preWorkflowProcessResult;
+        var firstStepProcessed = preFirstStepProcessed;
+
+        while (!workflowProcessResult.Unprocessed.IsEmpty && !this.StopProcess(firstStepProcessed))
         {
-            return workflowProcessResult;
+            var tailUnprocessed = workflowProcessResult.PopUnprocessed(out var current);
+
+            var stepResult = await this.ProcessStep(current, cancellationToken);
+
+            firstStepProcessed = true;
+
+            workflowProcessResult = stepResult + tailUnprocessed;
         }
-        else
-        {
-            var state = workflowProcessResult;
 
-            do
-            {
-                var tailUnprocessed = state.PopUnprocessed(out var current);
-
-                var stepResult = await this.ProcessStep(current, cancellationToken);
-
-                firstStepProcessed = true;
-
-                state = stepResult + tailUnprocessed;
-
-            } while (state.Unprocessed.Any() && !this.StopProcess(firstStepProcessed));
-
-            return state;
-        }
+        return workflowProcessResult;
     }
 
     private async ValueTask<WorkflowProcessResult> ProcessStep(UnprocessedStateResultBase unprocessedStateResultBase, CancellationToken cancellationToken)
@@ -103,8 +97,5 @@ public class WorkflowExecutor(
         }
     }
 
-    private bool StopProcess(bool firstStepProcessed)
-    {
-        return firstStepProcessed && executionPolicy == WorkflowExecutionPolicy.SingleStep;
-    }
+    private bool StopProcess(bool firstStepProcessed) => firstStepProcessed && executionPolicy == WorkflowExecutionPolicy.SingleStep;
 }

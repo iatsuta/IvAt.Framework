@@ -17,9 +17,9 @@ public class WaitEventState : IState
 
     public async ValueTask<IExecutionResult> Run(IExecutionContext executionContext)
     {
-        if (executionContext.IsCallbackEvent)
+        if (executionContext.CallbackEventInfo is { } callbackEventInfo)
         {
-            this.ReceivedData = executionContext.CallbackEventInfo!.Data;
+            this.ReceivedData = callbackEventInfo.Data;
 
             return new Done();
         }
@@ -30,28 +30,28 @@ public class WaitEventState : IState
     }
 }
 
-public class WaitEventState<TSource, TData> : IState
-{
-    public EventHeader Event { get; set; } = null!;
+//public class WaitEventState<TSource, TData> : IState
+//{
+//    public EventHeader Event { get; set; } = null!;
 
-    public WorkflowInstance? SourceWorkflow { get; set; }
+//    public WorkflowInstance? SourceWorkflow { get; set; }
 
-    public Func<TSource, TData, CancellationToken, ValueTask>? Callback { get; set; }
+//    public Func<TSource, TData, CancellationToken, ValueTask>? Callback { get; set; }
 
-    public async ValueTask<IExecutionResult> Run(IExecutionContext executionContext)
-    {
-        if (executionContext.IsCallbackEvent)
-        {
-            var data = (TData)executionContext.CallbackEventInfo!.Data!;
+//    public async ValueTask<IExecutionResult> Run(IExecutionContext executionContext)
+//    {
+//        if (executionContext.IsCallbackEvent)
+//        {
+//            var data = (TData)executionContext.CallbackEventInfo!.Data!;
 
-            if (this.Callback != null)
-            {
-                await this.Callback((TSource)executionContext.Source, data, executionContext.CancellationToken);
-            }
+//            if (this.Callback != null)
+//            {
+//                await this.Callback((TSource)executionContext.Source, data, executionContext.CancellationToken);
+//            }
 
-            return new Done();
-        }
+//            return new Done();
+//        }
 
-        return new WaitEventResult(this.Event, this.SourceWorkflow);
-    }
-}
+//        return new WaitEventResult(this.Event, this.SourceWorkflow);
+//    }
+//}

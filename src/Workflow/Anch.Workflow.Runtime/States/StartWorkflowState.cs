@@ -18,10 +18,10 @@ public class StartWorkflowState<TInnerSource>(IWorkflowHost host) : IState
 
     public async ValueTask<IExecutionResult> Run(IExecutionContext executionContext)
     {
-        if (executionContext.IsCallbackEvent)
+        if (executionContext.CallbackEventInfo is { } callbackEventInfo)
         {
-            if (executionContext.CallbackEventInfo!.Header == EventHeader.WorkflowFinished
-                && executionContext.CallbackEventInfo.SourceWorkflow!.Owner == executionContext.StateInstance)
+            if (callbackEventInfo.Header == EventHeader.WorkflowFinished
+                && callbackEventInfo.SourceWorkflow!.Owner == executionContext.StateInstance)
             {
                 return new Done();
             }

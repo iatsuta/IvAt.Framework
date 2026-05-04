@@ -11,13 +11,7 @@ public interface IExecutionContext
 
     WaitEventInfo? CallbackEventInfo { get; }
 
-
-
-    bool IsCallbackEvent => this.CallbackEventInfo != null;
-
     object Source { get; }
 
     WorkflowInstance WorkflowInstance { get; }
-
-    bool IsActual { get; }
 }

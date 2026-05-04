@@ -15,11 +15,6 @@ public class PushEventState : IState
 
     public async ValueTask<IExecutionResult> Run(IExecutionContext executionContext)
     {
-        if (executionContext.IsCallbackEvent)
-        {
-            return new Done();
-        }
-
         return new PushEventResult(this.Event, this.TargetState, this.Data);
     }
 }

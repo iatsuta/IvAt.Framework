@@ -15,6 +15,4 @@ public record ExecutionContext : IExecutionContext
     public object Source => this.WorkflowInstance.Source;
 
     public WorkflowInstance WorkflowInstance => this.StateInstance.Workflow;
-
-    public bool IsActual => this.StateInstance.IsActual;
 }

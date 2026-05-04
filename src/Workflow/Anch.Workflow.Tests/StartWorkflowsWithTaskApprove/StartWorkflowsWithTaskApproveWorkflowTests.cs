@@ -61,7 +61,9 @@ public class StartWorkflowsWithTaskApproveWorkflowTests : SingleScopeWorkflowTes
 
         Assert.Equal(StartWorkflowsWithTaskApproveStatus.Rejected, wfObj.Status);
 
-        Assert.Empty(await this.RootRepository.GetWaitEvents().ToListAsync(ct));
+        var finalEvents = await this.RootRepository.GetWaitEvents().ToListAsync(ct);
+
+        Assert.Empty(finalEvents);
     }
 
     [AnchFact]

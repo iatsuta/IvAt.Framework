@@ -27,6 +27,8 @@ public class StateInstance
     public HashSet<WaitEventInfo> WaitEvents { get; set; } = [];
 
 
+    public List<WorkflowInstance> GetActiveChildren() => this.Children.Where(i => i.Status.Role != WorkflowStatusRole.Finished).ToList();
+
     public void RegisterWaitEvent(WaitEventInfo eventInfo)
     {
         if (this != eventInfo.TargetState)

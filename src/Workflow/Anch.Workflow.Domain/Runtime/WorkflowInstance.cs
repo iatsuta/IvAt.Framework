@@ -16,15 +16,17 @@ public class WorkflowInstance
 
     public StateInstance CurrentState { get; set; } = null!;
 
-    public required WorkflowStatus Status { get; set; }
-
-    public void SetStatus(WorkflowStatus workflowStatus)
+    public required WorkflowStatus Status
     {
-        if (this.Status.Role == WorkflowStatusRole.Finished)
+        get;
+        set
         {
-            throw new InvalidOperationException("Workflow already finished.");
-        }
+            if (field.Role == WorkflowStatusRole.Finished)
+            {
+                throw new InvalidOperationException("Workflow already finished.");
+            }
 
-        this.Status = workflowStatus;
+            field = value;
+        }
     }
 }
