@@ -1,34 +1,31 @@
 ﻿using Anch.Core;
+using Anch.Core.DictionaryCache;
 using Anch.Workflow.Domain.Definition;
 
 namespace Anch.Workflow.Serialization;
 
-public abstract class SpecificWorkflowExternalStorageSource : ISpecificWorkflowExternalStorageSource
-{
-    private readonly Lazy<Dictionary<WorkflowDefinitionIdentity, ISpecificWorkflowExternalStorage>> lazyStorageDict;
+//public abstract class SpecificWorkflowExternalStorageSource : ISpecificWorkflowExternalStorageSource
+//{
+//    private readonly IDictionaryCache<WorkflowDefinitionIdentity, IWorkflowRepository> cache;
 
-    protected SpecificWorkflowExternalStorageSource(IWorkflowSource workflowSource)
-    {
-        this.lazyStorageDict = LazyHelper.Create(() =>
-            workflowSource.GetWorkflows().ChangeValue(this.CreateSpecificWorkflowExternalStorage));
-    }
+//    protected SpecificWorkflowExternalStorageSource(IWorkflowSource workflowSource) =>
 
-    protected abstract ISpecificWorkflowExternalStorage CreateSpecificWorkflowExternalStorage(IWorkflowDefinition wfRef);
+//        this.cache = new DictionaryCache<WorkflowDefinitionIdentity, IWorkflowRepository>(wfRef =>
+//            this.CreateForDefinition(workflowSource.Workflows[wfRef]));
 
-    public IReadOnlyDictionary<WorkflowDefinitionIdentity, ISpecificWorkflowExternalStorage> GetSpecificStorageDict()
-    {
-        return this.lazyStorageDict.Value;
-    }
-}
+//    protected abstract IWorkflowRepository CreateForDefinition(IWorkflowDefinition wfRef);
 
-public class SpecificWorkflowExternalStorageSource<TSpecificWorkflowExternalStorage>(
-    IServiceProxyFactory serviceProxyFactory,
-    IWorkflowSource workflowSource)
-    : SpecificWorkflowExternalStorageSource(workflowSource)
-    where TSpecificWorkflowExternalStorage : ISpecificWorkflowExternalStorage
-{
-    protected override ISpecificWorkflowExternalStorage CreateSpecificWorkflowExternalStorage(IWorkflowDefinition wfRef)
-    {
-        return serviceProxyFactory.Create<ISpecificWorkflowExternalStorage, TSpecificWorkflowExternalStorage>(wfRef);
-    }
-}
+//    public IWorkflowRepository GetForDefinition(WorkflowDefinitionIdentity workflowDefinitionIdentity) =>
+//        this.cache[workflowDefinitionIdentity];
+//}
+
+//public class SpecificWorkflowExternalStorageSource<TSpecificWorkflowExternalStorage>(
+//    IServiceProxyFactory serviceProxyFactory,
+//    IWorkflowSource workflowSource)
+//    : SpecificWorkflowExternalStorageSource(workflowSource)
+//    where TSpecificWorkflowExternalStorage : IWorkflowRepository
+//{
+//    protected override IWorkflowRepository CreateForDefinition(IWorkflowDefinition wfRef) =>
+
+//        serviceProxyFactory.Create<IWorkflowRepository, TSpecificWorkflowExternalStorage>(wfRef);
+//}

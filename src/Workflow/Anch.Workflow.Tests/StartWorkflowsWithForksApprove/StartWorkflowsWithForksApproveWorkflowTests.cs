@@ -21,9 +21,9 @@ public class StartWorkflowsWithForksApproveWorkflowTests : SingleScopeWorkflowTe
 
         var startStatus = wfObj.Status;
 
-        var waitApproveEvents = (await this.Storage.GetWaitEvents(ct)).Where(ei => ei.Header == StartWorkflowsWithForksApproveItemWorkflow.ApproveWaitEvent).ToList();
+        var waitApproveEvents = (await this.RootRepository.GetWaitEvents().ToListAsync(ct)).Where(ei => ei.Header == StartWorkflowsWithForksApproveItemWorkflow.ApproveWaitEvent).ToList();
 
-        var waitRejectEvents = (await this.Storage.GetWaitEvents(ct)).Where(ei => ei.Header == StartWorkflowsWithForksApproveItemWorkflow.RejectWaitEvent).ToList();
+        var waitRejectEvents = (await this.RootRepository.GetWaitEvents().ToListAsync(ct)).Where(ei => ei.Header == StartWorkflowsWithForksApproveItemWorkflow.RejectWaitEvent).ToList();
 
         var approvingInstances = waitApproveEvents.Select(e => e.TargetState.Workflow.Owner!.Workflow).ToArray();
 
@@ -56,7 +56,7 @@ public class StartWorkflowsWithForksApproveWorkflowTests : SingleScopeWorkflowTe
 
         Assert.Equal(StartWorkflowsWithForksApproveStatus.Rejected, wfObj.Status);
 
-        Assert.Empty(await this.Storage.GetWaitEvents(ct));
+        Assert.Empty(await this.RootRepository.GetWaitEvents().ToListAsync(ct));
     }
 
     [AnchFact]
@@ -73,7 +73,7 @@ public class StartWorkflowsWithForksApproveWorkflowTests : SingleScopeWorkflowTe
 
         var startStatus = wfObj.Status;
 
-        var waitApproveEvents = (await this.Storage.GetWaitEvents(ct)).Where(ei => ei.Header == StartWorkflowsWithForksApproveItemWorkflow.ApproveWaitEvent).ToList();
+        var waitApproveEvents = (await this.RootRepository.GetWaitEvents().ToListAsync(ct)).Where(ei => ei.Header == StartWorkflowsWithForksApproveItemWorkflow.ApproveWaitEvent).ToList();
 
         var approvingInstances = waitApproveEvents.Select(e => e.TargetState.Workflow.Owner!.Workflow).ToArray();
 
@@ -93,7 +93,7 @@ public class StartWorkflowsWithForksApproveWorkflowTests : SingleScopeWorkflowTe
 
         Assert.Equal(StartWorkflowsWithForksApproveStatus.Approved, wfObj.Status);
 
-        Assert.Empty(await this.Storage.GetWaitEvents(ct));
+        Assert.Empty(await this.RootRepository.GetWaitEvents().ToListAsync(ct));
     }
 
 
@@ -111,7 +111,7 @@ public class StartWorkflowsWithForksApproveWorkflowTests : SingleScopeWorkflowTe
 
         var startStatus = wfObj.Status;
 
-        var waitApproveEvents = (await this.Storage.GetWaitEvents(ct)).Where(ei => ei.Header == StartWorkflowsWithForksApproveItemWorkflow.ApproveWaitEvent).ToList();
+        var waitApproveEvents = (await this.RootRepository.GetWaitEvents().ToListAsync(ct)).Where(ei => ei.Header == StartWorkflowsWithForksApproveItemWorkflow.ApproveWaitEvent).ToList();
 
         var approvingInstances = waitApproveEvents.Select(e => e.TargetState.Workflow.Owner!.Workflow).ToArray();
 
@@ -128,7 +128,7 @@ public class StartWorkflowsWithForksApproveWorkflowTests : SingleScopeWorkflowTe
 
         Assert.Equal(StartWorkflowsWithForksApproveStatus.Rejected, wfObj.Status);
 
-        Assert.Empty(await this.Storage.GetWaitEvents(ct));
+        Assert.Empty(await this.RootRepository.GetWaitEvents().ToListAsync(ct));
     }
 
     protected override void SetupWorkflow(IWorkflowSetup workflowSetup)

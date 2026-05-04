@@ -6,11 +6,16 @@ namespace Anch.Workflow.Execution;
 
 public record WorkflowProcessResult(
     ImmutableList<WorkflowInstance> Modified,
-    ImmutableStack<UnprocessedStateResult> Unprocessed)
+    ImmutableStack<UnprocessedStateResultBase> Unprocessed)
 {
-    public WorkflowProcessResult PopUnprocessed(out UnprocessedStateResult current)
+    public WorkflowProcessResult(UnprocessedStateResultBase unprocessedStateResult)
+        : this([], [unprocessedStateResult])
     {
-        var tail = Unprocessed.Pop(out current);
+    }
+
+    public WorkflowProcessResult PopUnprocessed(out UnprocessedStateResultBase current)
+    {
+        var tail = this.Unprocessed.Pop(out current);
 
         return this with { Unprocessed = tail };
     }

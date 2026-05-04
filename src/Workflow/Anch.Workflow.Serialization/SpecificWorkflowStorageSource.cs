@@ -1,22 +1,19 @@
-﻿using Anch.Core;
+﻿using Anch.Core.DictionaryCache;
 using Anch.Workflow.Domain.Definition;
 
 namespace Anch.Workflow.Serialization;
 
-public abstract class SpecificWorkflowStorageSource : ISpecificWorkflowStorageSource
-{
-    private readonly Lazy<Dictionary<WorkflowDefinitionIdentity, ISpecificWorkflowStorage>> lazyStorageDict;
+//public abstract class SpecificWorkflowRepositorySource : ISpecificWorkflowRepositorySource
+//{
+//    private readonly IDictionaryCache<WorkflowDefinitionIdentity, IWorkflowRepository> cache;
 
-    protected SpecificWorkflowStorageSource(IWorkflowSource workflowSource)
-    {
-        this.lazyStorageDict = LazyHelper.Create(() =>
-            workflowSource.GetWorkflows().ChangeValue(this.CreateSpecificWorkflowStorage));
-    }
+//    protected SpecificWorkflowRepositorySource(IWorkflowSource workflowSource) =>
 
-    protected abstract ISpecificWorkflowStorage CreateSpecificWorkflowStorage(IWorkflowDefinition wfRef);
+//        this.cache = new DictionaryCache<WorkflowDefinitionIdentity, IWorkflowRepository>(wfRef =>
+//            this.CreateSpecificWorkflowRepository(workflowSource.Workflows[wfRef]));
 
-    public IReadOnlyDictionary<WorkflowDefinitionIdentity, ISpecificWorkflowStorage> GetSpecificStorageDict()
-    {
-        return this.lazyStorageDict.Value;
-    }
-}
+//    protected abstract IWorkflowRepository CreateSpecificWorkflowRepository(IWorkflowDefinition wfRef);
+
+//    public IWorkflowRepository GetSpecificStorageDict(WorkflowDefinitionIdentity workflowDefinitionIdentity) =>
+//        this.cache[workflowDefinitionIdentity];
+//}

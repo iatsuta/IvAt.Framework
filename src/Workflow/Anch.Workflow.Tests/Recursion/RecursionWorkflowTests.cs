@@ -21,6 +21,6 @@ public class RecursionWorkflowTests : SingleScopeWorkflowTestBase<RecursionWorkf
         Assert.Equal(WorkflowStatus.Finished, wi.Status);
         Assert.Equal(result, wfObj.Result);
 
-        Assert.Empty(await this.Storage.GetWaitEvents(ct));
+        Assert.Empty(await this.RootRepository.GetWaitEvents().ToListAsync(ct));
     }
 }

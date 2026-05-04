@@ -2,14 +2,8 @@
 
 namespace Anch.Workflow.Execution;
 
-public record UnprocessedStateResult(StateInstance StateInstance, UnprocessedStateData Data);
+public record UnprocessedStateResultBase;
 
-public abstract record UnprocessedStateData;
+public record UnprocessedStateResult(StateInstance StateInstance, IExecutionResult ExecutionResult) : UnprocessedStateResultBase;
 
-public record InputUnprocessedStateData : UnprocessedStateData;
-
-public record RunUnprocessedStateData : UnprocessedStateData;
-
-public record LeaveUnprocessedStateData : UnprocessedStateData;
-
-public record ExecutionResultUnprocessedStateData(IExecutionResult ExecutionResult) : UnprocessedStateData;
+public record UnprocessedCurrentStateResult(WorkflowInstance WorkflowInstance) : UnprocessedStateResultBase;

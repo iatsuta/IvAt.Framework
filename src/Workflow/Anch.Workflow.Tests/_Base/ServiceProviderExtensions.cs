@@ -12,9 +12,9 @@ public static class ServiceProviderExtensions
         return serviceProvider.GetRequiredService<IWorkflowHost>();
     }
 
-    public static IWorkflowStorage GetWorkflowStorage(this IServiceProvider serviceProvider)
+    public static IWorkflowRepository GetRootRepository(this IServiceProvider serviceProvider)
     {
-        return serviceProvider.GetRequiredService<IWorkflowStorage>();
+        return serviceProvider.GetRequiredKeyedService<IWorkflowRepository>(IWorkflowRepository.RootKey);
     }
 
     public static IWorkflowMachineFactory GetWorkflowMachineFactory(this IServiceProvider serviceProvider)

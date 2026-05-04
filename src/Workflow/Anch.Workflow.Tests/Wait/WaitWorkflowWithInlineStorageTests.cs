@@ -39,7 +39,7 @@
 
 //        await using (var pushScope = this.RootServiceProvider.CreateAsyncScope())
 //        {
-//            var waitStateInstance = await pushScope.ServiceProvider.GetWorkflowStorage().GetStateInstance(waitStateInstanceIdentity);
+//            var waitStateInstance = await pushScope.ServiceProvider.GetWorkflowRepository().GetStateInstance(waitStateInstanceIdentity);
 
 //            var processedWorkflowInstances = await pushScope.ServiceProvider.GetWorkflowHost().PushEvent(new EventHeader(WaitWorkflow.WaitEventName), waitStateInstance, WaitWorkflow.WaitEventData);
 
@@ -51,7 +51,7 @@
 //        // Assert
 //        await using (var assertScope = this.RootServiceProvider.CreateAsyncScope())
 //        {
-//            var storage = assertScope.ServiceProvider.GetWorkflowStorage();
+//            var storage = assertScope.ServiceProvider.GetWorkflowRepository();
 
 //            preWiStatus.Should().Be(WorkflowStatus.WaitEvent);
 
@@ -68,18 +68,18 @@
 //    {
 //        return base.CreateServices()
 
-//            .AddScoped<InlineWorkflowStorage>()
-//            .ReplaceScopedFrom<IWorkflowStorage, InlineWorkflowStorage>()
+//            .AddScoped<InlineWorkflowRepository>()
+//            .ReplaceScopedFrom<IWorkflowRepository, InlineWorkflowRepository>()
 
-//            .AddScoped<InlineWorkflowStorageItem<WaitWorkflowSource>, WaitWorkflowInlineWorkflowStorageItem>()
+//            .AddScoped<InlineWorkflowRepositoryItem<WaitWorkflowSource>, WaitWorkflowInlineWorkflowRepositoryItem>()
 //            .AddScoped<IWorkflowInstanceSerializer<WaitWorkflowSource>, WaitWorkflowWorkflowSerializer>()
 //            .AddScoped<IInlineStorage<WaitWorkflowSource>, WaitWorkflowPersistSource>();
 //    }
 //}
 
-//public class WaitWorkflowInlineWorkflowStorageItem : InlineWorkflowStorageItem<WaitWorkflowSource>
+//public class WaitWorkflowInlineWorkflowRepositoryItem : InlineWorkflowRepositoryItem<WaitWorkflowSource>
 //{
-//    public WaitWorkflowInlineWorkflowStorageItem(
+//    public WaitWorkflowInlineWorkflowRepositoryItem(
 //        IWorkflowInstanceSerializer<WaitWorkflowSource> mappingService,
 //        IInlineStorage<WaitWorkflowSource> persistSource)
 //        : base(mappingService, persistSource)

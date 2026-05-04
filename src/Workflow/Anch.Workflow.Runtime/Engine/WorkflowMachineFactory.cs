@@ -10,13 +10,13 @@ public class WorkflowMachineFactory : IWorkflowMachineFactory
 {
     private readonly IDictionaryCache<WorkflowInstance, IWorkflowMachine> cache;
 
-    public WorkflowMachineFactory(IServiceProxyFactory serviceProxyFactory, IWorkflowStorage workflowStorage)
+    public WorkflowMachineFactory(IServiceProxyFactory serviceProxyFactory, IWorkflowRepositoryFactory workflowRepositoryFactory)
     {
         this.cache = new DictionaryCache<WorkflowInstance, IWorkflowMachine>(wi =>
 
             serviceProxyFactory.Create<IWorkflowMachine>(
                 typeof(WorkflowMachine<>).MakeGenericType(wi.Definition.SourceType),
-                workflowStorage.GetSpecificStorage(wi.Definition.Identity),
+                workflowRepositoryFactory.Create(wi.Definition.Identity),
                 wi));
     }
 

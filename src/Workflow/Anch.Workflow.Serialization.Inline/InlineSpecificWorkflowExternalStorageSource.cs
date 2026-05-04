@@ -7,10 +7,10 @@ public class InlineSpecificWorkflowExternalStorageSource(IWorkflowSource workflo
     : SpecificWorkflowExternalStorageSource(workflowSource)
 {
     //
-    protected override ISpecificWorkflowExternalStorage CreateSpecificWorkflowExternalStorage(IWorkflowDefinition wfRef)
+    protected override IWorkflowRepository CreateSpecificWorkflowExternalStorage(IWorkflowDefinition wfRef)
     {
         var storageType = typeof(InlineSpecificWorkflowExternalStorage<>).MakeGenericType(wfRef.SourceType);
 
-        return serviceProxyFactory.Create<ISpecificWorkflowExternalStorage>(storageType, wfRef);
+        return serviceProxyFactory.Create<IWorkflowRepository>(storageType, wfRef);
     }
 }

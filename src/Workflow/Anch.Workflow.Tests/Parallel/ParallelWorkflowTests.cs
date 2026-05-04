@@ -17,7 +17,7 @@ public class ParallelWorkflowTests : SingleScopeWorkflowTestBase<ParallelWorkflo
 
         var preWfObjStatus = wfObj.Status;
 
-        var waitEvents = await this.Storage.GetWaitEvents(ct);
+        var waitEvents = await this.RootRepository.GetWaitEvents().ToListAsync(ct);
 
         var approveEvent = waitEvents.Single(ei => ei.Header == ParallelWorkflow.ApproveWaitEvent);
 
@@ -34,6 +34,6 @@ public class ParallelWorkflowTests : SingleScopeWorkflowTestBase<ParallelWorkflo
 
         Assert.Equal(WorkflowStatus.Finished, wi.Status);
 
-        Assert.Empty(await this.Storage.GetWaitEvents(ct));
+        Assert.Empty(await this.RootRepository.GetWaitEvents().ToListAsync(ct));
     }
 }

@@ -24,6 +24,6 @@ public class SwitchWorkflowTests : SingleScopeWorkflowTestBase<SwitchWorkflowObj
         Assert.Equal(WorkflowStatus.Finished, wi.Status);
         Assert.Equal(expectedResult, wfObj.Result);
 
-        Assert.Empty(await this.Storage.GetWaitEvents(ct));
+        Assert.Empty(await this.RootRepository.GetWaitEvents().ToListAsync(ct));
     }
 }

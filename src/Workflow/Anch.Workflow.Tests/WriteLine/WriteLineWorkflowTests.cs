@@ -35,7 +35,7 @@ public class WriteLineWorkflowTests : SingleScopeWorkflowTestBase<object, WriteL
 
         Assert.StartsWith(WriteLineWorkflow.Message, this.stringBuilder.ToString());
 
-        Assert.Empty(await this.Storage.GetWaitEvents(ct));
+        Assert.Empty(await this.RootRepository.GetWaitEvents().ToListAsync(ct));
     }
 
     protected override IServiceCollection CreateServices(IServiceCollection services)

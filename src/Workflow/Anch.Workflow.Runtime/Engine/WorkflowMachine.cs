@@ -12,7 +12,7 @@ public class WorkflowMachine<TSource>(
     IServiceProvider serviceProvider,
     IWorkflowHost host,
     IStateFactoryCache stateFactoryCache,
-    ISpecificWorkflowStorage storage,
+    IWorkflowRepository storage,
     WorkflowInstance workflowInstance,
     ICodeStateResolver codeStateResolver,
     IWorkflowEventListener? eventListener = null)
@@ -44,7 +44,24 @@ public class WorkflowMachine<TSource>(
     {
         if (this.WorkflowInstance.Status.Role != WorkflowStatusRole.Finished)
         {
-            return await this.SwitchState(this.WorkflowInstance.Definition.TerminateState, cancellationToken);
+            var prevState = this.WorkflowInstance.CurrentState;
+
+            var switchResult = this.SwitchState(this.WorkflowInstance.Definition.TerminateState);
+
+            if (prevState.OutputProcessed)
+            {
+                return switchResult;
+            }
+            else
+            {
+                var codeState = codeStateResolver.Resolve(prevState);
+
+                var executionContext = this.CreateExecutionContext(cancellationToken);
+
+                var leaveResult = await codeState.LeavePolicy.Leave(serviceProvider, executionContext);
+
+                return leaveResult + switchResult;
+            }
         }
         else
         {
@@ -82,11 +99,11 @@ public class WorkflowMachine<TSource>(
         eventListener?.OnCurrentStateChanged(this.WorkflowInstance);
     }
 
-    private async ValueTask<WorkflowProcessResult> SwitchState(IStateDefinition newStateDefinition, CancellationToken cancellationToken)
+    private WorkflowProcessResult SwitchState(IStateDefinition newStateDefinition)
     {
         this.SetCurrentState(newStateDefinition);
 
-        return await this.ProcessCurrentState(this.CreateExecutionContext(cancellationToken));
+        return new WorkflowProcessResult([this.WorkflowInstance], [new UnprocessedCurrentStateResult(this.WorkflowInstance)]);
     }
 
     private async ValueTask<WorkflowProcessResult> ProcessCurrentState(IExecutionContext executionContext)
@@ -96,9 +113,9 @@ public class WorkflowMachine<TSource>(
             return WorkflowProcessResult.Empty;
         }
 
-        await this.Save(executionContext.CancellationToken);
-
         executionContext.WorkflowInstance.SetStatus(WorkflowStatus.Runnable);
+
+        await this.Save(executionContext.CancellationToken);
 
         var currentState = executionContext.StateInstance;
         var codeState = codeStateResolver.Resolve(currentState);
@@ -111,11 +128,13 @@ public class WorkflowMachine<TSource>(
                 .BindInput(codeState, serviceProvider, executionContext.Source, executionContext.CancellationToken);
         }
 
-        var executionResult = await codeState.Run(executionContext);
+        var runExecutionResult = await codeState.Run(executionContext);
 
-        var workflowProcessResult = new WorkflowProcessResult([executionContext.WorkflowInstance], [new UnprocessedStateResult(currentState, executionResult)]);
+        var modifyResult = new WorkflowProcessResult([this.WorkflowInstance], []);
 
-        if (!currentState.OutputProcessed && executionResult.LeaveState)
+        var runResult = new WorkflowProcessResult([], [new UnprocessedStateResult(currentState, runExecutionResult)]);
+
+        if (!currentState.OutputProcessed && runExecutionResult.LeaveState)
         {
             currentState.OutputProcessed = true;
 
@@ -124,11 +143,11 @@ public class WorkflowMachine<TSource>(
 
             var leaveResult = await codeState.LeavePolicy.Leave(serviceProvider, executionContext);
 
-            return workflowProcessResult + leaveResult;
+            return modifyResult + leaveResult + runResult;
         }
         else
         {
-            return workflowProcessResult;
+            return modifyResult + runResult;
         }
     }
 
@@ -208,7 +227,7 @@ public class WorkflowMachine<TSource>(
         {
             var transition = stateInstance.Definition.Transitions.Single(tr => tr.Event.Header == pushEventInfo.Header);
 
-            return await this.SwitchState(transition.To, cancellationToken);
+            return this.SwitchState(transition.To);
         }
     }
 

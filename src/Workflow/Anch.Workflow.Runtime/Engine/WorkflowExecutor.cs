@@ -10,7 +10,7 @@ namespace Anch.Workflow.Engine;
 public class WorkflowExecutor(
     IWorkflowMachineFactory workflowMachineFactory,
     IServiceProvider serviceProvider,
-    IWorkflowStorage rootWorkflowStorage,
+    [FromKeyedServices(IWorkflowRepository.RootKey)]IWorkflowRepository workflowRootRepository,
     WorkflowExecutionPolicy executionPolicy)
     : IWorkflowExecutor
 {
@@ -33,7 +33,7 @@ public class WorkflowExecutor(
 
     public async ValueTask<WorkflowProcessResult> PushEvent(PushEventInfo pushEventInfo, CancellationToken cancellationToken)
     {
-        var waitEvents = await rootWorkflowStorage.GetWaitEvents(pushEventInfo, cancellationToken);
+        var waitEvents = await workflowRootRepository.GetWaitEvents(pushEventInfo).ToListAsync(cancellationToken);
 
         foreach (var waitEventInfo in waitEvents)
         {
@@ -68,9 +68,7 @@ public class WorkflowExecutor(
             {
                 var tailUnprocessed = state.PopUnprocessed(out var current);
 
-                var machine = workflowMachineFactory.Create(current.StateInstance.Workflow);
-
-                var stepResult = await machine.ProcessWorkflow(current.ExecutionResult, cancellationToken);
+                var stepResult = await this.ProcessStep(current, cancellationToken);
 
                 firstStepProcessed = true;
 
@@ -79,6 +77,29 @@ public class WorkflowExecutor(
             } while (state.Unprocessed.Any() && !this.StopProcess(firstStepProcessed));
 
             return state;
+        }
+    }
+
+    private async ValueTask<WorkflowProcessResult> ProcessStep(UnprocessedStateResultBase unprocessedStateResultBase, CancellationToken cancellationToken)
+    {
+        switch (unprocessedStateResultBase)
+        {
+            case UnprocessedStateResult unprocessedStateResult:
+            {
+                var machine = workflowMachineFactory.Create(unprocessedStateResult.StateInstance.Workflow);
+
+                return await machine.ProcessWorkflow(unprocessedStateResult.ExecutionResult, cancellationToken);
+            }
+
+            case UnprocessedCurrentStateResult unprocessedCurrentStateResult:
+            {
+                var machine = workflowMachineFactory.Create(unprocessedCurrentStateResult.WorkflowInstance);
+
+                return await machine.ProcessWorkflow(cancellationToken);
+            }
+
+            default:
+                throw new ArgumentOutOfRangeException(nameof(unprocessedStateResultBase), unprocessedStateResultBase, null);
         }
     }
 

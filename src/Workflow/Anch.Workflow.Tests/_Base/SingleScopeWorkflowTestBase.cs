@@ -23,7 +23,7 @@ public abstract class SingleScopeWorkflowTestBase<TSource, TWorkflow> : MultiSco
 
     protected IWorkflowMachineFactory WorkflowMachineFactory => this.ScopeServiceProvider.GetWorkflowMachineFactory();
 
-    protected IWorkflowStorage Storage => this.ScopeServiceProvider.GetWorkflowStorage();
+    protected IWorkflowRepository RootRepository => this.ScopeServiceProvider.GetRootRepository();
 
     protected IServiceProvider ScopeServiceProvider => this.lazyScope.Value.ServiceProvider;
 

@@ -25,6 +25,6 @@ public class WaitWorkflowTests : SingleScopeWorkflowTestBase<WaitWorkflowSource,
         Assert.Contains(wi, pushResult.Modified);
         Assert.Equal(WorkflowStatus.Finished, wi.Status);
 
-        Assert.Empty(await this.Storage.GetWaitEvents(ct));
+        Assert.Empty(await this.RootRepository.GetWaitEvents().ToListAsync(ct));
     }
 }

@@ -24,7 +24,7 @@ public class ParallelForeachWorkflowTests : SingleScopeWorkflowTestBase<Parallel
 
         var preWiStatus = wi.Status;
 
-        var waitUserEvents = (await this.Storage.GetWaitEvents(ct)).Where(ei => ei.Header == ParallelForeachItemWorkflow.TestItemWaitEvent).ToList();
+        var waitUserEvents = (await this.RootRepository.GetWaitEvents().ToListAsync(ct)).Where(ei => ei.Header == ParallelForeachItemWorkflow.TestItemWaitEvent).ToList();
 
         foreach (var waitUserEvent in waitUserEvents)
         {
@@ -38,7 +38,7 @@ public class ParallelForeachWorkflowTests : SingleScopeWorkflowTestBase<Parallel
         Assert.Equal(WorkflowStatus.Finished, wi.Status);
         Assert.Equal(expectedResult, wfObj.Result);
 
-        Assert.Empty(await this.Storage.GetWaitEvents(ct));
+        Assert.Empty(await this.RootRepository.GetWaitEvents().ToListAsync(ct));
     }
 
     protected override void SetupWorkflow(IWorkflowSetup workflowSetup)

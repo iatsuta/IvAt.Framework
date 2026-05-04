@@ -21,9 +21,9 @@ public class ParallelForeachApproveWorkflowTests : SingleScopeWorkflowTestBase<P
 
         var startStatus = wfObj.Status;
 
-        var waitApproveEvents = (await this.Storage.GetWaitEvents(ct)).Where(ei => ei.Header == ParallelForeachApproveItemWorkflow.ApproveWaitEvent).ToList();
+        var waitApproveEvents = (await this.RootRepository.GetWaitEvents().ToListAsync(ct)).Where(ei => ei.Header == ParallelForeachApproveItemWorkflow.ApproveWaitEvent).ToList();
 
-        var waitRejectEvents = (await this.Storage.GetWaitEvents(ct)).Where(ei => ei.Header == ParallelForeachApproveItemWorkflow.RejectWaitEvent).ToList();
+        var waitRejectEvents = (await this.RootRepository.GetWaitEvents().ToListAsync(ct)).Where(ei => ei.Header == ParallelForeachApproveItemWorkflow.RejectWaitEvent).ToList();
 
         var approvingInstances = waitApproveEvents.Select(e => e.TargetState.Workflow.Owner!.Workflow).ToArray();
 
@@ -56,7 +56,7 @@ public class ParallelForeachApproveWorkflowTests : SingleScopeWorkflowTestBase<P
 
         Assert.Equal(ParallelForeachApproveStatus.Rejected, wfObj.Status);
 
-        Assert.Empty(await this.Storage.GetWaitEvents(ct));
+        Assert.Empty(await this.RootRepository.GetWaitEvents().ToListAsync(ct));
     }
 
     [AnchFact]
@@ -73,7 +73,7 @@ public class ParallelForeachApproveWorkflowTests : SingleScopeWorkflowTestBase<P
 
         var startStatus = wfObj.Status;
 
-        var waitApproveEvents = (await this.Storage.GetWaitEvents(ct)).Where(ei => ei.Header == ParallelForeachApproveItemWorkflow.ApproveWaitEvent).ToList();
+        var waitApproveEvents = (await this.RootRepository.GetWaitEvents().ToListAsync(ct)).Where(ei => ei.Header == ParallelForeachApproveItemWorkflow.ApproveWaitEvent).ToList();
 
         var approvingInstances = waitApproveEvents.Select(e => e.TargetState.Workflow.Owner!.Workflow).ToArray();
 
@@ -93,7 +93,7 @@ public class ParallelForeachApproveWorkflowTests : SingleScopeWorkflowTestBase<P
 
         Assert.Equal(ParallelForeachApproveStatus.Approved, wfObj.Status);
 
-        Assert.Empty(await this.Storage.GetWaitEvents(ct));
+        Assert.Empty(await this.RootRepository.GetWaitEvents().ToListAsync(ct));
     }
 
 
@@ -111,7 +111,7 @@ public class ParallelForeachApproveWorkflowTests : SingleScopeWorkflowTestBase<P
 
         var startStatus = wfObj.Status;
 
-        var waitApproveEvents = (await this.Storage.GetWaitEvents(ct)).Where(ei => ei.Header == ParallelForeachApproveItemWorkflow.ApproveWaitEvent).ToList();
+        var waitApproveEvents = (await this.RootRepository.GetWaitEvents().ToListAsync(ct)).Where(ei => ei.Header == ParallelForeachApproveItemWorkflow.ApproveWaitEvent).ToList();
         var approvingInstances = waitApproveEvents.Select(e => e.TargetState.Workflow.Owner!.Workflow).ToArray();
 
         await this.WorkflowMachineFactory.Create(approvingInstances[0]).Terminate(ct);
@@ -127,7 +127,7 @@ public class ParallelForeachApproveWorkflowTests : SingleScopeWorkflowTestBase<P
 
         Assert.Equal(ParallelForeachApproveStatus.Rejected, wfObj.Status);
 
-        Assert.Empty(await this.Storage.GetWaitEvents(ct));
+        Assert.Empty(await this.RootRepository.GetWaitEvents().ToListAsync(ct));
     }
 
     protected override void SetupWorkflow(IWorkflowSetup workflowSetup)

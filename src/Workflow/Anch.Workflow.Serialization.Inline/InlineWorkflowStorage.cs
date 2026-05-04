@@ -7,21 +7,21 @@
 
 //namespace SyncWorkflow.Storage.Inline;
 
-//public class InlineWorkflowStorage : MemoryWorkflowStorage
+//public class InlineWorkflowRepository : MemoryWorkflowRepository
 //{
 //    private readonly IServiceProvider serviceProvider;
 
-//    private readonly IDictionaryCache<IWorkflowDefinition, IInlineSpecificWorkflowStorage> itemsCache;
+//    private readonly IDictionaryCache<IWorkflowDefinition, IInlineSpecificWorkflowRepository> itemsCache;
 
 
-//    public InlineWorkflowStorage(IServiceProvider serviceProvider)
+//    public InlineWorkflowRepository(IServiceProvider serviceProvider)
 //    {
 //        this.serviceProvider = serviceProvider;
 
-//        this.itemsCache = new DictionaryCache<IWorkflowDefinition, IInlineSpecificWorkflowStorage>(definition =>
-//            (IInlineSpecificWorkflowStorage)
+//        this.itemsCache = new DictionaryCache<IWorkflowDefinition, IInlineSpecificWorkflowRepository>(definition =>
+//            (IInlineSpecificWorkflowRepository)
 
-//                this.serviceProvider.GetRequiredService(typeof(InlineSpecificWorkflowStorage<>).MakeGenericType(definition.SourceType)));
+//                this.serviceProvider.GetRequiredService(typeof(InlineSpecificWorkflowRepository<>).MakeGenericType(definition.SourceType)));
 //    }
 
 //    protected override Guid GenerateWorkflowInstanceId(WorkflowInstance workflowInstance)
@@ -29,20 +29,20 @@
 //        return this.itemsCache[workflowInstance.Definition].GenerateWorkflowInstanceId(workflowInstance);
 //    }
 
-//    public override ValueTask<StateInstance> GetStateInstance(StateInstanceIdentity identity, CancellationToken cancellationToken = default)
+//    public override ValueTask<StateInstance> GetStateInstance(StateInstanceIdentity identity, CancellationToken cancellationToken)
 //    {
 
 
 //        return base.GetStateInstance(identity, cancellationToken);
 //    }
 
-//    public override ValueTask<WorkflowInstance> GetWorkflowInstance(WorkflowInstanceIdentity identity, CancellationToken cancellationToken = default)
+//    public override ValueTask<WorkflowInstance> GetWorkflowInstance(WorkflowInstanceIdentity identity, CancellationToken cancellationToken)
 //    {
 //        return base.GetWorkflowInstance(identity, cancellationToken);
 //    }
 
 
-//    public async ValueTask FlushChanges(CancellationToken cancellationToken = default)
+//    public async ValueTask FlushChanges(CancellationToken cancellationToken)
 //    {
 //        var currentSavedWorkflowInstances = this.WorkflowCache.Clone();
 

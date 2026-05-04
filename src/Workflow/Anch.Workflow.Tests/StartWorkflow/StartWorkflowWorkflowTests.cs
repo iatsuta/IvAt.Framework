@@ -17,7 +17,7 @@ public class StartWorkflowWorkflowTests : SingleScopeWorkflowTestBase<WaitWorkfl
         // Act
         var rootWi = await this.StartWorkflow(new WaitWorkflowSource(), ct);
 
-        var allWi = await this.Storage.GetWorkflowInstances(ct);
+        var allWi = await this.RootRepository.GetWorkflowInstances().ToListAsync(ct);
 
         var subWf = allWi.Except([rootWi]).Single();
 
@@ -38,7 +38,7 @@ public class StartWorkflowWorkflowTests : SingleScopeWorkflowTestBase<WaitWorkfl
         Assert.Equal(WorkflowStatus.Finished, rootWi.Status);
         Assert.Equal(WorkflowStatus.Finished, subWf.Status);
 
-        Assert.Empty(await this.Storage.GetWaitEvents(ct));
+        Assert.Empty(await this.RootRepository.GetWaitEvents().ToListAsync(ct));
     }
 
     protected override void SetupWorkflow(IWorkflowSetup workflowSetup)

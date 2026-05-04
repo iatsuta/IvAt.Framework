@@ -1,4 +1,5 @@
-﻿using Anch.Workflow.Domain;
+﻿using Anch.GenericQueryable;
+using Anch.Workflow.Domain;
 using Anch.Workflow.Domain.Definition;
 using Anch.Workflow.Domain.Runtime;
 
@@ -10,7 +11,7 @@ public class InlineSpecificWorkflowExternalStorage<TSource>(
     IInstanceIdGenerator<StateInstance> stateInstanceIdGenerator,
     IWorkflowInstanceSerializerFactory workflowInstanceSerializerFactory,
     IInlineStorage<TSource> persistSource)
-    : ISpecificWorkflowExternalStorage
+    : IWorkflowRepository
 
     where TSource : notnull
 {
@@ -18,7 +19,7 @@ public class InlineSpecificWorkflowExternalStorage<TSource>(
 
     public IWorkflowDefinition WorkflowDefinition { get; } = workflowDefinition;
 
-    public async ValueTask SaveWorkflowInstance(WorkflowInstance workflowInstance, CancellationToken cancellationToken = default)
+    public async ValueTask SaveWorkflowInstance(WorkflowInstance workflowInstance, CancellationToken cancellationToken)
     {
         if (workflowInstance.Definition != this.WorkflowDefinition)
         {
@@ -42,22 +43,19 @@ public class InlineSpecificWorkflowExternalStorage<TSource>(
         await persistSource.Save((TSource)workflowInstance.Source, cancellationToken);
     }
 
-    public async ValueTask<List<WaitEventInfo>> GetWaitEvents(CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<WaitEventInfo> GetWaitEvents()
     {
-        return [];
-
-        //throw new NotImplementedException();
+        throw new NotImplementedException();
     }
 
-    public async ValueTask<List<WaitEventInfo>> GetWaitEvents(PushEventInfo pushEventInfo, CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<WaitEventInfo> GetWaitEvents(PushEventInfo pushEventInfo)
     {
-        return [];
-        //throw new NotImplementedException();
+        throw new NotImplementedException();
     }
 
-    public async ValueTask<WorkflowInstance> GetWorkflowInstance(WorkflowInstanceIdentity identity, CancellationToken cancellationToken = default)
+    public async ValueTask<WorkflowInstance> TryGetWorkflowInstance(WorkflowInstanceIdentity identity, CancellationToken cancellationToken)
     {
-        var queryable = persistSource.GetQueryable(cancellationToken);
+        var queryable = persistSource.GetQueryable();
 
         var source = queryable.Where(persistSource.GetFilter(identity.ToFull(this.WorkflowDefinition.Identity))).Single();
 
@@ -73,9 +71,9 @@ public class InlineSpecificWorkflowExternalStorage<TSource>(
         return wi;
     }
 
-    public async ValueTask<StateInstance> GetStateInstance(StateInstanceIdentity identity, CancellationToken cancellationToken = default)
+    public async ValueTask<StateInstance> TryGetStateInstance(StateInstanceIdentity identity, CancellationToken cancellationToken)
     {
-        var queryable = persistSource.GetQueryable(cancellationToken);
+        var queryable = persistSource.GetQueryable();
 
         var source = queryable.Where(persistSource.GetFilter(identity.ToFull(this.WorkflowDefinition.Identity))).Single();
 
@@ -91,17 +89,16 @@ public class InlineSpecificWorkflowExternalStorage<TSource>(
         return wi.CurrentState;
     }
 
-    public async ValueTask<List<WorkflowInstance>> GetWorkflowInstances(CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<WorkflowInstance> GetWorkflowInstances()
     {
-        var queryable = persistSource.GetQueryable(cancellationToken);
+        var queryable = persistSource.GetQueryable();
 
         return queryable
-            .AsEnumerable()
-            .Select(source => this.workflowInstanceSerializer.Deserialize(source!))
-            .ToList();
+            .GenericAsAsyncEnumerable()
+            .Select(source => this.workflowInstanceSerializer.Deserialize(source!));
     }
 
-    public async ValueTask FlushChanges(CancellationToken cancellationToken = default)
+    public async ValueTask FlushChanges(CancellationToken cancellationToken)
     {
         await persistSource.FlushChanges(cancellationToken);
     }

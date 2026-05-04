@@ -6,7 +6,7 @@ public class StateInstance
 {
     public Guid Id { get; set; }
 
-    public StateInstanceFullIdentity Identity => new(this.Id, this.Workflow.Definition.Identity);
+    public StateInstanceIdentity Identity => new(this.Id, this.Workflow.Definition.Identity);
 
     public bool IsActual => this.IsCurrent
                             && this.Workflow.Status.Role != WorkflowStatusRole.Finished

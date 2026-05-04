@@ -2,7 +2,7 @@
 
 namespace Anch.Workflow.Serialization;
 
-public interface ISpecificWorkflowStorageSource
-{
-    IReadOnlyDictionary<WorkflowDefinitionIdentity, ISpecificWorkflowStorage> GetSpecificStorageDict();
-}
+//public interface ISpecificWorkflowRepositorySource
+//{
+//    IWorkflowRepository GetSpecificStorageDict(WorkflowDefinitionIdentity workflowDefinitionIdentity);
+//}

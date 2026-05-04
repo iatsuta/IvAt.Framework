@@ -6,13 +6,13 @@ namespace Anch.Workflow.Serialization.Inline;
 
 public interface IInlineStorage<TSource>
 {
-    ValueTask Save(TSource source, CancellationToken cancellationToken = default);
+    ValueTask Save(TSource source, CancellationToken cancellationToken);
 
-    ValueTask FlushChanges(CancellationToken cancellationToken = default);
+    ValueTask FlushChanges(CancellationToken cancellationToken);
 
-    IQueryable<TSource> GetQueryable(CancellationToken cancellationToken = default);
+    IQueryable<TSource> GetQueryable();
 
-    Expression<Func<TSource, bool>> GetFilter(WorkflowInstanceFullIdentity wi);
+    Expression<Func<TSource, bool>> GetFilter(WorkflowInstanceIdentity wi);
 
-    Expression<Func<TSource, bool>> GetFilter(StateInstanceFullIdentity si);
+    Expression<Func<TSource, bool>> GetFilter(StateInstanceIdentity si);
 }

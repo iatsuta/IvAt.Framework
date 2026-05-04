@@ -30,11 +30,19 @@ public class WorkflowSetup : IWorkflowSetup, IServiceInitializer
             .AddScoped<ICodeStateResolver, CodeStateResolver>()
 
             .AddSingleton<IWorkflowSource, WorkflowSource>()
+
             .AddScoped<IInstanceIdGenerator<WorkflowInstance>, RandomIdGenerator<WorkflowInstance>>()
             .AddScoped<IInstanceIdGenerator<StateInstance>, RandomIdGenerator<StateInstance>>()
-            .AddScoped<IWorkflowStorage, WorkflowStorage>()
-            .AddScoped<ISpecificWorkflowStorageSource, MemCachedSpecificWorkflowStorageSource>()
-            .AddScoped<ISpecificWorkflowExternalStorageSource, MemorySpecificWorkflowExternalStorageSource>();
+
+            .AddKeyedScoped<IWorkflowRepositoryFactory, CachedWorkflowRepositoryFactory>(IWorkflowRepositoryFactory.CacheKey)
+            .AddKeyedScoped<IWorkflowRepository, WorkflowRootRepository>(IWorkflowRepository.RootKey)
+
+
+            .AddSingleton<MemoryWorkflowRootState>()
+            .AddScoped<IWorkflowRepositoryFactory, MemoryWorkflowRepositoryFactory>()
+            //.AddScoped<ISpecificWorkflowRepositorySource, MemCachedSpecificWorkflowRepositorySource>()
+            //.AddScoped<ISpecificWorkflowExternalStorageSource, MemorySpecificWorkflowExternalStorageSource>()
+            ;
     }
 
     public IWorkflowSetup Add<TWorkflow>()

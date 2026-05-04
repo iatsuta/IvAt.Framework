@@ -17,7 +17,7 @@ public class TaskWorkflowTests : SingleScopeWorkflowTestBase<TaskWorkflowObject,
 
         var preWfObjStatus = wfObj.Status;
 
-        var approveEvent = (await this.Storage.GetWaitEvents(ct)).Single(ei => ei.Header == TaskWorkflow.ApproveEventHeader);
+        var approveEvent = (await this.RootRepository.GetWaitEvents().ToListAsync(ct)).Single(ei => ei.Header == TaskWorkflow.ApproveEventHeader);
         await this.Host.CreateExecutor(WorkflowExecutionPolicy.TillTheEnd).PushEvent(approveEvent.Header, approveEvent.TargetState, cancellationToken: ct);
 
         // Assert
@@ -28,6 +28,6 @@ public class TaskWorkflowTests : SingleScopeWorkflowTestBase<TaskWorkflowObject,
 
         Assert.Equal(WorkflowStatus.Finished, wi.Status);
 
-        Assert.Empty(await this.Storage.GetWaitEvents(ct));
+        Assert.Empty(await this.RootRepository.GetWaitEvents().ToListAsync(ct));
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Anch.Workflow.Serialization;
 
-public interface ISpecificWorkflowExternalStorageSource
-{
-    IReadOnlyDictionary<WorkflowDefinitionIdentity, ISpecificWorkflowExternalStorage> GetSpecificStorageDict();
-}
+//public interface ISpecificWorkflowExternalStorageSource
+//{
+//    IWorkflowRepository GetSpecificWorkflowExternalStorage(WorkflowDefinitionIdentity workflowDefinitionIdentity);
+//}
