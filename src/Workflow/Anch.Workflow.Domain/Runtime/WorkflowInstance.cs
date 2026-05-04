@@ -21,7 +21,7 @@ public class WorkflowInstance
         get;
         set
         {
-            if (field.Role == WorkflowStatusRole.Finished)
+            if (field?.Role == WorkflowStatusRole.Finished)
             {
                 throw new InvalidOperationException("Workflow already finished.");
             }
