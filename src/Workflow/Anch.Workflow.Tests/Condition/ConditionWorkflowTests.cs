@@ -11,7 +11,7 @@ public class ConditionWorkflowTests : SingleScopeWorkflowTestBase<ConditionWorkf
     [Theory]
     [AnchInlineData(100, true)]
     [AnchInlineData(101, false)]
-    public async Task UseIf_CodeSwitched_Cases(int value, bool isEven, CancellationToken ct)
+    public async ValueTask UseIf_CodeSwitched_Cases(int value, bool isEven, CancellationToken ct)
     {
         // Arrange
         var wfObj = new ConditionWorkflowObject { Value = value };

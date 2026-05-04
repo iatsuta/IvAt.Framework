@@ -2,7 +2,6 @@
 using Anch.Workflow.Domain.Runtime;
 using Anch.Workflow.Engine;
 using Anch.Workflow.Execution;
-using Anch.Workflow.States._Base;
 
 namespace Anch.Workflow.States;
 
@@ -14,7 +13,7 @@ public class PushEventState : IState
 
     public object? Data { get; set; }
 
-    public async Task<IExecutionResult> Run(IExecutionContext executionContext)
+    public async ValueTask<IExecutionResult> Run(IExecutionContext executionContext)
     {
         if (executionContext.IsCallbackEvent)
         {

@@ -10,7 +10,7 @@ public class ParallelForeachWorkflowTests : SingleScopeWorkflowTestBase<Parallel
     [Theory]
     [AnchInlineData(10, 100, 123, 760)]
     [AnchInlineData(3, 100, 5, 113)]
-    public async Task ParallelSum_ResultEquals(int wfCount, int extraAddToResult, int pushEventData, int expectedResult, CancellationToken ct)
+    public async ValueTask ParallelSum_ResultEquals(int wfCount, int extraAddToResult, int pushEventData, int expectedResult, CancellationToken ct)
     {
         // Arrange
         var wfObj = new ParallelForeachWorkflowObject

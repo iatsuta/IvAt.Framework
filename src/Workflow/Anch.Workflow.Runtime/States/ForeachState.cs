@@ -1,6 +1,5 @@
 ﻿using Anch.Workflow.Engine;
 using Anch.Workflow.Execution;
-using Anch.Workflow.States._Base;
 
 namespace Anch.Workflow.States;
 
@@ -19,7 +18,7 @@ public class ForeachState<TSource, TElement>(IWorkflowHost workflowHost) : IStat
 
     public int CurrentIndex { get; set; }
 
-    public async Task<IExecutionResult> Run(IExecutionContext executionContext)
+    public async ValueTask<IExecutionResult> Run(IExecutionContext executionContext)
     {
         throw new NotImplementedException();
 

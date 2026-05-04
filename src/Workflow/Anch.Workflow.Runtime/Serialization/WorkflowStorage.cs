@@ -18,24 +18,24 @@ public class WorkflowStorage(ISpecificWorkflowStorageSource specificWorkflowStor
         return this.SpecificStorageDict[identity];
     }
 
-    public async Task SaveWorkflowInstance(WorkflowInstance workflowInstance, CancellationToken cancellationToken = default)
+    public async ValueTask SaveWorkflowInstance(WorkflowInstance workflowInstance, CancellationToken cancellationToken = default)
     {
         await this.GetSpecificStorage(workflowInstance.Definition.Identity).SaveWorkflowInstance(workflowInstance, cancellationToken);
     }
 
-    public async Task<WorkflowInstance> GetWorkflowInstance(WorkflowInstanceFullIdentity identity, CancellationToken cancellationToken = default)
+    public async ValueTask<WorkflowInstance> GetWorkflowInstance(WorkflowInstanceFullIdentity identity, CancellationToken cancellationToken = default)
     {
         return await this.GetSpecificStorage(identity.Workflow).GetWorkflowInstance(identity, cancellationToken);
     }
 
-    public async Task<StateInstance> GetStateInstance(StateInstanceFullIdentity identity, CancellationToken cancellationToken = default)
+    public async ValueTask<StateInstance> GetStateInstance(StateInstanceFullIdentity identity, CancellationToken cancellationToken = default)
     {
         return await this.GetSpecificStorage(identity.Workflow).GetStateInstance(identity, cancellationToken);
     }
 
-    public async Task<List<WorkflowInstance>> GetWorkflowInstances(CancellationToken cancellationToken = default)
+    public async ValueTask<List<WorkflowInstance>> GetWorkflowInstances(CancellationToken cancellationToken = default)
     {
-        var result = await Task.WhenAll(
+        var result = await ValueTask.WhenAll(
             this.SpecificStorageDict
                 .Values
                 .Select(specificStorage => specificStorage.GetWorkflowInstances(cancellationToken)));
@@ -43,9 +43,9 @@ public class WorkflowStorage(ISpecificWorkflowStorageSource specificWorkflowStor
         return result.SelectMany().ToList();
     }
 
-    public async Task<List<WaitEventInfo>> GetWaitEvents(CancellationToken cancellationToken = default)
+    public async ValueTask<List<WaitEventInfo>> GetWaitEvents(CancellationToken cancellationToken = default)
     {
-        var result = await Task.WhenAll(
+        var result = await ValueTask.WhenAll(
             this.SpecificStorageDict
                 .Values
                 .Select(specificStorage => specificStorage.GetWaitEvents(cancellationToken)));
@@ -53,7 +53,7 @@ public class WorkflowStorage(ISpecificWorkflowStorageSource specificWorkflowStor
         return result.SelectMany().ToList();
     }
 
-    public async Task<List<WaitEventInfo>> GetWaitEvents(PushEventInfo pushEventInfo, CancellationToken cancellationToken = default)
+    public async ValueTask<List<WaitEventInfo>> GetWaitEvents(PushEventInfo pushEventInfo, CancellationToken cancellationToken = default)
     {
         if (pushEventInfo.TargetState != null)
         {
@@ -61,13 +61,13 @@ public class WorkflowStorage(ISpecificWorkflowStorageSource specificWorkflowStor
         }
         else
         {
-            var allResult = await Task.WhenAll(this.SpecificStorageDict.Values.Select(specificStorage => specificStorage.GetWaitEvents(pushEventInfo, cancellationToken)));
+            var allResult = await ValueTask.WhenAll(this.SpecificStorageDict.Values.Select(specificStorage => specificStorage.GetWaitEvents(pushEventInfo, cancellationToken)));
 
             return allResult.SelectMany().ToList();
         }
     }
 
-    public async Task FlushChanges(CancellationToken cancellationToken = default)
+    public async ValueTask FlushChanges(CancellationToken cancellationToken = default)
     {
         foreach (var specificStorage in this.SpecificStorageDict.Values)
         {

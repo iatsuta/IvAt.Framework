@@ -2,7 +2,6 @@
 
 using Anch.Workflow.Domain.Definition;
 using Anch.Workflow.States;
-using Anch.Workflow.States._Base;
 
 namespace Anch.Workflow.Builder;
 
@@ -30,7 +29,7 @@ public interface IWorkflowBuilder<TSource>
         return this.Then<IServiceProvider>(async (source, _, _) => action(source));
     }
 
-    IStateBuilder<TSource, ActionState<TSource, TService>> Then<TService>(Func<TSource, TService, CancellationToken, Task> action)
+    IStateBuilder<TSource, ActionState<TSource, TService>> Then<TService>(Func<TSource, TService, CancellationToken, ValueTask> action)
         where TService : notnull
     {
         return this.Then<ActionState<TSource, TService>>()
@@ -63,7 +62,7 @@ public interface IWorkflowBuilder<TSource>
         this.If<TService>(async (source, service, _) => condition(source, service), trueSetupWorkflowBuilder, falseSetupWorkflowBuilder);
 
     IStateBuilder<TSource, IfState> If<TService>(
-       Func<TSource, TService, CancellationToken, Task<bool>> condition,
+       Func<TSource, TService, CancellationToken, ValueTask<bool>> condition,
        Action<IWorkflowBuilder<TSource>> trueSetupWorkflowBuilder,
        Action<IWorkflowBuilder<TSource>>? falseSetupWorkflowBuilder = null)
         where TService : notnull;
@@ -86,7 +85,7 @@ public interface IWorkflowBuilder<TSource>
     }
 
     IStateBuilder<TSource, SwitchState<TProperty>> Switch<TProperty, TService>(
-        Func<TSource, TService, CancellationToken, Task<TProperty>> selector,
+        Func<TSource, TService, CancellationToken, ValueTask<TProperty>> selector,
         params (TProperty CaseValue, Action<IWorkflowBuilder<TSource>> CaseSetupWorkflowBuilder)[] cases)
         where TService : notnull
     {
@@ -94,7 +93,7 @@ public interface IWorkflowBuilder<TSource>
     }
 
     IStateBuilder<TSource, SwitchState<TProperty>> Switch<TProperty, TService>(
-        Func<TSource, TService, CancellationToken, Task<TProperty>> selector,
+        Func<TSource, TService, CancellationToken, ValueTask<TProperty>> selector,
         Action<IWorkflowBuilder<TSource>> defaultCaseSetupWorkflowBuilder,
         params (TProperty CaseValue, Action<IWorkflowBuilder<TSource>> CaseSetupWorkflowBuilder)[] cases)
         where TService : notnull;
@@ -108,7 +107,7 @@ public interface IWorkflowBuilder<TSource>
     }
 
     public IStateBuilder<TSource, ParallelForeachState<TSource, TElement>> ParallelForeach<TElement, TService>(
-        Func<TSource, TService, CancellationToken, Task<IEnumerable<TElement>>> getElements,
+        Func<TSource, TService, CancellationToken, ValueTask<IEnumerable<TElement>>> getElements,
         Action<IWorkflowBuilder<(TSource Source, TElement Element)>> setupIteratorBuilder)
         where TService : notnull;
 
@@ -122,7 +121,7 @@ public interface IWorkflowBuilder<TSource>
     }
 
     IStateBuilder<TSource, ForeachState<TSource, TElement>> Foreach<TElement, TService>(
-        Func<TSource, TService, CancellationToken, Task<IEnumerable<TElement>>> getElements,
+        Func<TSource, TService, CancellationToken, ValueTask<IEnumerable<TElement>>> getElements,
         Action<IWorkflowBuilder<(TSource Source, TElement Element)>> setupIteratorBuilder)
         where TService : notnull;
 
@@ -134,5 +133,5 @@ public interface IWorkflowBuilder<TSource>
 
     IStateBuilder<TSource, FinalState> Finish(Func<TSource, object?> getResult);
 
-    IStateBuilder<TSource, TaskState> Task(Action<ITaskBuilder<TSource>> setup);
+    IStateBuilder<TSource, TaskState> ValueTask(Action<ITaskBuilder<TSource>> setup);
 }

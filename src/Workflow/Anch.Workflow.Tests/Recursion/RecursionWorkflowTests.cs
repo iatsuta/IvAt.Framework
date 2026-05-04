@@ -9,7 +9,7 @@ public class RecursionWorkflowTests : SingleScopeWorkflowTestBase<RecursionWorkf
     [Theory]
     [AnchInlineData(4, 1000, 1006)]
     [AnchInlineData(11, 1000, 1055)]
-    public async Task SumNumbersByRecurse_ResultEquals(int limit, int extraAddToResult, int result, CancellationToken ct)
+    public async ValueTask SumNumbersByRecurse_ResultEquals(int limit, int extraAddToResult, int result, CancellationToken ct)
     {
         // Arrange
         var wfObj = new RecursionWorkflowObject { Limit = limit, ExtraAddToResult = extraAddToResult };

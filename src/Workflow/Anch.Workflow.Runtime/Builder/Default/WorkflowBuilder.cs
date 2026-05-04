@@ -4,7 +4,6 @@ using Anch.Workflow.Builder.Default.DomainDefinition;
 using Anch.Workflow.Domain;
 using Anch.Workflow.Domain.Definition;
 using Anch.Workflow.States;
-using Anch.Workflow.States._Base;
 
 namespace Anch.Workflow.Builder.Default;
 
@@ -80,7 +79,7 @@ public class WorkflowBuilder<TSource>(WorkflowDefinition workflow) : IWorkflowBu
     }
 
     public IStateBuilder<TSource, IfState> If<TService>(
-        Func<TSource, TService, CancellationToken, Task<bool>> condition,
+        Func<TSource, TService, CancellationToken, ValueTask<bool>> condition,
         Action<IWorkflowBuilder<TSource>> trueSetupWorkflowBuilder,
         Action<IWorkflowBuilder<TSource>>? falseSetupWorkflowBuilder = null)
         where TService : notnull
@@ -106,7 +105,7 @@ public class WorkflowBuilder<TSource>(WorkflowDefinition workflow) : IWorkflowBu
     }
 
     public IStateBuilder<TSource, SwitchState<TProperty>> Switch<TProperty, TService>(
-        Func<TSource, TService, CancellationToken, Task<TProperty>> selector,
+        Func<TSource, TService, CancellationToken, ValueTask<TProperty>> selector,
         Action<IWorkflowBuilder<TSource>> defaultCaseSetupWorkflowBuilder,
         params (TProperty CaseValue, Action<IWorkflowBuilder<TSource>> CaseSetupWorkflowBuilder)[] cases)
 
@@ -144,7 +143,7 @@ public class WorkflowBuilder<TSource>(WorkflowDefinition workflow) : IWorkflowBu
     }
 
     public IStateBuilder<TSource, ParallelForeachState<TSource, TElement>> ParallelForeach<TElement, TService>(
-        Func<TSource, TService, CancellationToken, Task<IEnumerable<TElement>>> getElements,
+        Func<TSource, TService, CancellationToken, ValueTask<IEnumerable<TElement>>> getElements,
         Action<IWorkflowBuilder<(TSource Source, TElement Element)>> setupIteratorBuilder)
         where TService : notnull
     {
@@ -169,7 +168,7 @@ public class WorkflowBuilder<TSource>(WorkflowDefinition workflow) : IWorkflowBu
     }
 
     public IStateBuilder<TSource, ForeachState<TSource, TElement>> Foreach<TElement, TService>(
-        Func<TSource, TService, CancellationToken, Task<IEnumerable<TElement>>> getElements,
+        Func<TSource, TService, CancellationToken, ValueTask<IEnumerable<TElement>>> getElements,
         Action<IWorkflowBuilder<(TSource Source, TElement Element)>> setupIteratorBuilder)
         where TService : notnull
     {
@@ -187,7 +186,7 @@ public class WorkflowBuilder<TSource>(WorkflowDefinition workflow) : IWorkflowBu
             .Input(s => s.Result, getResult);
     }
 
-    public IStateBuilder<TSource, TaskState> Task(Action<ITaskBuilder<TSource>> setup)
+    public IStateBuilder<TSource, TaskState> ValueTask(Action<ITaskBuilder<TSource>> setup)
     {
         var taskState = this.ThenInternal<TaskState>(false);
 

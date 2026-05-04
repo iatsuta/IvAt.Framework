@@ -8,7 +8,7 @@ namespace Anch.Workflow.Tests.StartWorkflowsWithForksApprove;
 public class StartWorkflowsWithForksApproveWorkflowTests : SingleScopeWorkflowTestBase<StartWorkflowsWithForksApproveWorkflowObject, StartWorkflowsWithForksApproveWorkflow>
 {
     [AnchFact]
-    public async Task SomeOneRejected_ApprovingItemsTerminated(CancellationToken ct)
+    public async ValueTask SomeOneRejected_ApprovingItemsTerminated(CancellationToken ct)
     {
         // Arrange
         var wfObj = new StartWorkflowsWithForksApproveWorkflowObject
@@ -60,7 +60,7 @@ public class StartWorkflowsWithForksApproveWorkflowTests : SingleScopeWorkflowTe
     }
 
     [AnchFact]
-    public async Task AllApproved_RootWfApproved(CancellationToken ct)
+    public async ValueTask AllApproved_RootWfApproved(CancellationToken ct)
     {
         // Arrange
         var wfObj = new StartWorkflowsWithForksApproveWorkflowObject
@@ -98,7 +98,7 @@ public class StartWorkflowsWithForksApproveWorkflowTests : SingleScopeWorkflowTe
 
 
     [AnchFact]
-    public async Task TerminateChildren_RootWf_Rejected(CancellationToken ct)
+    public async ValueTask TerminateChildren_RootWf_Rejected(CancellationToken ct)
     {
         // Arrange
         var wfObj = new StartWorkflowsWithForksApproveWorkflowObject

@@ -14,7 +14,7 @@ public class MemorySpecificWorkflowExternalStorage(
 
     public IWorkflowDefinition WorkflowDefinition { get; } = workflowDefinition;
 
-    public async Task SaveWorkflowInstance(WorkflowInstance workflowInstance, CancellationToken cancellationToken = default)
+    public async ValueTask SaveWorkflowInstance(WorkflowInstance workflowInstance, CancellationToken cancellationToken = default)
     {
         if (workflowInstance.Definition != this.WorkflowDefinition)
         {
@@ -36,7 +36,7 @@ public class MemorySpecificWorkflowExternalStorage(
         this.Values[workflowInstance.Identity] = workflowInstance;
     }
 
-    public async Task<List<WaitEventInfo>> ReleaseWaitEvents(PushEventInfo pushEventInfo, CancellationToken cancellationToken = default)
+    public async ValueTask<List<WaitEventInfo>> ReleaseWaitEvents(PushEventInfo pushEventInfo, CancellationToken cancellationToken = default)
     {
         var waitEvents = await this.GetWaitEvents(pushEventInfo, cancellationToken);
 
@@ -48,12 +48,12 @@ public class MemorySpecificWorkflowExternalStorage(
         return waitEvents;
     }
 
-    public async Task<WorkflowInstance> GetWorkflowInstance(WorkflowInstanceIdentity identity, CancellationToken cancellationToken = default)
+    public async ValueTask<WorkflowInstance> GetWorkflowInstance(WorkflowInstanceIdentity identity, CancellationToken cancellationToken = default)
     {
         return this.Values[identity];
     }
 
-    public async Task<StateInstance> GetStateInstance(StateInstanceIdentity identity, CancellationToken cancellationToken = default)
+    public async ValueTask<StateInstance> GetStateInstance(StateInstanceIdentity identity, CancellationToken cancellationToken = default)
     {
         return this.Values
             .Values
@@ -61,17 +61,17 @@ public class MemorySpecificWorkflowExternalStorage(
             .Single(si => si.Identity == identity);
     }
 
-    public async Task<List<WorkflowInstance>> GetWorkflowInstances(CancellationToken cancellationToken = default)
+    public async ValueTask<List<WorkflowInstance>> GetWorkflowInstances(CancellationToken cancellationToken = default)
     {
         return this.Values.Values.ToList();
     }
 
-    public async Task<List<WaitEventInfo>> GetWaitEvents(CancellationToken cancellationToken = default)
+    public async ValueTask<List<WaitEventInfo>> GetWaitEvents(CancellationToken cancellationToken = default)
     {
         return this.Values.Values.SelectMany(wi => wi.CurrentState.WaitEvents).ToList();
     }
 
-    public async Task<List<WaitEventInfo>> GetWaitEvents(PushEventInfo pushEventInfo, CancellationToken cancellationToken = default)
+    public async ValueTask<List<WaitEventInfo>> GetWaitEvents(PushEventInfo pushEventInfo, CancellationToken cancellationToken = default)
     {
         var request =
 
@@ -86,7 +86,7 @@ public class MemorySpecificWorkflowExternalStorage(
         return request.ToList();
     }
 
-    public async Task FlushChanges(CancellationToken cancellationToken = default)
+    public async ValueTask FlushChanges(CancellationToken cancellationToken = default)
     {
     }
 }

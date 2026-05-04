@@ -2,7 +2,6 @@
 using Anch.Workflow.Domain.Runtime;
 using Anch.Workflow.Engine;
 using Anch.Workflow.Execution;
-using Anch.Workflow.States._Base;
 
 namespace Anch.Workflow.States;
 
@@ -17,7 +16,7 @@ public class StartWorkflowState<TInnerSource>(IWorkflowHost host) : IState
 
     public StateLeavePolicy LeavePolicy { get; set; } = StateLeavePolicy.TerminateChild;
 
-    public async Task<IExecutionResult> Run(IExecutionContext executionContext)
+    public async ValueTask<IExecutionResult> Run(IExecutionContext executionContext)
     {
         if (executionContext.IsCallbackEvent)
         {

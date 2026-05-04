@@ -27,20 +27,20 @@ public class WorkflowMachine<TSource>(
         this.SetCurrentState(this.WorkflowInstance.Definition.StartState);
     }
 
-    public async Task Save(CancellationToken cancellationToken)
+    public async ValueTask Save(CancellationToken cancellationToken)
     {
         await storage.SaveWorkflowInstance(this.WorkflowInstance, cancellationToken);
     }
 
-    public async Task<WorkflowProcessResult> ProcessWorkflow(CancellationToken cancellationToken)
+    public async ValueTask<WorkflowProcessResult> ProcessWorkflow(CancellationToken cancellationToken)
     {
         return await this.ProcessCurrentState(this.CreateExecutionContext(cancellationToken));
     }
 
-    public Task<WorkflowProcessResult> ProcessWorkflow(IExecutionResult executionResult, CancellationToken cancellationToken) =>
+    public ValueTask<WorkflowProcessResult> ProcessWorkflow(IExecutionResult executionResult, CancellationToken cancellationToken) =>
         this.ProcessExecutionResult(this.WorkflowInstance.CurrentState, executionResult, cancellationToken);
 
-    public async Task<WorkflowProcessResult> Terminate(CancellationToken cancellationToken)
+    public async ValueTask<WorkflowProcessResult> Terminate(CancellationToken cancellationToken)
     {
         if (this.WorkflowInstance.Status.Role != WorkflowStatusRole.Finished)
         {
@@ -82,14 +82,14 @@ public class WorkflowMachine<TSource>(
         eventListener?.OnCurrentStateChanged(this.WorkflowInstance);
     }
 
-    private async Task<WorkflowProcessResult> SwitchState(IStateDefinition newStateDefinition, CancellationToken cancellationToken)
+    private async ValueTask<WorkflowProcessResult> SwitchState(IStateDefinition newStateDefinition, CancellationToken cancellationToken)
     {
         this.SetCurrentState(newStateDefinition);
 
         return await this.ProcessCurrentState(this.CreateExecutionContext(cancellationToken));
     }
 
-    private async Task<WorkflowProcessResult> ProcessCurrentState(IExecutionContext executionContext)
+    private async ValueTask<WorkflowProcessResult> ProcessCurrentState(IExecutionContext executionContext)
     {
         if (!executionContext.StateInstance.IsActual)
         {
@@ -132,7 +132,7 @@ public class WorkflowMachine<TSource>(
         }
     }
 
-    protected virtual async Task<WorkflowProcessResult> ProcessExecutionResult(StateInstance stateInstance, IExecutionResult executionResult,
+    protected virtual async ValueTask<WorkflowProcessResult> ProcessExecutionResult(StateInstance stateInstance, IExecutionResult executionResult,
         CancellationToken cancellationToken)
     {
         switch (executionResult)
@@ -175,13 +175,13 @@ public class WorkflowMachine<TSource>(
         }
     }
 
-    private async Task<WorkflowProcessResult> ProcessExecutionResult(StateInstance stateInstance, PushEventResult pushEventResult,
+    private async ValueTask<WorkflowProcessResult> ProcessExecutionResult(StateInstance stateInstance, PushEventResult pushEventResult,
         CancellationToken cancellationToken)
     {
         return await this.ProcessExecutionResult(stateInstance, pushEventResult.ToEventInfo(stateInstance.Workflow), cancellationToken);
     }
 
-    private async Task<WorkflowProcessResult> ProcessExecutionResult(StateInstance stateInstance, PushEventInfo pushEventInfo,
+    private async ValueTask<WorkflowProcessResult> ProcessExecutionResult(StateInstance stateInstance, PushEventInfo pushEventInfo,
         CancellationToken cancellationToken)
     {
         if (pushEventInfo.TargetState == null && pushEventInfo.Header.IsGlobal)
@@ -212,7 +212,7 @@ public class WorkflowMachine<TSource>(
         }
     }
 
-    public async Task<WorkflowProcessResult> PushReleasedEvent(WaitEventInfo releasedEventInfo, CancellationToken cancellationToken)
+    public async ValueTask<WorkflowProcessResult> PushReleasedEvent(WaitEventInfo releasedEventInfo, CancellationToken cancellationToken)
     {
         var executionContext = this.CreateExecutionContext(releasedEventInfo.TargetState, cancellationToken, releasedEventInfo);
 

@@ -3,13 +3,13 @@ using Anch.Workflow.Domain.Runtime;
 
 namespace Anch.Workflow.Engine;
 
-public class ExecutionContext : IExecutionContext
+public record ExecutionContext : IExecutionContext
 {
-    public StateInstance StateInstance { get; init; } = null!;
+    public required StateInstance StateInstance { get; init; }
 
-    public CancellationToken CancellationToken { get; init; } = CancellationToken.None!;
+    public required CancellationToken CancellationToken { get; init; }
 
-    public WaitEventInfo? CallbackEventInfo { get; init; } = null;
+    public required WaitEventInfo? CallbackEventInfo { get; init; }
 
 
     public object Source => this.WorkflowInstance.Source;

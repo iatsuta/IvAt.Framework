@@ -1,7 +1,6 @@
 ﻿using Anch.Workflow.Domain;
 using Anch.Workflow.Engine;
 using Anch.Workflow.Execution;
-using Anch.Workflow.States._Base;
 
 namespace Anch.Workflow.States;
 
@@ -11,7 +10,7 @@ public class SwitchState<TProperty> : IState
 
     public IReadOnlyDictionary<TProperty, EventHeader> Cases { get; set; } = null!;
 
-    public async Task<IExecutionResult> Run(IExecutionContext executionContext)
+    public async ValueTask<IExecutionResult> Run(IExecutionContext executionContext)
     {
         return new PushEventResult(
             this.Cases.GetValueOrDefault(this.Value, DefaultCaseEvent),

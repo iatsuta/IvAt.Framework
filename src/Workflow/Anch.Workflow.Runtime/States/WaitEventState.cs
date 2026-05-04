@@ -2,7 +2,6 @@
 using Anch.Workflow.Domain.Runtime;
 using Anch.Workflow.Engine;
 using Anch.Workflow.Execution;
-using Anch.Workflow.States._Base;
 
 namespace Anch.Workflow.States;
 
@@ -16,7 +15,7 @@ public class WaitEventState : IState
 
     public object? ReceivedData { get; set; }
 
-    public async Task<IExecutionResult> Run(IExecutionContext executionContext)
+    public async ValueTask<IExecutionResult> Run(IExecutionContext executionContext)
     {
         if (executionContext.IsCallbackEvent)
         {
@@ -37,9 +36,9 @@ public class WaitEventState<TSource, TData> : IState
 
     public WorkflowInstance? SourceWorkflow { get; set; }
 
-    public Func<TSource, TData, CancellationToken, Task>? Callback { get; set; }
+    public Func<TSource, TData, CancellationToken, ValueTask>? Callback { get; set; }
 
-    public async Task<IExecutionResult> Run(IExecutionContext executionContext)
+    public async ValueTask<IExecutionResult> Run(IExecutionContext executionContext)
     {
         if (executionContext.IsCallbackEvent)
         {

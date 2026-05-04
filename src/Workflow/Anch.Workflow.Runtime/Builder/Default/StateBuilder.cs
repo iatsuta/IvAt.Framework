@@ -3,7 +3,7 @@
 using Anch.Core;
 using Anch.Workflow.Builder.Default.DomainDefinition;
 using Anch.Workflow.Domain;
-using Anch.Workflow.States._Base;
+using Anch.Workflow.States;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -33,14 +33,14 @@ public class StateBuilder<TSource, TState> : WorkflowBuilder<TSource>, IStateBui
 
     public IStateBuilder<TSource, TState> Input<TStateProperty, TSourceProperty, TService>(
         Expression<Func<TState, TStateProperty>> getStateProperty,
-        Func<TSource, TService, CancellationToken, Task<TSourceProperty>> getSourceProperty)
+        Func<TSource, TService, CancellationToken, ValueTask<TSourceProperty>> getSourceProperty)
         where TSourceProperty : TStateProperty
         where TService : notnull
 
     {
         var setStatePropertyAction = getStateProperty.GetProperty().GetSetValueAction<TState, TStateProperty>();
 
-        Func<IServiceProvider, TSource, TState, CancellationToken, Task> setAction = async (serviceProvider, source, state, ct) =>
+        Func<IServiceProvider, TSource, TState, CancellationToken, ValueTask> setAction = async (serviceProvider, source, state, ct) =>
 
             setStatePropertyAction(state, await getSourceProperty(source, serviceProvider.GetRequiredService<TService>(), ct));
 
@@ -51,13 +51,13 @@ public class StateBuilder<TSource, TState> : WorkflowBuilder<TSource>, IStateBui
 
     public IStateBuilder<TSource, TState> Output<TSourceProperty, TStateProperty, TService>(
         Expression<Func<TSource, TSourceProperty>> getSourceProperty,
-        Func<TState, TService, CancellationToken, Task<TStateProperty>> getStateProperty)
+        Func<TState, TService, CancellationToken, ValueTask<TStateProperty>> getStateProperty)
         where TStateProperty : TSourceProperty
         where TService : notnull
     {
         var setSourcePropertyAction = getSourceProperty.GetProperty().GetSetValueAction<TSource, TSourceProperty>();
 
-        Func<IServiceProvider, TState, TSource, CancellationToken,  Task> setAction = async (serviceProvider, state, source, ct) =>
+        Func<IServiceProvider, TState, TSource, CancellationToken,  ValueTask> setAction = async (serviceProvider, state, source, ct) =>
 
             setSourcePropertyAction(source, await getStateProperty(state, serviceProvider.GetRequiredService<TService>(), ct));
 

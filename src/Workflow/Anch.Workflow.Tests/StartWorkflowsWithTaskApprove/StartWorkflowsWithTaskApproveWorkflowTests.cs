@@ -9,7 +9,7 @@ public class StartWorkflowsWithTaskApproveWorkflowTests : SingleScopeWorkflowTes
     StartWorkflowsWithTaskApproveWorkflow>
 {
     [AnchFact]
-    public async Task SomeOneRejected_ApprovingItemsTerminated(CancellationToken ct)
+    public async ValueTask SomeOneRejected_ApprovingItemsTerminated(CancellationToken ct)
     {
         // Arrange
         var wfObj = new StartWorkflowsWithTaskApproveWorkflowObject
@@ -65,7 +65,7 @@ public class StartWorkflowsWithTaskApproveWorkflowTests : SingleScopeWorkflowTes
     }
 
     [AnchFact]
-    public async Task AllApproved_RootWfApproved(CancellationToken ct)
+    public async ValueTask AllApproved_RootWfApproved(CancellationToken ct)
     {
         // Arrange
         var wfObj = new StartWorkflowsWithTaskApproveWorkflowObject
@@ -105,7 +105,7 @@ public class StartWorkflowsWithTaskApproveWorkflowTests : SingleScopeWorkflowTes
 
 
     [AnchFact]
-    public async Task TerminateChildren_RootWf_Rejected(CancellationToken ct)
+    public async ValueTask TerminateChildren_RootWf_Rejected(CancellationToken ct)
     {
         // Arrange
         var wfObj = new StartWorkflowsWithTaskApproveWorkflowObject

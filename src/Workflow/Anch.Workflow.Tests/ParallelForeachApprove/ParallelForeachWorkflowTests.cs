@@ -8,7 +8,7 @@ namespace Anch.Workflow.Tests.ParallelForeachApprove;
 public class ParallelForeachApproveWorkflowTests : SingleScopeWorkflowTestBase<ParallelForeachApproveWorkflowObject, ParallelForeachApproveWorkflow>
 {
     [AnchFact]
-    public async Task SomeOneRejected_ApprovingItemsTerminated(CancellationToken ct)
+    public async ValueTask SomeOneRejected_ApprovingItemsTerminated(CancellationToken ct)
     {
         // Arrange
         var wfObj = new ParallelForeachApproveWorkflowObject
@@ -60,7 +60,7 @@ public class ParallelForeachApproveWorkflowTests : SingleScopeWorkflowTestBase<P
     }
 
     [AnchFact]
-    public async Task AllApproved_RootWfApproved(CancellationToken ct)
+    public async ValueTask AllApproved_RootWfApproved(CancellationToken ct)
     {
         // Arrange
         var wfObj = new ParallelForeachApproveWorkflowObject
@@ -98,7 +98,7 @@ public class ParallelForeachApproveWorkflowTests : SingleScopeWorkflowTestBase<P
 
 
     [AnchFact]
-    public async Task TerminateChildren_RootWf_Rejected(CancellationToken ct)
+    public async ValueTask TerminateChildren_RootWf_Rejected(CancellationToken ct)
     {
         // Arrange
         var wfObj = new ParallelForeachApproveWorkflowObject

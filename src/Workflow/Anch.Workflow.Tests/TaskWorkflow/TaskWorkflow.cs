@@ -17,7 +17,7 @@ public class TaskWorkflow : BuildWorkflow<TaskWorkflowObject>
             .Then(wfObj => wfObj.Status = TaskApproveStatus.Approving)
             .WithName("Start")
 
-            .Task(tb => tb
+            .ValueTask(tb => tb
                 .AddCommand(ApproveEventHeader,
                     approveBranch => approveBranch
                         .Then(wfObj => wfObj.Status = TaskApproveStatus.Approved)

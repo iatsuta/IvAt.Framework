@@ -10,7 +10,7 @@ namespace Anch.Workflow.Tests.StartWorkflow;
 public class StartWorkflowWorkflowTests : SingleScopeWorkflowTestBase<WaitWorkflowSource, RootWorkflow>
 {
     [AnchFact]
-    public async Task StartRootWf_SendPushEventToChild_WorkflowFinished(CancellationToken ct)
+    public async ValueTask StartRootWf_SendPushEventToChild_WorkflowFinished(CancellationToken ct)
     {
         // Arrange
 

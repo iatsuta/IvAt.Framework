@@ -21,7 +21,7 @@ public class WriteLineWorkflowTests : SingleScopeWorkflowTestBase<object, WriteL
     }
 
     [AnchFact]
-    public async Task WriteText_TextReceived(CancellationToken ct)
+    public async ValueTask WriteText_TextReceived(CancellationToken ct)
     {
         // Arrange
 

@@ -9,7 +9,7 @@ public class SumWorkflowTests : SingleScopeWorkflowTestBase<SumWorkflowObject, S
     [Theory]
     [AnchInlineData(2, 3, 5)]
     [AnchInlineData(6, 7, 13)]
-    public async Task SumNumbers_ResultEquals(int v1, int v2, int expectedResult, CancellationToken ct)
+    public async ValueTask SumNumbers_ResultEquals(int v1, int v2, int expectedResult, CancellationToken ct)
     {
         // Arrange
         var wfObj = new SumWorkflowObject { Value1 = v1, Value2 = v2 };

@@ -29,20 +29,20 @@
 //        return this.itemsCache[workflowInstance.Definition].GenerateWorkflowInstanceId(workflowInstance);
 //    }
 
-//    public override Task<StateInstance> GetStateInstance(StateInstanceIdentity identity, CancellationToken cancellationToken = default)
+//    public override ValueTask<StateInstance> GetStateInstance(StateInstanceIdentity identity, CancellationToken cancellationToken = default)
 //    {
 
 
 //        return base.GetStateInstance(identity, cancellationToken);
 //    }
 
-//    public override Task<WorkflowInstance> GetWorkflowInstance(WorkflowInstanceIdentity identity, CancellationToken cancellationToken = default)
+//    public override ValueTask<WorkflowInstance> GetWorkflowInstance(WorkflowInstanceIdentity identity, CancellationToken cancellationToken = default)
 //    {
 //        return base.GetWorkflowInstance(identity, cancellationToken);
 //    }
 
 
-//    public async Task FlushChanges(CancellationToken cancellationToken = default)
+//    public async ValueTask FlushChanges(CancellationToken cancellationToken = default)
 //    {
 //        var currentSavedWorkflowInstances = this.WorkflowCache.Clone();
 

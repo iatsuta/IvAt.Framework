@@ -8,7 +8,7 @@ namespace Anch.Workflow.Tests.Wait;
 public class WaitWorkflowTests : SingleScopeWorkflowTestBase<WaitWorkflowSource, WaitWorkflow>
 {
     [AnchFact]
-    public async Task SendWaitedEvent_TestPassed(CancellationToken ct)
+    public async ValueTask SendWaitedEvent_TestPassed(CancellationToken ct)
     {
         // Arrange
 

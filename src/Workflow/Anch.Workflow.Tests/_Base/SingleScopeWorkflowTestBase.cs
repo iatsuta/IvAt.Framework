@@ -27,14 +27,14 @@ public abstract class SingleScopeWorkflowTestBase<TSource, TWorkflow> : MultiSco
 
     protected IServiceProvider ScopeServiceProvider => this.lazyScope.Value.ServiceProvider;
 
-    protected async Task<WorkflowInstance> StartWorkflow(TSource source, CancellationToken cancellationToken)
+    protected async ValueTask<WorkflowInstance> StartWorkflow(TSource source, CancellationToken cancellationToken)
     {
         var wfStartResult = await this.StartWorkflowNative(source, cancellationToken);
 
         return wfStartResult.Modified.First();
     }
 
-    protected async Task<WorkflowProcessResult> StartWorkflowNative(TSource source, CancellationToken cancellationToken)
+    protected async ValueTask<WorkflowProcessResult> StartWorkflowNative(TSource source, CancellationToken cancellationToken)
     {
         return await this.Host.CreateExecutor(WorkflowExecutionPolicy.TillTheEnd).Start<TSource, TWorkflow>(source, cancellationToken);
     }

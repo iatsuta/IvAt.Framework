@@ -1,4 +1,4 @@
-﻿using Anch.Workflow.States._Base;
+﻿using Anch.Workflow.States;
 
 namespace Anch.Workflow.StateFactory;
 
@@ -6,7 +6,7 @@ public interface IStateFactory
 {
     IState CreateState(IServiceProvider serviceProvider, object source);
 
-    Task BindInput(IState state, IServiceProvider serviceProvider, object source, CancellationToken ct);
+    ValueTask BindInput(IState state, IServiceProvider serviceProvider, object source, CancellationToken ct);
 
-    Task BindOutput(IState state, IServiceProvider serviceProvider, object source, CancellationToken ct);
+    ValueTask BindOutput(IState state, IServiceProvider serviceProvider, object source, CancellationToken ct);
 }

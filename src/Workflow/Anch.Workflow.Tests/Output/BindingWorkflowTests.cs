@@ -9,7 +9,7 @@ public class BindingWorkflowTests : SingleScopeWorkflowTestBase<BindingWorkflowO
     [Theory]
     [AnchInlineData(2, 3, 5)]
     [AnchInlineData(6, 7, 13)]
-    public async Task BindingInputAndOutputPropsByState_ResultEquals(int v1, int v2, int expectedResult, CancellationToken ct)
+    public async ValueTask BindingInputAndOutputPropsByState_ResultEquals(int v1, int v2, int expectedResult, CancellationToken ct)
     {
         // Arrange
         var wfObj = new BindingWorkflowObject { Value1 = v1, Value2 = v2 };

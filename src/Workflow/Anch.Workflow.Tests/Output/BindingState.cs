@@ -1,6 +1,6 @@
 using Anch.Workflow.Engine;
 using Anch.Workflow.Execution;
-using Anch.Workflow.States._Base;
+using Anch.Workflow.States;
 
 namespace Anch.Workflow.Tests.Output;
 
@@ -13,7 +13,7 @@ public class BindingState : IState
     public int Result { get; set; }
 
 
-    public async Task<IExecutionResult> Run(IExecutionContext executionContext)
+    public async ValueTask<IExecutionResult> Run(IExecutionContext executionContext)
     {
         this.Result = this.Value1 + this.Value2;
 

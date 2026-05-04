@@ -7,7 +7,7 @@ namespace Anch.Workflow.Tests.TaskWorkflow;
 public class TaskWorkflowTests : SingleScopeWorkflowTestBase<TaskWorkflowObject, TaskWorkflow>
 {
     [AnchFact]
-    public async Task Task_SendApproveCommand_WorkflowApproved(CancellationToken ct)
+    public async ValueTask Task_SendApproveCommand_WorkflowApproved(CancellationToken ct)
     {
         // Arrange
         var wfObj = new TaskWorkflowObject();

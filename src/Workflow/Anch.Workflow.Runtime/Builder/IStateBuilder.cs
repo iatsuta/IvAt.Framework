@@ -1,7 +1,7 @@
 ﻿using System.Linq.Expressions;
 
 using Anch.Workflow.Builder.Default.DomainDefinition;
-using Anch.Workflow.States._Base;
+using Anch.Workflow.States;
 
 namespace Anch.Workflow.Builder;
 
@@ -28,7 +28,7 @@ public interface IStateBuilder<TSource, TState> : IWorkflowBuilder<TSource>, ISt
 
     IStateBuilder<TSource, TState> Input<TStateProperty, TSourceProperty, TService>(
         Expression<Func<TState, TStateProperty>> getStateProperty,
-        Func<TSource, TService, CancellationToken, Task<TSourceProperty>> getSourceProperty)
+        Func<TSource, TService, CancellationToken, ValueTask<TSourceProperty>> getSourceProperty)
         where TSourceProperty : TStateProperty
         where TService : notnull;
 
@@ -46,7 +46,7 @@ public interface IStateBuilder<TSource, TState> : IWorkflowBuilder<TSource>, ISt
 
     IStateBuilder<TSource, TState> Output<TSourceProperty, TStateProperty, TService>(
         Expression<Func<TSource, TSourceProperty>> propertyValueSelector,
-        Func<TState, TService, CancellationToken, Task<TStateProperty>> getStateProperty)
+        Func<TState, TService, CancellationToken, ValueTask<TStateProperty>> getStateProperty)
         where TStateProperty : TSourceProperty
         where TService : notnull;
 

@@ -18,7 +18,7 @@ public class InlineSpecificWorkflowExternalStorage<TSource>(
 
     public IWorkflowDefinition WorkflowDefinition { get; } = workflowDefinition;
 
-    public async Task SaveWorkflowInstance(WorkflowInstance workflowInstance, CancellationToken cancellationToken = default)
+    public async ValueTask SaveWorkflowInstance(WorkflowInstance workflowInstance, CancellationToken cancellationToken = default)
     {
         if (workflowInstance.Definition != this.WorkflowDefinition)
         {
@@ -42,20 +42,20 @@ public class InlineSpecificWorkflowExternalStorage<TSource>(
         await persistSource.Save((TSource)workflowInstance.Source, cancellationToken);
     }
 
-    public async Task<List<WaitEventInfo>> GetWaitEvents(CancellationToken cancellationToken = default)
+    public async ValueTask<List<WaitEventInfo>> GetWaitEvents(CancellationToken cancellationToken = default)
     {
         return [];
 
         //throw new NotImplementedException();
     }
 
-    public async Task<List<WaitEventInfo>> GetWaitEvents(PushEventInfo pushEventInfo, CancellationToken cancellationToken = default)
+    public async ValueTask<List<WaitEventInfo>> GetWaitEvents(PushEventInfo pushEventInfo, CancellationToken cancellationToken = default)
     {
         return [];
         //throw new NotImplementedException();
     }
 
-    public async Task<WorkflowInstance> GetWorkflowInstance(WorkflowInstanceIdentity identity, CancellationToken cancellationToken = default)
+    public async ValueTask<WorkflowInstance> GetWorkflowInstance(WorkflowInstanceIdentity identity, CancellationToken cancellationToken = default)
     {
         var queryable = persistSource.GetQueryable(cancellationToken);
 
@@ -73,7 +73,7 @@ public class InlineSpecificWorkflowExternalStorage<TSource>(
         return wi;
     }
 
-    public async Task<StateInstance> GetStateInstance(StateInstanceIdentity identity, CancellationToken cancellationToken = default)
+    public async ValueTask<StateInstance> GetStateInstance(StateInstanceIdentity identity, CancellationToken cancellationToken = default)
     {
         var queryable = persistSource.GetQueryable(cancellationToken);
 
@@ -91,7 +91,7 @@ public class InlineSpecificWorkflowExternalStorage<TSource>(
         return wi.CurrentState;
     }
 
-    public async Task<List<WorkflowInstance>> GetWorkflowInstances(CancellationToken cancellationToken = default)
+    public async ValueTask<List<WorkflowInstance>> GetWorkflowInstances(CancellationToken cancellationToken = default)
     {
         var queryable = persistSource.GetQueryable(cancellationToken);
 
@@ -101,7 +101,7 @@ public class InlineSpecificWorkflowExternalStorage<TSource>(
             .ToList();
     }
 
-    public async Task FlushChanges(CancellationToken cancellationToken = default)
+    public async ValueTask FlushChanges(CancellationToken cancellationToken = default)
     {
         await persistSource.FlushChanges(cancellationToken);
     }

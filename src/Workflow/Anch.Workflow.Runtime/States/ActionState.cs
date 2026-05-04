@@ -1,15 +1,14 @@
 ﻿using Anch.Workflow.Engine;
 using Anch.Workflow.Execution;
-using Anch.Workflow.States._Base;
 
 namespace Anch.Workflow.States;
 
 public class ActionState<TSource, TService>(TService service) : IState
     where TService : notnull
 {
-    public Func<TSource, TService, CancellationToken, Task> Action { get; set; } = null!;
+    public Func<TSource, TService, CancellationToken, ValueTask> Action { get; set; } = null!;
 
-    public async Task<IExecutionResult> Run(IExecutionContext executionContext)
+    public async ValueTask<IExecutionResult> Run(IExecutionContext executionContext)
     {
         await this.Action((TSource)executionContext.Source, service, executionContext.CancellationToken);
 

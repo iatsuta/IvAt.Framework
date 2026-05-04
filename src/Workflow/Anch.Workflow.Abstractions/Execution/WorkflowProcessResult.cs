@@ -6,21 +6,45 @@ namespace Anch.Workflow.Execution;
 
 public record WorkflowProcessResult(
     ImmutableList<WorkflowInstance> Modified,
-    ImmutableList<UnprocessedStateResult> Unprocessed)
+    ImmutableStack<UnprocessedStateResult> Unprocessed)
 {
+    public WorkflowProcessResult PopUnprocessed(out UnprocessedStateResult current)
+    {
+        var tail = Unprocessed.Pop(out current);
+
+        return this with { Unprocessed = tail };
+    }
+
     public static WorkflowProcessResult operator +(WorkflowProcessResult result1, WorkflowProcessResult result2)
     {
-        if (result1 == Empty)
+        if (ReferenceEquals(result1, Empty))
         {
             return result2;
         }
-        else if (result2 == Empty)
+        else if (ReferenceEquals(result2, Empty))
         {
             return result1;
         }
         else
         {
-            return new[] { result1, result2 }.Aggregate();
+            var newModified = result1.Modified;
+
+            foreach (var otherModified in result2.Modified)
+            {
+                if (!newModified.Contains(otherModified))
+                {
+                    newModified = newModified.Add(otherModified);
+                }
+            }
+
+            var newUnprocessed = result2.Unprocessed;
+
+            foreach (var item in result1.Unprocessed)
+            {
+                newUnprocessed = newUnprocessed.Push(item);
+            }
+
+            return new WorkflowProcessResult(newModified, newUnprocessed);
         }
     }
 

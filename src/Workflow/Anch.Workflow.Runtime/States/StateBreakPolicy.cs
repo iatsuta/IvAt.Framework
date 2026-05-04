@@ -3,9 +3,9 @@ using Anch.Workflow.Engine;
 
 namespace Anch.Workflow.States;
 
-public class StateBreakPolicy(Func<IExecutionContext, Task<bool>> func)
+public class StateBreakPolicy(Func<IExecutionContext, ValueTask<bool>> func)
 {
-    public async Task<bool> CanBreak(IExecutionContext executionContext)
+    public async ValueTask<bool> CanBreak(IExecutionContext executionContext)
     {
         return await func(executionContext);
     }

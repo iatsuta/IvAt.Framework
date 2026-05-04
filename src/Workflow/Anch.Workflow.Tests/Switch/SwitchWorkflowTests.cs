@@ -12,7 +12,7 @@ public class SwitchWorkflowTests : SingleScopeWorkflowTestBase<SwitchWorkflowObj
     [AnchInlineData(2, "2 Case 2")]
     [AnchInlineData(3, "3 Case 3")]
     [AnchInlineData(4, "4 DefaultCase")]
-    public async Task UseIf_CodeSwitched_Cases(int value, string expectedResult, CancellationToken ct)
+    public async ValueTask UseIf_CodeSwitched_Cases(int value, string expectedResult, CancellationToken ct)
     {
         // Arrange
         var wfObj = new SwitchWorkflowObject { Value = value };

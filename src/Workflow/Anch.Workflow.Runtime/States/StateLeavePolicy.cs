@@ -6,9 +6,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Anch.Workflow.States;
 
-public class StateLeavePolicy(Func<IServiceProvider, IExecutionContext, Task<WorkflowProcessResult>> action)
+public class StateLeavePolicy(Func<IServiceProvider, IExecutionContext, ValueTask<WorkflowProcessResult>> action)
 {
-    public async Task<WorkflowProcessResult> Leave(IServiceProvider serviceProvider, IExecutionContext executionContext)
+    public async ValueTask<WorkflowProcessResult> Leave(IServiceProvider serviceProvider, IExecutionContext executionContext)
     {
         return await action(serviceProvider, executionContext);
     }
