@@ -21,9 +21,9 @@ public class ParallelForeachApproveWorkflowTests : SingleScopeWorkflowTestBase<P
 
         var startStatus = wfObj.Status;
 
-        var waitApproveEvents = (await this.RootRepository.GetWaitEvents().ToListAsync(ct)).Where(ei => ei.Header == ParallelForeachApproveItemWorkflow.ApproveWaitEvent).ToList();
+        var waitApproveEvents = await this.RootRepository.GetWaitEvents().Where(ei => ei.Header == ParallelForeachApproveItemWorkflow.ApproveWaitEvent).ToListAsync(ct);
 
-        var waitRejectEvents = (await this.RootRepository.GetWaitEvents().ToListAsync(ct)).Where(ei => ei.Header == ParallelForeachApproveItemWorkflow.RejectWaitEvent).ToList();
+        var waitRejectEvents = await this.RootRepository.GetWaitEvents().Where(ei => ei.Header == ParallelForeachApproveItemWorkflow.RejectWaitEvent).ToListAsync(ct);
 
         var approvingInstances = waitApproveEvents.Select(e => e.TargetState.Workflow.Owner!.Workflow).ToArray();
 
@@ -73,7 +73,7 @@ public class ParallelForeachApproveWorkflowTests : SingleScopeWorkflowTestBase<P
 
         var startStatus = wfObj.Status;
 
-        var waitApproveEvents = (await this.RootRepository.GetWaitEvents().ToListAsync(ct)).Where(ei => ei.Header == ParallelForeachApproveItemWorkflow.ApproveWaitEvent).ToList();
+        var waitApproveEvents = await this.RootRepository.GetWaitEvents().Where(ei => ei.Header == ParallelForeachApproveItemWorkflow.ApproveWaitEvent).ToListAsync(ct);
 
         var approvingInstances = waitApproveEvents.Select(e => e.TargetState.Workflow.Owner!.Workflow).ToArray();
 
@@ -111,7 +111,7 @@ public class ParallelForeachApproveWorkflowTests : SingleScopeWorkflowTestBase<P
 
         var startStatus = wfObj.Status;
 
-        var waitApproveEvents = (await this.RootRepository.GetWaitEvents().ToListAsync(ct)).Where(ei => ei.Header == ParallelForeachApproveItemWorkflow.ApproveWaitEvent).ToList();
+        var waitApproveEvents = await this.RootRepository.GetWaitEvents().Where(ei => ei.Header == ParallelForeachApproveItemWorkflow.ApproveWaitEvent).ToListAsync(ct);
         var approvingInstances = waitApproveEvents.Select(e => e.TargetState.Workflow.Owner!.Workflow).ToArray();
 
         await this.WorkflowMachineFactory.Create(approvingInstances[0]).Terminate(ct);

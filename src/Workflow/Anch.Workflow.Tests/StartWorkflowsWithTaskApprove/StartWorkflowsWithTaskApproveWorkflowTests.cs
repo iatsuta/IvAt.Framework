@@ -22,11 +22,9 @@ public class StartWorkflowsWithTaskApproveWorkflowTests : SingleScopeWorkflowTes
 
         var startStatus = wfObj.Status;
 
-        var waitApproveEvents = (await this.RootRepository.GetWaitEvents().ToListAsync(ct)).Where(ei => ei.Header == StartWorkflowsWithTaskApproveItemWorkflow.ApproveWaitEvent)
-            .ToList();
+        var waitApproveEvents = await this.RootRepository.GetWaitEvents().Where(ei => ei.Header == StartWorkflowsWithTaskApproveItemWorkflow.ApproveWaitEvent).ToListAsync(ct);
 
-        var waitRejectEvents = (await this.RootRepository.GetWaitEvents().ToListAsync(ct)).Where(ei => ei.Header == StartWorkflowsWithTaskApproveItemWorkflow.RejectWaitEvent)
-            .ToList();
+        var waitRejectEvents = await this.RootRepository.GetWaitEvents().Where(ei => ei.Header == StartWorkflowsWithTaskApproveItemWorkflow.RejectWaitEvent).ToListAsync(ct);
 
         var approvingInstances = waitApproveEvents.Select(e => e.TargetState.Workflow).ToArray();
 
@@ -80,8 +78,7 @@ public class StartWorkflowsWithTaskApproveWorkflowTests : SingleScopeWorkflowTes
 
         var startStatus = wfObj.Status;
 
-        var waitApproveEvents = (await this.RootRepository.GetWaitEvents().ToListAsync(ct)).Where(ei => ei.Header == StartWorkflowsWithTaskApproveItemWorkflow.ApproveWaitEvent)
-            .ToList();
+        var waitApproveEvents = await this.RootRepository.GetWaitEvents().Where(ei => ei.Header == StartWorkflowsWithTaskApproveItemWorkflow.ApproveWaitEvent).ToListAsync(ct);
 
         var approvingInstances = waitApproveEvents.Select(e => e.TargetState.Workflow).ToArray();
 
@@ -120,8 +117,7 @@ public class StartWorkflowsWithTaskApproveWorkflowTests : SingleScopeWorkflowTes
 
         var startStatus = wfObj.Status;
 
-        var waitApproveEvents = (await this.RootRepository.GetWaitEvents().ToListAsync(ct)).Where(ei => ei.Header == StartWorkflowsWithTaskApproveItemWorkflow.ApproveWaitEvent)
-            .ToList();
+        var waitApproveEvents = await this.RootRepository.GetWaitEvents().Where(ei => ei.Header == StartWorkflowsWithTaskApproveItemWorkflow.ApproveWaitEvent).ToListAsync(ct);
 
         var approvingInstances = waitApproveEvents.Select(e => e.TargetState.Workflow).ToArray();
 

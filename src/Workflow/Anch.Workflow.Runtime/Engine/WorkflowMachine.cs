@@ -60,6 +60,8 @@ public class WorkflowMachine<TSource>(
 
                 var leaveResult = await codeState.LeavePolicy.Leave(serviceProvider, executionContext);
 
+                prevState.ReleaseWaitEvents();
+
                 return leaveResult + switchResult;
             }
         }

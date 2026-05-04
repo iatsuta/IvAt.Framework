@@ -8,8 +8,5 @@ public record WaitEventInfo(
     StateInstance TargetState,
     object? Data = null)
 {
-    public bool Release()
-    {
-        return this.TargetState.WaitEvents.Remove(this);
-    }
+    public bool Release() => this.TargetState.WaitEvents.Remove(this);
 }
