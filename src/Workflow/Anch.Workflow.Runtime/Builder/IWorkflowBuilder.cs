@@ -70,6 +70,7 @@ public interface IWorkflowBuilder<TSource>
     IStateBuilder<TSource, SwitchState<TProperty>> Switch<TProperty>(Func<TSource, TProperty> selector,
 
         params (TProperty CaseValue, Action<IWorkflowBuilder<TSource>> CaseSetupWorkflowBuilder)[] cases)
+        where TProperty : notnull
     {
         return this.Switch(selector, _ => {}, cases);
     }
@@ -80,6 +81,7 @@ public interface IWorkflowBuilder<TSource>
         Action<IWorkflowBuilder<TSource>> defaultCaseSetupWorkflowBuilder,
 
         params (TProperty CaseValue, Action<IWorkflowBuilder<TSource>> CaseSetupWorkflowBuilder)[] cases)
+        where TProperty : notnull
     {
         return this.Switch<TProperty, IServiceProvider>(async (source, _, _) => selector(source), defaultCaseSetupWorkflowBuilder, cases);
     }
@@ -88,6 +90,7 @@ public interface IWorkflowBuilder<TSource>
         Func<TSource, TService, CancellationToken, ValueTask<TProperty>> selector,
         params (TProperty CaseValue, Action<IWorkflowBuilder<TSource>> CaseSetupWorkflowBuilder)[] cases)
         where TService : notnull
+        where TProperty : notnull
     {
         return this.Switch(selector, _ => { }, cases);
     }
@@ -96,7 +99,8 @@ public interface IWorkflowBuilder<TSource>
         Func<TSource, TService, CancellationToken, ValueTask<TProperty>> selector,
         Action<IWorkflowBuilder<TSource>> defaultCaseSetupWorkflowBuilder,
         params (TProperty CaseValue, Action<IWorkflowBuilder<TSource>> CaseSetupWorkflowBuilder)[] cases)
-        where TService : notnull;
+        where TService : notnull
+        where TProperty : notnull;
 
 
     IStateBuilder<TSource, ParallelForeachState<TSource, TElement>> ParallelForeach<TElement>(

@@ -72,6 +72,7 @@ public class WorkflowBuilder<TSource>(WorkflowDefinition workflow) : IWorkflowBu
     public IStateBuilder<TSource, StartWorkflowsState<TSource, TInnerSource>> StartWorkflows<TInnerSource, TWorkflow>(
         Func<TSource, IEnumerable<TInnerSource>> getElements)
         where TWorkflow : IWorkflow<TInnerSource>
+        where TInnerSource : notnull
     {
         return this.Then<StartWorkflowsState<TSource, TInnerSource>>()
             .Input(s => s.ElementWorkflow, async (TSource _, TWorkflow workflow, CancellationToken _) => workflow)
@@ -110,6 +111,7 @@ public class WorkflowBuilder<TSource>(WorkflowDefinition workflow) : IWorkflowBu
         params (TProperty CaseValue, Action<IWorkflowBuilder<TSource>> CaseSetupWorkflowBuilder)[] cases)
 
         where TService : notnull
+        where TProperty : notnull
     {
         var baseCasesList = cases
             .Select((pair, i) => new

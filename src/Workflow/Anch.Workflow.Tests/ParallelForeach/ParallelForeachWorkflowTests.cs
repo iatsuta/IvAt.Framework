@@ -38,7 +38,9 @@ public class ParallelForeachWorkflowTests : SingleScopeWorkflowTestBase<Parallel
         Assert.Equal(WorkflowStatus.Finished, wi.Status);
         Assert.Equal(expectedResult, wfObj.Result);
 
-        Assert.Empty(await this.RootRepository.GetWaitEvents().ToListAsync(ct));
+        var finalEvents = await this.RootRepository.GetWaitEvents().ToListAsync(ct);
+
+        Assert.Empty(finalEvents);
     }
 
     protected override void SetupWorkflow(IWorkflowSetup workflowSetup)
