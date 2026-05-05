@@ -23,9 +23,16 @@ public abstract class ParallelStateBase<TSource> : IState
         {
             var startExecutionResult = new WorkflowProcessExecutionResult(startSteps, false);
 
-            return executionContext.CallbackEventInfo != null
-                ? new MultiExecutionResult([new Wait(), startExecutionResult])
-                : new MultiExecutionResult([startExecutionResult, .. notProcessedWorkflow.Select(subWf => new WaitEventResult(EventHeader.WorkflowFinished, subWf))]);
+            if (executionContext.CallbackEventInfo == null)
+            {
+                return new MultiExecutionResult([
+                    startExecutionResult, .. notProcessedWorkflow.Select(subWf => new WaitEventResult(EventHeader.WorkflowFinished, subWf))
+                ]);
+            }
+            else
+            {
+                return new MultiExecutionResult([new Wait(), startExecutionResult]);
+            }
         }
         else
         {

@@ -139,6 +139,8 @@ public class WorkflowMachine(
 
             var leaveResult = await codeStateProcessor.CodeState.LeavePolicy.Leave(serviceProvider, executionContext);
 
+            currentState.ReleaseWaitEvents();
+
             return modifyResult + leaveResult + runResult;
         }
         else
