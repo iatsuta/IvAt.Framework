@@ -1,4 +1,5 @@
-﻿using Anch.Workflow.Domain.Definition;
+﻿using Anch.Core;
+using Anch.Workflow.Domain.Definition;
 using Anch.Workflow.States;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -14,10 +15,8 @@ public class StateFactory<TState, TSource>(IStateDefinition stateDefinition) : I
     private readonly List<Func<IServiceProvider, TState, TSource, CancellationToken, ValueTask>> outputActions =
         stateDefinition.OutputActions.Cast<Func<IServiceProvider, TState, TSource, CancellationToken, ValueTask>>().ToList();
 
-    public IState CreateState(IServiceProvider serviceProvider, object source)
-    {
-        return ActivatorUtilities.CreateInstance<TState>(serviceProvider);
-    }
+    public IState CreateState(IServiceProvider serviceProvider, object source) =>
+        serviceProvider.GetRequiredService<IServiceProxyFactory>().Create<TState>();
 
     public async ValueTask BindInput(IState state, IServiceProvider serviceProvider, object source, CancellationToken ct)
     {

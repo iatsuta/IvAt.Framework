@@ -83,7 +83,6 @@ public class ParallelForeachApproveWorkflowTests : SingleScopeWorkflowTestBase<P
         }
 
         // Assert
-
         Assert.Equal(ParallelForeachApproveStatus.Approving, startStatus);
 
         foreach (var approvingInstance in approvingInstances)

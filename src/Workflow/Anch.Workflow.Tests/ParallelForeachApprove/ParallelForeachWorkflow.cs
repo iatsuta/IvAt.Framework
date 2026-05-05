@@ -15,7 +15,7 @@ public class ParallelForeachApproveWorkflow : BuildWorkflow<ParallelForeachAppro
                         .StartWorkflow<ParallelForeachApproveItemWorkflowObject, ParallelForeachApproveItemWorkflow>(pair => pair.Element))
             .SetFinishedBreak(item => item.Status != ParallelForeachApproveStatus.Approved)
             .WithStatus(ParallelForeachApproveStatus.Approving)
-            
+
             .If(wfObj => wfObj.Items.All(subWf => subWf.Status == ParallelForeachApproveStatus.Approved),
                 trueBranch => trueBranch.Finish().WithStatus(ParallelForeachApproveStatus.Approved),
                 falseBranch => falseBranch.Finish().WithStatus(ParallelForeachApproveStatus.Rejected));
