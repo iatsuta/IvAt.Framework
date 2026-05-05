@@ -14,6 +14,7 @@ public class WaitWorkflow : BuildWorkflow<WaitWorkflowSource, WaitWorkflowStatus
     protected override void Build(IWorkflowBuilder<WaitWorkflowSource, WaitWorkflowStatus> builder) =>
 
         builder
+            .WithStatusProperty(wfObj => wfObj.Status)
             .Then<WaitEventState>()
             .WithStatus(WaitWorkflowStatus.ExampleWaitEvent)
             .Input(s => s.Event, new EventHeader(WaitEventName))

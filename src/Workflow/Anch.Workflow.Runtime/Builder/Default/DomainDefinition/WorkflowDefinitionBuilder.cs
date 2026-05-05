@@ -220,6 +220,11 @@ public class WorkflowDefinitionBuilder<TSource, TStatus> : IWorkflowDefinition<T
         {
             throw new InvalidOperationException("Invalid events");
         }
+
+        if (typeof(TStatus) != typeof(Ignore) && this.StatusAccessors == null)
+        {
+            throw new InvalidOperationException($"{nameof(this.StatusAccessors)} must be initialized");
+        }
     }
 
     public void ReplaceAutoNames((IStateDefinitionBuilder State, int? Index)? ownerInfo = null)

@@ -8,6 +8,7 @@ public class ParallelForeachApproveWorkflow : BuildWorkflow<ParallelForeachAppro
     protected override void Build(IWorkflowBuilder<ParallelForeachApproveWorkflowObject, ParallelForeachApproveStatus> builder) =>
 
         builder
+            .WithStatusProperty(wfObj => wfObj.Status)
             .ParallelForeach(
                 wfObj => wfObj.Items,
                 iteratorBuilder =>

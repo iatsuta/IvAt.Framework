@@ -14,6 +14,7 @@ public class TaskWorkflow : BuildWorkflow<TaskWorkflowObject, TaskApproveStatus>
     protected override void Build(IWorkflowBuilder<TaskWorkflowObject, TaskApproveStatus> builder) =>
 
         builder
+            .WithStatusProperty(wfObj => wfObj.Status)
             .Then(wfObj => wfObj.Status = TaskApproveStatus.Approving)
             .WithName("Start")
 
