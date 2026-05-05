@@ -12,8 +12,8 @@ public class ParallelWorkflow : BuildWorkflow<ParallelWorkflowObject>
 
     public static readonly EventHeader RejectWaitEvent = new(nameof(RejectWaitEvent));
 
-    protected override void Build(IWorkflowBuilder<ParallelWorkflowObject, Ignore> builder)
-    {
+    protected override void Build(IWorkflowBuilder<ParallelWorkflowObject, Ignore> builder) =>
+
         builder
             .Then(wfObj => wfObj.Status = ParallelApproveStatus.Approving)
             .WithName("ApprovingState")
@@ -32,5 +32,4 @@ public class ParallelWorkflow : BuildWorkflow<ParallelWorkflowObject>
                     .Output(wfObj => wfObj.Status, ParallelApproveStatus.Rejected))
 
             .SetBreak(StateBreakPolicy.WaitAny);
-    }
 }

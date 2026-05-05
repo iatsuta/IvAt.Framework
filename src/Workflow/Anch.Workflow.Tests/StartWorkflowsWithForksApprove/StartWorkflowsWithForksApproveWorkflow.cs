@@ -6,8 +6,8 @@ namespace Anch.Workflow.Tests.StartWorkflowsWithForksApprove;
 
 public class StartWorkflowsWithForksApproveWorkflow : BuildWorkflow<StartWorkflowsWithForksApproveWorkflowObject>
 {
-    protected override void Build(IWorkflowBuilder<StartWorkflowsWithForksApproveWorkflowObject, Ignore> builder)
-    {
+    protected override void Build(IWorkflowBuilder<StartWorkflowsWithForksApproveWorkflowObject, Ignore> builder) =>
+
         builder
             .Then(wfObj => wfObj.Status = StartWorkflowsWithForksApproveStatus.Approving)
 
@@ -16,7 +16,6 @@ public class StartWorkflowsWithForksApproveWorkflow : BuildWorkflow<StartWorkflo
             .SetFinishedBreak(item => item.Status != StartWorkflowsWithForksApproveStatus.Approved)
 
             .Then(wfObj => wfObj.Status = wfObj.Items.All(subWf => subWf.Status == StartWorkflowsWithForksApproveStatus.Approved)
-                                         ? StartWorkflowsWithForksApproveStatus.Approved
-                                         : StartWorkflowsWithForksApproveStatus.Rejected);
-    }
+                ? StartWorkflowsWithForksApproveStatus.Approved
+                : StartWorkflowsWithForksApproveStatus.Rejected);
 }

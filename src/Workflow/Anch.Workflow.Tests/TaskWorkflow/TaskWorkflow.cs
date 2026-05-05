@@ -11,8 +11,8 @@ public class TaskWorkflow : BuildWorkflow<TaskWorkflowObject, TaskApproveStatus>
     public static readonly EventHeader RejectEventHeader = new("Reject");
 
 
-    protected override void Build(IWorkflowBuilder<TaskWorkflowObject, TaskApproveStatus> builder)
-    {
+    protected override void Build(IWorkflowBuilder<TaskWorkflowObject, TaskApproveStatus> builder) =>
+
         builder
             .Then(wfObj => wfObj.Status = TaskApproveStatus.Approving)
             .WithName("Start")
@@ -32,5 +32,4 @@ public class TaskWorkflow : BuildWorkflow<TaskWorkflowObject, TaskApproveStatus>
 
             .Then(wfObj => wfObj.PostProcessWork = true)
             .WithName("PostProcessWorkState");
-    }
 }

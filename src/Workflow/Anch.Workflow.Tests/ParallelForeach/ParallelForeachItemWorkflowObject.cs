@@ -8,8 +8,5 @@ public class ParallelForeachItemWorkflowObject
 
     public string Name { get; set; } = null!;
 
-    public override string ToString()
-    {
-        return this.Name;
-    }
+    public override string ToString() => this.Name;
 }

@@ -11,12 +11,11 @@ public class WaitWorkflow : BuildWorkflow<WaitWorkflowSource, WaitWorkflowStatus
 
     public const int WaitEventData = 123;
 
-    protected override void Build(IWorkflowBuilder<WaitWorkflowSource, WaitWorkflowStatus> builder)
-    {
+    protected override void Build(IWorkflowBuilder<WaitWorkflowSource, WaitWorkflowStatus> builder) =>
+
         builder
             .Then<WaitEventState>()
             .WithStatus(WaitWorkflowStatus.ExampleWaitEvent)
             .Input(s => s.Event, new EventHeader(WaitEventName))
             .Input(s => s.ExpectedData, WaitEventData);
-    }
 }

@@ -8,8 +8,5 @@ public class WriteLineWorkflow : BuildWorkflow<object>
 {
     public const string Message = "Hello world!";
 
-    protected override void Build(IWorkflowBuilder<object, Ignore> builder)
-    {
-        builder.WriteLine(Message);
-    }
+    protected override void Build(IWorkflowBuilder<object, Ignore> builder) => builder.WriteLine(Message);
 }

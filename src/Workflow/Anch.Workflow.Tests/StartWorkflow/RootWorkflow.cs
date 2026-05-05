@@ -7,8 +7,7 @@ namespace Anch.Workflow.Tests.StartWorkflow;
 
 public class RootWorkflow : BuildWorkflow<WaitWorkflowSource>
 {
-    protected override void Build(IWorkflowBuilder<WaitWorkflowSource, Ignore> builder)
-    {
+    protected override void Build(IWorkflowBuilder<WaitWorkflowSource, Ignore> builder) =>
+
         builder.StartWorkflow<WaitWorkflowSource, WaitWorkflow>(v => v);
-    }
 }

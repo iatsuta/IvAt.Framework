@@ -8,21 +8,16 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Anch.Workflow.Engine;
 
-public class WorkflowMachineFactory : IWorkflowMachineFactory
+public class WorkflowMachineFactory(
+    IServiceProxyFactory serviceProxyFactory,
+    [FromKeyedServices(IWorkflowRepositoryFactory.CacheKey)]
+    IWorkflowRepositoryFactory workflowRepositoryFactory) : IWorkflowMachineFactory
 {
-    private readonly IDictionaryCache<WorkflowInstance, IWorkflowMachine> cache;
+    private readonly IDictionaryCache<WorkflowInstance, IWorkflowMachine> cache =
 
-    public WorkflowMachineFactory(
-        IServiceProxyFactory serviceProxyFactory,
-        [FromKeyedServices(IWorkflowRepositoryFactory.CacheKey)]
-        IWorkflowRepositoryFactory workflowRepositoryFactory) =>
+        new DictionaryCache<WorkflowInstance, IWorkflowMachine>(wi =>
 
-        this.cache = new DictionaryCache<WorkflowInstance, IWorkflowMachine>(wi =>
-
-            serviceProxyFactory.Create<IWorkflowMachine>(
-                typeof(WorkflowMachine<>).MakeGenericType(wi.Definition.SourceType),
-                workflowRepositoryFactory.Create(wi.Definition.Identity),
-                wi));
+            serviceProxyFactory.Create<WorkflowMachine>(workflowRepositoryFactory.Create(wi.Definition.Identity), wi));
 
     public IWorkflowMachine Create(WorkflowInstance workflowInstance) => this.cache[workflowInstance];
 

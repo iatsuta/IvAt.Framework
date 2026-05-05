@@ -8,18 +8,15 @@ using Anch.Workflow.StateFactory;
 
 namespace Anch.Workflow.Engine;
 
-public class WorkflowMachine<TSource>(
+public class WorkflowMachine(
     IServiceProvider serviceProvider,
     IWorkflowHost host,
-    IStateFactoryCache stateFactoryCache,
+    ICodeStateProcessorFactory codeStateProcessorFactory,
     IWorkflowRepository storage,
     WorkflowInstance workflowInstance,
-    ICodeStateResolver codeStateResolver,
     IWorkflowEventListener? eventListener = null)
     : IWorkflowMachine
 {
-    private TSource Source => (TSource)this.WorkflowInstance.Source;
-
     public WorkflowInstance WorkflowInstance { get; } = workflowInstance;
 
     public void SetStartState()
@@ -54,11 +51,11 @@ public class WorkflowMachine<TSource>(
             }
             else
             {
-                var codeState = codeStateResolver.Resolve(prevState);
+                var codeStateProcessor = codeStateProcessorFactory.Create(prevState);
 
                 var executionContext = this.CreateExecutionContext(cancellationToken);
 
-                var leaveResult = await codeState.LeavePolicy.Leave(serviceProvider, executionContext);
+                var leaveResult = await codeStateProcessor.CodeState.LeavePolicy.Leave(serviceProvider, executionContext);
 
                 prevState.ReleaseWaitEvents();
 
@@ -117,17 +114,18 @@ public class WorkflowMachine<TSource>(
         await this.Save(executionContext.CancellationToken);
 
         var currentState = executionContext.StateInstance;
-        var codeState = codeStateResolver.Resolve(currentState);
+        var codeStateProcessor = codeStateProcessorFactory.Create(currentState);
 
         if (!currentState.InputProcessed)
         {
             currentState.InputProcessed = true;
 
-            await stateFactoryCache.GetStateFactory(currentState.Definition)
-                .BindInput(codeState, serviceProvider, executionContext.Source, executionContext.CancellationToken);
+            await codeStateProcessor.BindInput(executionContext.CancellationToken);
+
+            codeStateProcessor.SetStatus();
         }
 
-        var runExecutionResult = await codeState.Run(executionContext);
+        var runExecutionResult = await codeStateProcessor.CodeState.Run(executionContext);
 
         var modifyResult = new WorkflowProcessResult([this.WorkflowInstance], []);
 
@@ -137,10 +135,9 @@ public class WorkflowMachine<TSource>(
         {
             currentState.OutputProcessed = true;
 
-            await stateFactoryCache.GetStateFactory(currentState.Definition)
-                .BindOutput(codeState, serviceProvider, executionContext.Source, executionContext.CancellationToken);
+            await codeStateProcessor.BindOutput(executionContext.CancellationToken);
 
-            var leaveResult = await codeState.LeavePolicy.Leave(serviceProvider, executionContext);
+            var leaveResult = await codeStateProcessor.CodeState.LeavePolicy.Leave(serviceProvider, executionContext);
 
             return modifyResult + leaveResult + runResult;
         }

@@ -5,8 +5,8 @@ namespace Anch.Workflow.Tests.ParallelForeachApprove;
 
 public class ParallelForeachApproveWorkflow : BuildWorkflow<ParallelForeachApproveWorkflowObject, ParallelForeachApproveStatus>
 {
-    protected override void Build(IWorkflowBuilder<ParallelForeachApproveWorkflowObject, ParallelForeachApproveStatus> builder)
-    {
+    protected override void Build(IWorkflowBuilder<ParallelForeachApproveWorkflowObject, ParallelForeachApproveStatus> builder) =>
+
         builder
             .ParallelForeach(
                 wfObj => wfObj.Items,
@@ -19,5 +19,4 @@ public class ParallelForeachApproveWorkflow : BuildWorkflow<ParallelForeachAppro
             .If(wfObj => wfObj.Items.All(subWf => subWf.Status == ParallelForeachApproveStatus.Approved),
                 trueBranch => trueBranch.Finish().WithStatus(ParallelForeachApproveStatus.Approved),
                 falseBranch => falseBranch.Finish().WithStatus(ParallelForeachApproveStatus.Rejected));
-    }
 }

@@ -38,9 +38,8 @@ public class WriteLineWorkflowTests : SingleScopeWorkflowTestBase<object, WriteL
         Assert.Empty(await this.RootRepository.GetWaitEvents().ToListAsync(ct));
     }
 
-    protected override IServiceCollection CreateServices(IServiceCollection services)
-    {
-        return base.CreateServices(services)
+    protected override IServiceCollection CreateServices(IServiceCollection services) =>
+
+        base.CreateServices(services)
             .AddSingleton<IDefaultOutput>(new DefaultOutput(this.writer));
-    }
 }

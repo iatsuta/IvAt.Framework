@@ -6,8 +6,8 @@ namespace Anch.Workflow.Tests.Switch;
 
 public class SwitchWorkflow : BuildWorkflow<SwitchWorkflowObject>
 {
-    protected override void Build(IWorkflowBuilder<SwitchWorkflowObject, Ignore> builder)
-    {
+    protected override void Build(IWorkflowBuilder<SwitchWorkflowObject, Ignore> builder) =>
+
         builder
             .Switch(wfObj => wfObj.Value,
 
@@ -18,5 +18,4 @@ public class SwitchWorkflow : BuildWorkflow<SwitchWorkflowObject>
                 (3, caseBuilder => caseBuilder.Then(wfObj => wfObj.Result = "Case 3")))
 
             .Then(wfObj => wfObj.Result = $"{wfObj.Value} {wfObj.Result}");
-    }
 }

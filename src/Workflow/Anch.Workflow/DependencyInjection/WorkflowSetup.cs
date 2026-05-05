@@ -23,11 +23,9 @@ public class WorkflowSetup : IWorkflowSetup, IServiceInitializer
         }
 
         services
-            .AddSingleton<IStateFactoryCache, StateFactoryCache>()
+            .AddScoped<ICodeStateProcessorFactory, CodeStateProcessorFactory>()
             .AddScoped<IWorkflowMachineFactory, WorkflowMachineFactory>()
             .AddScoped<IWorkflowHost, WorkflowHost>()
-
-            .AddScoped<ICodeStateResolver, CodeStateResolver>()
 
             .AddSingleton<IWorkflowSource, WorkflowSource>()
 
@@ -37,12 +35,8 @@ public class WorkflowSetup : IWorkflowSetup, IServiceInitializer
             .AddKeyedScoped<IWorkflowRepositoryFactory, CachedWorkflowRepositoryFactory>(IWorkflowRepositoryFactory.CacheKey)
             .AddKeyedScoped<IWorkflowRepository, WorkflowRootRepository>(IWorkflowRepository.RootKey)
 
-
             .AddSingleton<MemoryWorkflowRootState>()
-            .AddScoped<IWorkflowRepositoryFactory, MemoryWorkflowRepositoryFactory>()
-            //.AddScoped<ISpecificWorkflowRepositorySource, MemCachedSpecificWorkflowRepositorySource>()
-            //.AddScoped<ISpecificWorkflowExternalStorageSource, MemorySpecificWorkflowExternalStorageSource>()
-            ;
+            .AddScoped<IWorkflowRepositoryFactory, MemoryWorkflowRepositoryFactory>();
     }
 
     public IWorkflowSetup Add<TWorkflow>()

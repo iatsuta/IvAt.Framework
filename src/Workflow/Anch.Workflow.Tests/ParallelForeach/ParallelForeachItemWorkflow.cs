@@ -14,10 +14,10 @@ public class ParallelForeachItemWorkflow : BuildWorkflow<ParallelForeachItemWork
     {
         builder.If(wfObj => wfObj.Value % 2 == 0,
 
-                trueBuilder => trueBuilder
-                                .Then<WaitEventState>()
-                                    .Input(s => s.Event, TestItemWaitEvent)
-                                    .Output(wfObj => wfObj.EventValue, s => (int)s.ReceivedData!)
-                                .Then(_ => { }));
+            trueBuilder => trueBuilder
+                .Then<WaitEventState>()
+                .Input(s => s.Event, TestItemWaitEvent)
+                .Output(wfObj => wfObj.EventValue, s => (int)s.ReceivedData!)
+                .Then(_ => { }));
     }
 }
