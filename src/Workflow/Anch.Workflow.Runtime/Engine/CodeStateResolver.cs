@@ -12,8 +12,5 @@ public class CodeStateResolver(IServiceProvider serviceProvider, IStateFactoryCa
             .GetStateFactory(stateInstance.Definition)
             .CreateState(serviceProvider, stateInstance.Workflow.Source));
 
-    public IState Resolve(StateInstance stateInstance)
-    {
-        return this.stateCache[stateInstance];
-    }
+    public IState Resolve(StateInstance stateInstance) => this.stateCache[stateInstance];
 }

@@ -26,11 +26,8 @@ public class WorkflowMachineFactory : IWorkflowMachineFactory
 
     public IWorkflowMachine Create(WorkflowInstance workflowInstance) => this.cache[workflowInstance];
 
-    public IWorkflowMachine Create<TSource>(TSource source, IWorkflow<TSource> workflow)
-        where TSource : notnull =>
-        this.Create(source, workflow.Definition);
-
-    public IWorkflowMachine Create(object source, IWorkflowDefinition workflowDefinition)
+    public IWorkflowMachine Create<TSource>(TSource source, IWorkflowDefinition<TSource> workflowDefinition)
+        where TSource : notnull
     {
         var wi = new WorkflowInstance
         {
