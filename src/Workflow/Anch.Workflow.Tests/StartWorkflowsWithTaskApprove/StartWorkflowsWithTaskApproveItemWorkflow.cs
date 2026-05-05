@@ -1,3 +1,4 @@
+using Anch.Core;
 using Anch.Workflow.Builder;
 using Anch.Workflow.Builder.Default;
 using Anch.Workflow.Domain;
@@ -10,7 +11,7 @@ public class StartWorkflowsWithTaskApproveItemWorkflow : BuildWorkflow<StartWork
 
     public static readonly EventHeader RejectWaitEvent = new(nameof(RejectWaitEvent));
 
-    protected override void Build(IWorkflowBuilder<StartWorkflowsWithTaskApproveItemWorkflowObject> builder)
+    protected override void Build(IWorkflowBuilder<StartWorkflowsWithTaskApproveItemWorkflowObject, Ignore> builder)
     {
         builder
             .Then(wfObj => wfObj.Status = StartWorkflowsWithTaskApproveStatus.Approving)

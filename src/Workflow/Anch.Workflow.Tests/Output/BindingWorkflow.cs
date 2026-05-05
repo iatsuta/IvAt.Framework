@@ -1,3 +1,4 @@
+using Anch.Core;
 using Anch.Workflow.Builder;
 using Anch.Workflow.Builder.Default;
 
@@ -5,7 +6,7 @@ namespace Anch.Workflow.Tests.Output;
 
 public class BindingWorkflow : BuildWorkflow<BindingWorkflowObject>
 {
-    protected override void Build(IWorkflowBuilder<BindingWorkflowObject> builder)
+    protected override void Build(IWorkflowBuilder<BindingWorkflowObject, Ignore> builder)
     {
         builder.Then<BindingState>()
             .Input(s => s.Value1, wfObj => wfObj.Value1)

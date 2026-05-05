@@ -4,14 +4,14 @@ using Anch.Workflow.Domain;
 
 namespace Anch.Workflow.Tests.TaskWorkflow;
 
-public class TaskWorkflow : BuildWorkflow<TaskWorkflowObject>
+public class TaskWorkflow : BuildWorkflow<TaskWorkflowObject, TaskApproveStatus>
 {
     public static readonly EventHeader ApproveEventHeader = new("Approve");
 
     public static readonly EventHeader RejectEventHeader = new("Reject");
 
 
-    protected override void Build(IWorkflowBuilder<TaskWorkflowObject> builder)
+    protected override void Build(IWorkflowBuilder<TaskWorkflowObject, TaskApproveStatus> builder)
     {
         builder
             .Then(wfObj => wfObj.Status = TaskApproveStatus.Approving)

@@ -6,13 +6,13 @@ namespace Anch.Workflow.StateFactory;
 
 public class StateFactoryCache : IStateFactoryCache
 {
-    private readonly IDictionaryCache<IStateDefinition, IStateFactory> cache = new DictionaryCache<IStateDefinition, IStateFactory>(
-        stateDefinition => typeof(StateFactory<,>)
-                          .MakeGenericType(stateDefinition.StateType, stateDefinition.Workflow.SourceType)
-                          .GetConstructors()
-                          .Single()
-                          .Invoke([stateDefinition])
-                          .Pipe(res => (IStateFactory)res))
+    private readonly IDictionaryCache<IStateDefinition, IStateFactory> cache = new DictionaryCache<IStateDefinition, IStateFactory>(stateDefinition =>
+            typeof(StateFactory<,,>)
+                .MakeGenericType(stateDefinition.Workflow.SourceType, stateDefinition.Workflow.StatusType, stateDefinition.StateType)
+                .GetConstructors()
+                .Single()
+                .Invoke([stateDefinition])
+                .Pipe(res => (IStateFactory)res))
         .WithLock();
 
 

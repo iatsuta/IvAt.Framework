@@ -2,8 +2,8 @@
 
 namespace Anch.Workflow.Builder;
 
-public interface ITaskBuilder<TSource>
+public interface ITaskBuilder<TSource, TStatus>
     where TSource : notnull
 {
-    ITaskBuilder<TSource> AddCommand(EventHeader eventHeader, Action<IWorkflowBuilder<TSource>> branchSetup);
+    ITaskBuilder<TSource, TStatus> AddCommand(EventHeader eventHeader, Action<IWorkflowBuilder<TSource, TStatus>> branchSetup);
 }

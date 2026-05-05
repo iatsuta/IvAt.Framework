@@ -1,3 +1,4 @@
+using Anch.Core;
 using Anch.Workflow.Builder;
 using Anch.Workflow.Builder.Default;
 
@@ -5,7 +6,7 @@ namespace Anch.Workflow.Tests.Recursion;
 
 public class RecursionWorkflow : BuildWorkflow<RecursionWorkflowObject>
 {
-    protected override void Build(IWorkflowBuilder<RecursionWorkflowObject> builder)
+    protected override void Build(IWorkflowBuilder<RecursionWorkflowObject, Ignore> builder)
     {
         var start = builder
             .Then(_ => { });

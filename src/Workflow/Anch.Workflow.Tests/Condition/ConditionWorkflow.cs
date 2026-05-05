@@ -1,3 +1,4 @@
+using Anch.Core;
 using Anch.Workflow.Builder;
 using Anch.Workflow.Builder.Default;
 
@@ -5,7 +6,7 @@ namespace Anch.Workflow.Tests.Condition;
 
 public class ConditionWorkflow : BuildWorkflow<ConditionWorkflowObject>
 {
-    protected override void Build(IWorkflowBuilder<ConditionWorkflowObject> builder)
+    protected override void Build(IWorkflowBuilder<ConditionWorkflowObject, Ignore> builder)
     {
         builder
             .If((ConditionWorkflowObject obj, ConditionWorkflowService service) => service.IsEven(obj),

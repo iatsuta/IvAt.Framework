@@ -7,7 +7,7 @@ public class StateDefinitionResolverFactory(IServiceProxyFactory serviceProxyFac
 {
     public IStateDefinitionResolver<TSource> Create<TSource>(IWorkflowDefinition workflow)
     {
-        var statusType = workflow.DomainBindingInfo.StatusType!;
+        var statusType = workflow.StatusType;
 
         var stateDefinitionResolverType = typeof(StateDefinitionResolver<,>).MakeGenericType(typeof(TSource), statusType);
 

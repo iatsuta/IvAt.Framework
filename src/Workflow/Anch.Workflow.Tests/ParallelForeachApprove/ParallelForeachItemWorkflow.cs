@@ -1,3 +1,4 @@
+using Anch.Core;
 using Anch.Workflow.Builder;
 using Anch.Workflow.Builder.Default;
 using Anch.Workflow.Domain;
@@ -11,7 +12,7 @@ public class ParallelForeachApproveItemWorkflow : BuildWorkflow<ParallelForeachA
 
     public static readonly EventHeader RejectWaitEvent = new(nameof(RejectWaitEvent));
 
-    protected override void Build(IWorkflowBuilder<ParallelForeachApproveItemWorkflowObject> builder)
+    protected override void Build(IWorkflowBuilder<ParallelForeachApproveItemWorkflowObject, Ignore> builder)
     {
         builder
             .Then(wfObj => wfObj.Status = ParallelForeachApproveStatus.Approving)

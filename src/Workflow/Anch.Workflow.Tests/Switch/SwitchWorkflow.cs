@@ -1,3 +1,4 @@
+using Anch.Core;
 using Anch.Workflow.Builder;
 using Anch.Workflow.Builder.Default;
 
@@ -5,7 +6,7 @@ namespace Anch.Workflow.Tests.Switch;
 
 public class SwitchWorkflow : BuildWorkflow<SwitchWorkflowObject>
 {
-    protected override void Build(IWorkflowBuilder<SwitchWorkflowObject> builder)
+    protected override void Build(IWorkflowBuilder<SwitchWorkflowObject, Ignore> builder)
     {
         builder
             .Switch(wfObj => wfObj.Value,

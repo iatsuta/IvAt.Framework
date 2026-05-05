@@ -6,21 +6,16 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Anch.Workflow.StateFactory;
 
-public class StateFactory<TState, TSource>(IStateDefinition stateDefinition) : IStateFactory
+public class StateFactory<TSource, TStatus, TState>(IStateDefinition<TSource, TStatus, TState> stateDefinition) : IStateFactory
+    where TSource : notnull
     where TState : IState
 {
-    private readonly List<Func<IServiceProvider, TSource, TState, CancellationToken, ValueTask>> inputActions =
-        stateDefinition.InputActions.Cast<Func<IServiceProvider, TSource, TState, CancellationToken, ValueTask>>().ToList();
-
-    private readonly List<Func<IServiceProvider, TState, TSource, CancellationToken, ValueTask>> outputActions =
-        stateDefinition.OutputActions.Cast<Func<IServiceProvider, TState, TSource, CancellationToken, ValueTask>>().ToList();
-
     public IState CreateState(IServiceProvider serviceProvider, object source) =>
         serviceProvider.GetRequiredService<IServiceProxyFactory>().Create<TState>();
 
     public async ValueTask BindInput(IState state, IServiceProvider serviceProvider, object source, CancellationToken ct)
     {
-        foreach (var initAction in this.inputActions)
+        foreach (var initAction in stateDefinition.InputActions)
         {
             await initAction(serviceProvider, (TSource)source, (TState)state, ct);
         }
@@ -28,7 +23,7 @@ public class StateFactory<TState, TSource>(IStateDefinition stateDefinition) : I
 
     public async ValueTask BindOutput(IState state, IServiceProvider serviceProvider, object source, CancellationToken ct)
     {
-        foreach (var outputAction in this.outputActions)
+        foreach (var outputAction in stateDefinition.OutputActions)
         {
             await outputAction(serviceProvider, (TState)state, (TSource)source, ct);
         }

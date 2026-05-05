@@ -9,6 +9,6 @@ public class WorkflowSource(IEnumerable<IWorkflow> rootWorkflows) : IWorkflowSou
 {
     public FrozenDictionary<WorkflowDefinitionIdentity, IWorkflowDefinition> Workflows =>
         field ??= rootWorkflows.Select(wf => wf.Definition)
-            .GetAllElements(wfRef => wfRef.States.SelectMany(state => state.SubWorkflow))
+            .GetAllElements(wfRef => wfRef.States.SelectMany(state => state.SubWorkflows))
             .ToFrozenDictionary(wfRef => wfRef.Identity);
 }

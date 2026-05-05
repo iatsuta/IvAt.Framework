@@ -1,7 +1,45 @@
-﻿using System.Collections.Frozen;
-using System.Collections.Immutable;
+﻿namespace Anch.Workflow.Domain.Definition;
 
-namespace Anch.Workflow.Domain.Definition;
+public interface IStateDefinition<TSource, TStatus, in TState> : IStateDefinition<TSource, TStatus>
+    where TSource : notnull
+{
+    IReadOnlyList<Func<IServiceProvider, TSource, TState, CancellationToken, ValueTask>> InputActions { get; }
+
+    IReadOnlyList<Func<IServiceProvider, TState, TSource, CancellationToken, ValueTask>> OutputActions { get; }
+
+    Type IStateDefinition.StateType => typeof(TState);
+}
+
+public interface IStateDefinition<TSource, TStatus> : IStateDefinition
+    where TSource : notnull
+{
+    new IWorkflowDefinition<TSource, TStatus> Workflow { get; }
+
+    new IReadOnlyList<ITransitionDefinition<TSource, TStatus>> Transitions { get; }
+
+    new TStatus? Status { get; }
+
+
+
+    IWorkflowDefinition IStateDefinition.Workflow => this.Workflow;
+
+    IReadOnlyList<ITransitionDefinition> IStateDefinition.Transitions => this.Transitions;
+
+    object? IStateDefinition.Status => this.Status;
+}
+
+//public interface IStateDefinition<TSource> : IStateDefinition
+//    where TSource : notnull
+//{
+//    new IWorkflowDefinition<TSource> Workflow { get; }
+
+//    new IReadOnlyList<ITransitionDefinition<TSource>> Transitions { get; }
+
+
+//    IWorkflowDefinition IStateDefinition.Workflow => this.Workflow;
+
+//    IReadOnlyList<ITransitionDefinition> IStateDefinition.Transitions => this.Transitions;
+//}
 
 public interface IStateDefinition
 {
@@ -9,17 +47,13 @@ public interface IStateDefinition
 
     object? Status { get; }
 
-    Type StateType { get; set; }
+    Type StateType { get; }
 
     IWorkflowDefinition Workflow { get; }
 
-    ImmutableList<Delegate> InputActions { get; }
+    IReadOnlyList<ITransitionDefinition> Transitions { get; }
 
-    ImmutableList<Delegate> OutputActions { get; }
+    IReadOnlyList<IWorkflowDefinition> SubWorkflows { get; }
 
-    ImmutableList<ITransitionDefinition> Transitions { get; }
-
-    ImmutableList<IWorkflowDefinition> SubWorkflow { get; }
-
-    FrozenDictionary<string, object> AdditionalInfo { get; }
+    IReadOnlyDictionary<string, object> AdditionalInfo { get; }
 }

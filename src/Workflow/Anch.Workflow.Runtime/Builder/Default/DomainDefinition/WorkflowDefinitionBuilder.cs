@@ -1,24 +1,19 @@
-﻿using System.Collections.Frozen;
-using System.Collections.Immutable;
-using System.Linq.Expressions;
-
-using Anch.Core;
+﻿using Anch.Core;
 using Anch.Workflow.Domain;
 using Anch.Workflow.Domain.Definition;
 using Anch.Workflow.States;
 
 namespace Anch.Workflow.Builder.Default.DomainDefinition;
 
-public class WorkflowDefinition : IWorkflowDefinition
+public class WorkflowDefinitionBuilder<TSource, TStatus> : IWorkflowDefinition<TSource, TStatus>, IWorkflowDefinitionBuilder
+    where TSource : notnull
 {
-    private readonly List<StateDefinition> statesWithAutoFinish = [];
+    private readonly List<IStateDefinitionBuilder<TSource, TStatus>> statesWithAutoFinish = [];
 
     private bool isAutoFinalStart = true;
 
-    public WorkflowDefinition(Type sourceType)
+    public WorkflowDefinitionBuilder()
     {
-        this.SourceType = sourceType;
-
         this.DefaultFinalState = this.CreateDefaultFinalState();
         this.StartState = this.DefaultFinalState;
         this.TerminateState = this.CreateTerminateState();
@@ -26,46 +21,32 @@ public class WorkflowDefinition : IWorkflowDefinition
         this.States.Add(this.DefaultFinalState);
     }
 
+    public PropertyAccessors<TSource, TStatus>? StatusAccessors { get; set; }
+
+    public PropertyAccessors<TSource, long>? VersionAccessors { get; set; }
+
     public WorkflowDefinitionIdentity Identity { get; set; } = null!;
-
-    public LambdaExpression? StatusProperty { get; set; }
-
-    public LambdaExpression? VersionProperty { get; set; }
 
     public bool IsAutoIdentity { get; set; } = true;
 
-    public WorkflowDomainBindingInfo DomainBindingInfo => field ??= this.BuildDomainBindingInfo();
-
     public bool InTechnical { get; set; }
 
-    public Type SourceType { get; }
+    public List<IStateDefinitionBuilder<TSource, TStatus>> States { get; set; } = [];
 
-    public List<StateDefinition> States { get; set; } = [];
+    public IStateDefinitionBuilder<TSource, TStatus> StartState { get; set; }
 
-    public StateDefinition StartState { get; set; }
+    public IStateDefinitionBuilder<TSource, TStatus> DefaultFinalState { get; set; }
 
-    public StateDefinition DefaultFinalState { get; set; }
+    public IStateDefinitionBuilder<TSource, TStatus> TerminateState { get; set; }
 
-    public StateDefinition TerminateState { get; set; }
+    public Dictionary<string, object> Settings { get; set; } = [];
 
-    public Dictionary<string, object> Settings { get; set; } = new();
-
-    IStateDefinition IWorkflowDefinition.StartState => this.StartState;
-
-    IStateDefinition IWorkflowDefinition.TerminateState => this.TerminateState;
-
-    IStateDefinition IWorkflowDefinition.DefaultFinalState => this.DefaultFinalState;
-
-    ImmutableList<IStateDefinition> IWorkflowDefinition.States => field ??= [.. this.States];
-
-    FrozenDictionary<string, object> IWorkflowDefinition.Settings => field ??= this.Settings.ToFrozenDictionary();
-
-    public WorkflowDefinition HeaderClone()
+    public WorkflowDefinitionBuilder<TSource, TStatus> CloneHeader()
     {
-        return new WorkflowDefinition(this.SourceType);
+        return new WorkflowDefinitionBuilder<TSource, TStatus>();
     }
 
-    public void AddState(StateDefinition stateDefinition)
+    public void AddState(IStateDefinitionBuilder<TSource, TStatus> stateDefinition)
     {
         this.InsertPreLast(stateDefinition);
 
@@ -79,20 +60,20 @@ public class WorkflowDefinition : IWorkflowDefinition
         }
     }
 
-    public void Attach(StateDefinition stateDefinition, EventHeader attachEvent, WorkflowDefinition branch)
+    public void Attach(IStateDefinitionBuilder<TSource, TStatus> stateDefinition, EventHeader attachEvent, WorkflowDefinitionBuilder<TSource, TStatus> branch)
     {
         if (stateDefinition.Workflow != this)
         {
             throw new InvalidOperationException();
         }
 
-        var eventDefinition = new EventDefinition { Header = attachEvent };
+        var eventDefinition = new EventDefinitionBuilder { Header = attachEvent };
 
         stateDefinition.Events.Add(eventDefinition);
 
         branch.TryAddEmptyState();
 
-        stateDefinition.Transitions.Add(new TransitionDefinition { Event = eventDefinition, To = branch.StartState });
+        stateDefinition.Transitions.Add(new TransitionDefinitionBuilder<TSource, TStatus> { Event = eventDefinition, To = branch.StartState });
 
         this.statesWithAutoFinish.AddRange(branch.statesWithAutoFinish);
 
@@ -115,12 +96,12 @@ public class WorkflowDefinition : IWorkflowDefinition
         }
     }
 
-    private void InsertPreLast(StateDefinition stateDefinition)
+    private void InsertPreLast(IStateDefinitionBuilder<TSource, TStatus> stateDefinition)
     {
         this.States.Insert(this.States.Count - 1, stateDefinition);
     }
 
-    public void UpdateAutoFinish(StateDefinition newLastStateDefinition)
+    public void UpdateAutoFinish(IStateDefinitionBuilder<TSource, TStatus> newLastStateDefinition)
     {
         foreach (var stateDefinition in this.statesWithAutoFinish)
         {
@@ -139,7 +120,7 @@ public class WorkflowDefinition : IWorkflowDefinition
         if (!newLastStateDefinition.Transitions.Any() && newLastStateDefinition.Events.Count == 1 &&
             newLastStateDefinition.Events[0].Header == EventHeader.StateDone)
         {
-            newLastStateDefinition.Transitions.Add(new TransitionDefinition { Event = newLastStateDefinition.Events[0], To = this.DefaultFinalState });
+            newLastStateDefinition.Transitions.Add(new TransitionDefinitionBuilder<TSource, TStatus> { Event = newLastStateDefinition.Events[0], To = this.DefaultFinalState });
 
             this.statesWithAutoFinish.Add(newLastStateDefinition);
         }
@@ -149,14 +130,13 @@ public class WorkflowDefinition : IWorkflowDefinition
     {
         if (this.isAutoFinalStart)
         {
-            var emptyState = new StateDefinition
+            var emptyState = new StateDefinitionBuilder<TSource, TStatus, EmptyState>
             {
-                Name = StateDefinition.SystemEmptyName,
-                StateType = typeof(EmptyState),
+                Name = StateDefinitionBuilder.SystemEmptyName,
                 Workflow = this
             };
 
-            emptyState.Events.Add(new EventDefinition
+            emptyState.Events.Add(new EventDefinitionBuilder
             {
                 Header = EventHeader.StateDone
             });
@@ -165,32 +145,30 @@ public class WorkflowDefinition : IWorkflowDefinition
         }
     }
 
-    private StateDefinition CreateDefaultFinalState()
+    private IStateDefinitionBuilder<TSource, TStatus> CreateDefaultFinalState()
     {
-        var finalState = new StateDefinition
+        var finalState = new StateDefinitionBuilder<TSource, TStatus, FinalState>
         {
-            Name = StateDefinition.SystemFinalName,
-            StateType = typeof(FinalState),
+            Name = StateDefinitionBuilder.SystemFinalName,
             Workflow = this
         };
 
-        finalState.Events.Add(new EventDefinition { Header = EventHeader.WorkflowFinished });
+        finalState.Events.Add(new EventDefinitionBuilder { Header = EventHeader.WorkflowFinished });
 
         return finalState;
     }
 
-    private StateDefinition CreateTerminateState()
+    private IStateDefinitionBuilder<TSource, TStatus> CreateTerminateState()
     {
-        var terminateState = new StateDefinition
+        var terminateState = new StateDefinitionBuilder<TSource, TStatus, TerminateState>
         {
-            Name = StateDefinition.SystemTerminateName,
-            StateType = typeof(TerminateState),
+            Name = StateDefinitionBuilder.SystemTerminateName,
             Workflow = this
         };
 
-        terminateState.Events.Add(new EventDefinition { Header = EventHeader.WorkflowTerminated });
+        terminateState.Events.Add(new EventDefinitionBuilder { Header = EventHeader.WorkflowTerminated });
 
-        terminateState.Events.Add(new EventDefinition { Header = EventHeader.WorkflowFinished });
+        terminateState.Events.Add(new EventDefinitionBuilder { Header = EventHeader.WorkflowFinished });
 
         return terminateState;
     }
@@ -199,7 +177,7 @@ public class WorkflowDefinition : IWorkflowDefinition
     {
         foreach (var state in this.States.ToList())
         {
-            if (state.Name == StateDefinition.SystemEmptyName && state.StateType == typeof(EmptyState))
+            if (state.Name == StateDefinitionBuilder.SystemEmptyName && state.StateType == typeof(EmptyState))
             {
                 var nextState = state.Transitions.Single().To;
 
@@ -244,7 +222,7 @@ public class WorkflowDefinition : IWorkflowDefinition
         }
     }
 
-    public void ReplaceAutoNames((StateDefinition State, int? Index)? ownerInfo = null)
+    public void ReplaceAutoNames((IStateDefinitionBuilder State, int? Index)? ownerInfo = null)
     {
         var stateDigitCount = (int)Math.Log10(this.States.Count);
 
@@ -268,45 +246,31 @@ public class WorkflowDefinition : IWorkflowDefinition
 
             foreach (var subWfPair in statePair.State.SubWorkflows.Select((subWf, index) => new { SubWf = subWf, Index = index }))
             {
-                subWfPair.SubWf.BaseDefinition.ReplaceAutoNames((statePair.State, statePair.State.SubWorkflows.Count == 1 ? null : subWfPair.Index));
+                subWfPair.SubWf.ReplaceAutoNames((statePair.State, statePair.State.SubWorkflows.Count == 1 ? null : subWfPair.Index));
             }
         }
     }
 
-    private WorkflowDomainBindingInfo BuildDomainBindingInfo()
-    {
-        if (this.StatusProperty == null)
-        {
-            return new Func<WorkflowDomainBindingInfo<object>>(this.BuildDomainBindingInfoGeneric<object>)
-                .CreateGenericMethod(this.SourceType)
-                .Invoke<WorkflowDomainBindingInfo>(this);
-        }
-        else
-        {
-            return new Func<WorkflowDomainBindingInfo<object, Ignore>>(this.BuildDomainBindingInfoGeneric<object, Ignore>)
-                .CreateGenericMethod(this.SourceType, this.StatusProperty.ReturnType)
-                .Invoke<WorkflowDomainBindingInfo>(this);
-        }
-    }
-
-    private WorkflowDomainBindingInfo<TSource> BuildDomainBindingInfoGeneric<TSource>() =>
-
-        new() { Version = this.TryGetVersionPropertyAccessors<TSource>() };
-
-    private WorkflowDomainBindingInfo<TSource, TStatus> BuildDomainBindingInfoGeneric<TSource, TStatus>() =>
-
-        new()
-        {
-            Version = this.TryGetVersionPropertyAccessors<TSource>(),
-            Status = new PropertyAccessors<TSource, TStatus>((Expression<Func<TSource, TStatus>>)this.StatusProperty!)
-        };
-
-    private PropertyAccessors<TSource, long>? TryGetVersionPropertyAccessors<TSource>() =>
-
-        this.VersionProperty == null
-            ? null
-            : new PropertyAccessors<TSource, long>(
-                this.VersionProperty as Expression<Func<TSource, long>> ?? throw new InvalidOperationException("Invalid version property"));
-
     public override string ToString() => this.Identity.ToString();
+
+
+    IReadOnlyList<IStateDefinition<TSource, TStatus>> IWorkflowDefinition<TSource, TStatus>.States => this.States;
+
+    IStateDefinition<TSource, TStatus> IWorkflowDefinition<TSource, TStatus>.StartState => this.StartState;
+
+    IStateDefinition<TSource, TStatus> IWorkflowDefinition<TSource, TStatus>.DefaultFinalState => this.DefaultFinalState;
+
+    IStateDefinition<TSource, TStatus> IWorkflowDefinition<TSource, TStatus>.TerminateState => this.TerminateState;
+
+
+    IReadOnlyList<IStateDefinition> IWorkflowDefinition.States => this.States;
+
+    IStateDefinition IWorkflowDefinition.StartState => this.StartState;
+
+    IStateDefinition IWorkflowDefinition.TerminateState => this.TerminateState;
+
+    IStateDefinition IWorkflowDefinition.DefaultFinalState => this.DefaultFinalState;
+
+
+    IReadOnlyDictionary<string, object> IWorkflowDefinition.Settings => this.Settings;
 }

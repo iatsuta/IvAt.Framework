@@ -1,7 +1,30 @@
-﻿using System.Collections.Frozen;
-using System.Collections.Immutable;
+﻿using Anch.Core;
 
 namespace Anch.Workflow.Domain.Definition;
+
+public interface IWorkflowDefinition<TSource, TStatus> : IWorkflowDefinition<TSource>
+    where TSource : notnull
+{
+    PropertyAccessors<TSource, TStatus>? StatusAccessors { get; }
+
+    new IReadOnlyList<IStateDefinition<TSource, TStatus>> States { get; }
+
+    new IStateDefinition<TSource, TStatus> StartState { get; }
+
+    new IStateDefinition<TSource, TStatus> DefaultFinalState { get; }
+
+    new IStateDefinition<TSource, TStatus> TerminateState { get; }
+
+    Type IWorkflowDefinition.StatusType => typeof(TStatus);
+}
+
+public interface IWorkflowDefinition<TSource> : IWorkflowDefinition
+    where TSource : notnull
+{
+    PropertyAccessors<TSource, long>? VersionAccessors { get; }
+
+    Type IWorkflowDefinition.SourceType => typeof(TSource);
+}
 
 public interface IWorkflowDefinition
 {
@@ -9,13 +32,13 @@ public interface IWorkflowDefinition
 
     Type SourceType { get; }
 
-    long Version => 1;
+    Type StatusType { get; }
 
-    WorkflowDomainBindingInfo DomainBindingInfo { get; }
+    long Version => 1;
 
     bool InTechnical { get; }
 
-    ImmutableList<IStateDefinition> States { get; }
+    IReadOnlyList<IStateDefinition> States { get; }
 
     IStateDefinition StartState { get; }
 
@@ -23,5 +46,5 @@ public interface IWorkflowDefinition
 
     IStateDefinition TerminateState { get; }
 
-    FrozenDictionary<string, object> Settings { get; }
+    IReadOnlyDictionary<string, object> Settings { get; }
 }

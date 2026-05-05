@@ -4,44 +4,28 @@ using Anch.Workflow.Domain.Definition;
 
 namespace Anch.Workflow.Builder.Default;
 
-public abstract class BuildWorkflow : IWorkflow
-{
-    private readonly Lazy<WorkflowDefinition> lazyDefinition;
-
-    protected BuildWorkflow()
-    {
-        this.lazyDefinition = LazyHelper.Create(this.CreateDefinition);
-    }
-
-    public IWorkflowDefinition Definition => this.BaseDefinition;
-
-    public WorkflowDefinition BaseDefinition => this.lazyDefinition.Value;
-
-    protected abstract WorkflowDefinition CreateDefinition();
-
-    public override string ToString()
-    {
-        return $"Workflow ({this.Definition.Identity.Name})";
-    }
-}
-
-public abstract class BuildWorkflow<TSource> : BuildWorkflow, IWorkflow<TSource>
+public abstract class BuildWorkflow<TSource> : BuildWorkflow<TSource, Ignore>
     where TSource : notnull
 {
-    protected abstract void Build(IWorkflowBuilder<TSource> builder);
+}
 
-    protected override WorkflowDefinition CreateDefinition()
+public abstract class BuildWorkflow<TSource, TStatus> : IWorkflow<TSource, TStatus>
+    where TSource : notnull
+{
+    protected abstract void Build(IWorkflowBuilder<TSource, TStatus> builder);
+
+
+    private readonly Lazy<WorkflowDefinitionBuilder<TSource, TStatus>> lazyDefinition;
+
+    protected BuildWorkflow() => this.lazyDefinition = LazyHelper.Create(this.CreateDefinition);
+
+    public WorkflowDefinitionBuilder<TSource, TStatus> Definition => this.lazyDefinition.Value;
+
+    private WorkflowDefinitionBuilder<TSource, TStatus> CreateDefinition()
     {
-        var workflowDefinition = new WorkflowDefinition(typeof(TSource))
-        {
-            Identity = new(this.GetType().Name)
-        };
+        var workflowDefinition = new WorkflowDefinitionBuilder<TSource, TStatus> { Identity = new(this.GetType().Name) };
 
-        {
-            var builder = new WorkflowBuilder<TSource>(workflowDefinition);
-
-            this.Build(builder);
-        }
+        this.Build(new WorkflowBuilder<TSource, TStatus>(workflowDefinition));
 
         workflowDefinition.Optimize();
         workflowDefinition.Validate();
@@ -49,4 +33,11 @@ public abstract class BuildWorkflow<TSource> : BuildWorkflow, IWorkflow<TSource>
 
         return workflowDefinition;
     }
+
+    public override string ToString()
+    {
+        return $"Workflow ({this.Definition.Identity.Name})";
+    }
+
+    IWorkflowDefinition<TSource, TStatus> IWorkflow<TSource, TStatus>.Definition => this.Definition;
 }

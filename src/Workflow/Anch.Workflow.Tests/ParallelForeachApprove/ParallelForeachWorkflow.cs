@@ -3,9 +3,9 @@ using Anch.Workflow.Builder.Default;
 
 namespace Anch.Workflow.Tests.ParallelForeachApprove;
 
-public class ParallelForeachApproveWorkflow : BuildWorkflow<ParallelForeachApproveWorkflowObject>
+public class ParallelForeachApproveWorkflow : BuildWorkflow<ParallelForeachApproveWorkflowObject, ParallelForeachApproveStatus>
 {
-    protected override void Build(IWorkflowBuilder<ParallelForeachApproveWorkflowObject> builder)
+    protected override void Build(IWorkflowBuilder<ParallelForeachApproveWorkflowObject, ParallelForeachApproveStatus> builder)
     {
         builder
             .ParallelForeach(

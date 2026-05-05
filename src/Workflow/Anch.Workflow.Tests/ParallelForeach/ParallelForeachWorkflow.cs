@@ -1,3 +1,4 @@
+using Anch.Core;
 using Anch.Workflow.Builder;
 using Anch.Workflow.Builder.Default;
 
@@ -5,7 +6,7 @@ namespace Anch.Workflow.Tests.ParallelForeach;
 
 public class ParallelForeachWorkflow : BuildWorkflow<ParallelForeachWorkflowObject>
 {
-    protected override void Build(IWorkflowBuilder<ParallelForeachWorkflowObject> builder)
+    protected override void Build(IWorkflowBuilder<ParallelForeachWorkflowObject, Ignore> builder)
     {
         builder
             .ParallelForeach(

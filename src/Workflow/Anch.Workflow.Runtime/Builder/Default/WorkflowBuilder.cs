@@ -1,5 +1,6 @@
 ﻿using System.Linq.Expressions;
 
+using Anch.Core;
 using Anch.Workflow.Builder.Default.DomainDefinition;
 using Anch.Workflow.Domain;
 using Anch.Workflow.Domain.Definition;
@@ -7,82 +8,82 @@ using Anch.Workflow.States;
 
 namespace Anch.Workflow.Builder.Default;
 
-public class WorkflowBuilder<TSource>(WorkflowDefinition workflow) : IWorkflowBuilder<TSource>
+public class WorkflowBuilder<TSource, TStatus>(WorkflowDefinitionBuilder<TSource, TStatus> workflowBuilder) : IWorkflowBuilder<TSource, TStatus>
     where TSource : notnull
+    where TStatus : notnull
 {
-    protected readonly WorkflowDefinition Workflow = workflow;
-
-    public IWorkflowBuilder<TSource> WithStatusProperty<TStatus>(Expression<Func<TSource, TStatus>> statusPath)
+    public IWorkflowBuilder<TSource, TStatus> WithStatusProperty(Expression<Func<TSource, TStatus>> statusPath)
     {
-        this.Workflow.StatusProperty = statusPath;
+        workflowBuilder.StatusAccessors = statusPath.ToPropertyAccessors();
 
         return this;
     }
 
-    public IWorkflowBuilder<TSource> WithVersionProperty<TStatus>(Expression<Func<TSource, Guid>> versionPath)
+    public IWorkflowBuilder<TSource, TStatus> WithVersionProperty(Expression<Func<TSource, long>> versionPath)
     {
-        this.Workflow.VersionProperty = versionPath;
+        workflowBuilder.VersionAccessors = versionPath.ToPropertyAccessors();
 
         return this;
     }
 
-    public IWorkflowBuilder<TSource> WithSetting(string name, object value)
+    public IWorkflowBuilder<TSource, TStatus> WithSetting(string name, object value)
     {
-        this.Workflow.Settings[name] = value;
+        workflowBuilder.Settings[name] = value;
 
         return this;
     }
 
-    public IWorkflowBuilder<TSource> WithIdentity(WorkflowDefinitionIdentity identity)
+    public IWorkflowBuilder<TSource, TStatus> WithIdentity(WorkflowDefinitionIdentity identity)
     {
-        this.Workflow.Identity = identity;
-        this.Workflow.IsAutoIdentity = false;
+        workflowBuilder.Identity = identity;
+        workflowBuilder.IsAutoIdentity = false;
 
         return this;
     }
 
-    public IStateBuilder<TSource, TState> Then<TState>()
+    public IStateBuilder<TSource, TStatus, TState> Then<TState>()
         where TState : IState
     {
         return this.ThenInternal<TState>(true);
     }
 
-    private StateBuilder<TSource, TState> ThenInternal<TState>(bool addDoneEvent)
+    private StateBuilder<TSource, TStatus, TState> ThenInternal<TState>(bool addDoneEvent)
         where TState : IState
     {
-        return new StateBuilder<TSource, TState>(this.Workflow, addDoneEvent);
+        return new StateBuilder<TSource, TStatus, TState>(workflowBuilder, addDoneEvent);
     }
 
-    public IWorkflowBuilder<TSource> Then(IStateBuilder state)
+    public IWorkflowBuilder<TSource, TStatus> Then(IStateBuilder<TSource, TStatus> state)
     {
-        this.Workflow.UpdateAutoFinish(state.StateDefinition);
+        workflowBuilder.UpdateAutoFinish(state.StateDefinitionBuilder);
 
         return this;
     }
 
-    public IStateBuilder<TSource, StartWorkflowState<TInnerSource>> StartWorkflow<TInnerSource, TWorkflow>(Func<TSource, TInnerSource> getInnerSource)
-        where TWorkflow : IWorkflow<TInnerSource>
+    public IStateBuilder<TSource, TStatus, StartWorkflowState<TInnerSource>> StartWorkflow<TInnerSource, TInnerWorkflow>(
+        Func<TSource, TInnerSource> getInnerSource)
+        where TInnerWorkflow : IWorkflow<TInnerSource>
         where TInnerSource : notnull
     {
         return this.Then<StartWorkflowState<TInnerSource>>()
-            .Input(s => s.InnerWorkflow, async (TSource _, TWorkflow workflow, CancellationToken _) => workflow)
+            .Input(s => s.InnerWorkflow, async (TSource _, TInnerWorkflow innerWorkflow, CancellationToken _) => innerWorkflow)
             .Input(s => s.InnerSource, getInnerSource);
     }
 
-    public IStateBuilder<TSource, StartWorkflowsState<TSource, TInnerSource>> StartWorkflows<TInnerSource, TWorkflow>(
+    public IStateBuilder<TSource, TStatus, StartWorkflowsState<TSource, TInnerSource>> StartWorkflows<TInnerSource, TInnerWorkflow>(
         Func<TSource, IEnumerable<TInnerSource>> getElements)
-        where TWorkflow : IWorkflow<TInnerSource>
+        where TInnerWorkflow : IWorkflow<TInnerSource>
         where TInnerSource : notnull
     {
         return this.Then<StartWorkflowsState<TSource, TInnerSource>>()
-            .Input(s => s.ElementWorkflow, async (TSource _, TWorkflow workflow, CancellationToken _) => workflow)
+            .Input(s => s.ElementWorkflow, async (TSource _, TInnerWorkflow innerWorkflow, CancellationToken _) => innerWorkflow)
             .Input(s => s.Elements, getElements);
     }
 
-    public IStateBuilder<TSource, IfState> If<TService>(
+    public IStateBuilder<TSource, TStatus, IfState> If<TService>(
         Func<TSource, TService, CancellationToken, ValueTask<bool>> condition,
-        Action<IWorkflowBuilder<TSource>> trueSetupWorkflowBuilder,
-        Action<IWorkflowBuilder<TSource>>? falseSetupWorkflowBuilder = null)
+        Action<IWorkflowBuilder<TSource, TStatus>> trueSetupWorkflowBuilder,
+        Action<IWorkflowBuilder<TSource, TStatus>>? falseSetupWorkflowBuilder = null)
         where TService : notnull
     {
         var ifState = this
@@ -92,23 +93,23 @@ public class WorkflowBuilder<TSource>(WorkflowDefinition workflow) : IWorkflowBu
         foreach (var pair in new[]
                  {
                      (IfState.TrueEvent, trueSetupWorkflowBuilder),
-                     (IfState.FalseEvent, falseSetupWorkflowBuilder ?? (_ => {}))
+                     (IfState.FalseEvent, falseSetupWorkflowBuilder ?? (_ => { }))
                  })
         {
-            var innerDefinition = this.Workflow.HeaderClone();
+            var innerDefinition = workflowBuilder.CloneHeader();
 
-            pair.Item2(new WorkflowBuilder<TSource>(innerDefinition));
+            pair.Item2(new WorkflowBuilder<TSource, TStatus>(innerDefinition));
 
-            this.Workflow.Attach(ifState.StateDefinition, pair.Item1, innerDefinition);
+            workflowBuilder.Attach(ifState.StateDefinitionBuilder, pair.Item1, innerDefinition);
         }
 
         return ifState;
     }
 
-    public IStateBuilder<TSource, SwitchState<TProperty>> Switch<TProperty, TService>(
+    public IStateBuilder<TSource, TStatus, SwitchState<TProperty>> Switch<TProperty, TService>(
         Func<TSource, TService, CancellationToken, ValueTask<TProperty>> selector,
-        Action<IWorkflowBuilder<TSource>> defaultCaseSetupWorkflowBuilder,
-        params (TProperty CaseValue, Action<IWorkflowBuilder<TSource>> CaseSetupWorkflowBuilder)[] cases)
+        Action<IWorkflowBuilder<TSource, TStatus>> defaultCaseSetupWorkflowBuilder,
+        params (TProperty CaseValue, Action<IWorkflowBuilder<TSource, TStatus>> CaseSetupWorkflowBuilder)[] cases)
 
         where TService : notnull
         where TProperty : notnull
@@ -134,73 +135,73 @@ public class WorkflowBuilder<TSource>(WorkflowDefinition workflow) : IWorkflowBu
 
         foreach (var eventCase in allEventCases)
         {
-            var innerDefinition = this.Workflow.HeaderClone();
+            var innerDefinition = workflowBuilder.CloneHeader();
 
-            eventCase.Setup(new WorkflowBuilder<TSource>(innerDefinition));
+            eventCase.Setup(new WorkflowBuilder<TSource, TStatus>(innerDefinition));
 
-            this.Workflow.Attach(switchState.StateDefinition, eventCase.EventHeader, innerDefinition);
+            workflowBuilder.Attach(switchState.StateDefinitionBuilder, eventCase.EventHeader, innerDefinition);
         }
 
         return switchState;
     }
 
-    public IStateBuilder<TSource, ParallelForeachState<TSource, TElement>> ParallelForeach<TElement, TService>(
+    public IStateBuilder<TSource, TStatus, ParallelForeachState<TSource, TElement>> ParallelForeach<TElement, TService>(
         Func<TSource, TService, CancellationToken, ValueTask<IEnumerable<TElement>>> getElements,
-        Action<IWorkflowBuilder<(TSource Source, TElement Element)>> setupIteratorBuilder)
+        Action<IWorkflowBuilder<(TSource Source, TElement Element), object>> setupIteratorBuilder)
         where TService : notnull
     {
-        var iteratorWorkflow = new IteratorWorkflow<TSource, TElement>(setupIteratorBuilder);
+        var iteratorWorkflow = new ActionBuildWorkflow<(TSource, TElement), object>(setupIteratorBuilder);
 
         return this.Then<ParallelForeachState<TSource, TElement>>()
-            .WithSubWorkflow([iteratorWorkflow])
+            .WithSubWorkflow([iteratorWorkflow.Definition])
             .Input(s => s.Elements, getElements)
             .Input(s => s.ElementWorkflow, iteratorWorkflow);
     }
 
-    public IStateBuilder<TSource, ParallelState<TSource>> Parallel(
-        params Action<IWorkflowBuilder<TSource>>[] setupForks)
+    public IStateBuilder<TSource, TStatus, ParallelState<TSource>> Parallel(
+        params Action<IWorkflowBuilder<TSource, object>>[] setupForks)
     {
         var forks = setupForks
-            .Select(setupFork => new ForkWorkflow<TSource>(setupFork))
+            .Select(setupFork => new ActionBuildWorkflow<TSource, object>(setupFork))
             .ToArray();
 
         return this.Then<ParallelState<TSource>>()
-            .WithSubWorkflow(forks)
+            .WithSubWorkflow(forks.Select(w => w.Definition))
             .Input(s => s.Forks, forks);
     }
 
-    public IStateBuilder<TSource, ForeachState<TSource, TElement>> Foreach<TElement, TService>(
+    public IStateBuilder<TSource, TStatus, ForeachState<TSource, TElement>> Foreach<TElement, TService>(
         Func<TSource, TService, CancellationToken, ValueTask<IEnumerable<TElement>>> getElements,
-        Action<IWorkflowBuilder<(TSource Source, TElement Element)>> setupIteratorBuilder)
+        Action<IWorkflowBuilder<(TSource Source, TElement Element), object>> setupIteratorBuilder)
         where TService : notnull
     {
-        var iteratorWorkflow = new IteratorWorkflow<TSource, TElement>(setupIteratorBuilder);
+        var iteratorWorkflow = new ActionBuildWorkflow<(TSource, TElement), object>(setupIteratorBuilder);
 
         return this.Then<ForeachState<TSource, TElement>>()
-            .WithSubWorkflow([iteratorWorkflow])
+            .WithSubWorkflow([iteratorWorkflow.Definition])
             .Input(s => s.Elements, getElements)
             .Input(s => s.ElementWorkflow, iteratorWorkflow);
     }
 
-    public IStateBuilder<TSource, FinalState> Finish(Func<TSource, object?> getResult)
+    public IStateBuilder<TSource, TStatus, FinalState> Finish(Func<TSource, object?> getResult)
     {
         return this.Then<FinalState>()
             .Input(s => s.Result, getResult);
     }
 
-    public IStateBuilder<TSource, TaskState> ValueTask(Action<ITaskBuilder<TSource>> setup)
+    public IStateBuilder<TSource, TStatus, TaskState> ValueTask(Action<ITaskBuilder<TSource, TStatus>> setup)
     {
         var taskState = this.ThenInternal<TaskState>(false);
 
-        IStateBuilder<TSource, TaskState> genTaskState = taskState;
+        IStateBuilder<TSource, TStatus, TaskState> genTaskState = taskState;
 
-        var taskBuilder = new TaskBuilder<TSource>(this.Workflow, taskState);
+        var taskBuilder = new TaskBuilder<TSource, TStatus>(workflowBuilder, taskState);
 
         setup(taskBuilder);
 
         genTaskState.Input(s => s.CommandHeaders, taskBuilder.Commands);
 
-        taskState.StateDefinition.AdditionalInfo.Add(TaskState.CommandsKey, taskBuilder.Commands);
+        taskState.StateDefinitionBuilder.AdditionalInfo.Add(TaskState.CommandsKey, taskBuilder.Commands);
 
         return taskState;
     }

@@ -1,3 +1,4 @@
+using Anch.Core;
 using Anch.Workflow.Builder;
 using Anch.Workflow.Builder.Default;
 
@@ -5,7 +6,7 @@ namespace Anch.Workflow.Tests.StartWorkflowsWithTaskApprove;
 
 public class StartWorkflowsWithTaskApproveWorkflow : BuildWorkflow<StartWorkflowsWithTaskApproveWorkflowObject>
 {
-    protected override void Build(IWorkflowBuilder<StartWorkflowsWithTaskApproveWorkflowObject> builder)
+    protected override void Build(IWorkflowBuilder<StartWorkflowsWithTaskApproveWorkflowObject, Ignore> builder)
     {
         builder
             .Then(wfObj => wfObj.Status = StartWorkflowsWithTaskApproveStatus.Approving)

@@ -1,3 +1,4 @@
+using Anch.Core;
 using Anch.Workflow.Builder;
 using Anch.Workflow.Builder.Default;
 using Anch.Workflow.Domain;
@@ -9,7 +10,7 @@ public class ParallelForeachItemWorkflow : BuildWorkflow<ParallelForeachItemWork
 {
     public static readonly EventHeader TestItemWaitEvent = new(nameof(TestItemWaitEvent));
 
-    protected override void Build(IWorkflowBuilder<ParallelForeachItemWorkflowObject> builder)
+    protected override void Build(IWorkflowBuilder<ParallelForeachItemWorkflowObject, Ignore> builder)
     {
         builder.If(wfObj => wfObj.Value % 2 == 0,
 

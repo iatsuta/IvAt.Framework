@@ -1,12 +1,12 @@
-﻿using Anch.Workflow.Builder.Default;
+﻿using Anch.Workflow.Builder.Default.DomainDefinition;
 using Anch.Workflow.States;
 
 namespace Anch.Workflow.Builder;
 
 public static class StateBuilderExtensions
 {
-    public static IStateBuilder<TSource, TState> SetBreak<TSource, TState>(
-        this IStateBuilder<TSource, TState> stateBuilder,
+    public static IStateBuilder<TSource, TStatus, TState> SetBreak<TSource, TStatus, TState>(
+        this IStateBuilder<TSource, TStatus, TState> stateBuilder,
         StateBreakPolicy breakPolicy)
         where TSource : notnull
         where TState : ParallelStateBase<TSource>
@@ -15,8 +15,8 @@ public static class StateBuilderExtensions
             .Input(state => state.BreakPolicy, breakPolicy);
     }
 
-    public static IStateBuilder<TSource, ParallelForeachState<TSource, TElement>> SetFinishedBreak<TSource, TElement>(
-        this IStateBuilder<TSource, ParallelForeachState<TSource, TElement>> stateBuilder,
+    public static IStateBuilder<TSource, TStatus, ParallelForeachState<TSource, TElement>> SetFinishedBreak<TSource, TStatus, TElement>(
+        this IStateBuilder<TSource, TStatus, ParallelForeachState<TSource, TElement>> stateBuilder,
         Func<TElement, bool> condition)
         where TSource : notnull
     {
@@ -24,8 +24,8 @@ public static class StateBuilderExtensions
             .SetBreak(StateBreakPolicy.AnyFinishedItem<(TSource Source, TElement Element)>(pair => condition(pair.Element)));
     }
 
-    public static IStateBuilder<TSource, StartWorkflowsState<TSource, TElement>> SetFinishedBreak<TSource, TElement>(
-        this IStateBuilder<TSource, StartWorkflowsState<TSource, TElement>> stateBuilder,
+    public static IStateBuilder<TSource, TStatus, StartWorkflowsState<TSource, TElement>> SetFinishedBreak<TSource, TStatus, TElement>(
+        this IStateBuilder<TSource, TStatus, StartWorkflowsState<TSource, TElement>> stateBuilder,
         Func<TElement, bool> condition)
         where TSource : notnull
         where TElement : notnull
@@ -34,11 +34,11 @@ public static class StateBuilderExtensions
             .SetBreak(StateBreakPolicy.AnyFinishedItem(condition));
     }
 
-    internal static IStateBuilder<TSource, TState> WithSubWorkflow<TSource, TState>(this IStateBuilder<TSource, TState> stateBuilder, IEnumerable<BuildWorkflow> subWorkflows)
+    internal static IStateBuilder<TSource, TStatus, TState> WithSubWorkflow<TSource, TStatus, TState>(this IStateBuilder<TSource, TStatus, TState> stateBuilder, IEnumerable<IWorkflowDefinitionBuilder> subWorkflows)
         where TSource : notnull
         where TState : IState
     {
-        stateBuilder.StateDefinition.SubWorkflows.AddRange(subWorkflows);
+        stateBuilder.StateDefinitionBuilder.SubWorkflows.AddRange(subWorkflows);
 
         return stateBuilder;
     }

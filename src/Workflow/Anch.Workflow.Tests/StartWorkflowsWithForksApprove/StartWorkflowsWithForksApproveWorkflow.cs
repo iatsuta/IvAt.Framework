@@ -1,3 +1,4 @@
+using Anch.Core;
 using Anch.Workflow.Builder;
 using Anch.Workflow.Builder.Default;
 
@@ -5,7 +6,7 @@ namespace Anch.Workflow.Tests.StartWorkflowsWithForksApprove;
 
 public class StartWorkflowsWithForksApproveWorkflow : BuildWorkflow<StartWorkflowsWithForksApproveWorkflowObject>
 {
-    protected override void Build(IWorkflowBuilder<StartWorkflowsWithForksApproveWorkflowObject> builder)
+    protected override void Build(IWorkflowBuilder<StartWorkflowsWithForksApproveWorkflowObject, Ignore> builder)
     {
         builder
             .Then(wfObj => wfObj.Status = StartWorkflowsWithForksApproveStatus.Approving)

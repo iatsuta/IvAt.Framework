@@ -1,3 +1,4 @@
+using Anch.Core;
 using Anch.Workflow.Builder;
 using Anch.Workflow.Builder.Default;
 using Anch.Workflow.Domain;
@@ -11,7 +12,7 @@ public class StartWorkflowsWithForksApproveItemWorkflow : BuildWorkflow<StartWor
 
     public static readonly EventHeader RejectWaitEvent = new(nameof(RejectWaitEvent));
 
-    protected override void Build(IWorkflowBuilder<StartWorkflowsWithForksApproveItemWorkflowObject> builder)
+    protected override void Build(IWorkflowBuilder<StartWorkflowsWithForksApproveItemWorkflowObject, Ignore> builder)
     {
         builder
             .Then(wfObj => wfObj.Status = StartWorkflowsWithForksApproveStatus.Approving)

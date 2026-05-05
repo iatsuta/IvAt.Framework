@@ -2,19 +2,20 @@
 
 namespace Anch.Workflow.Serialization.Inline;
 
-public class StateDefinitionResolver<TSource, TStatus>(IWorkflowDefinition workflow) : IStateDefinitionResolver<TSource>
+public class StateDefinitionResolver<TSource, TStatus>(IWorkflowDefinition<TSource, TStatus> workflow) : IStateDefinitionResolver<TSource>
+    where TSource : notnull
     where TStatus : notnull
 {
-    private readonly WorkflowDomainBindingInfo<TSource, TStatus> workflowDomainBindingInfo =
-        (WorkflowDomainBindingInfo<TSource, TStatus>)workflow.DomainBindingInfo;
+    private readonly Func<TSource, TStatus> getStatus = (workflow.StatusAccessors ?? throw new InvalidOperationException("StatusAccessors cannot be null"))
+        .Getter;
 
     //private readonly Func<TSource, TStatus> getStatus = ((Expression<Func<TSource, TStatus>>)workflow.Definition.DomainBindingInfo.StatusProperty!).Compile(LambdaCompileCache.Default);
 
-    private readonly Dictionary<TStatus, IStateDefinition> statusMap = workflow.States.Where(state => state.Status != null).ToDictionary(st => (TStatus)st.Status!);
+    private readonly Dictionary<TStatus, IStateDefinition<TSource, TStatus>> statusMap = workflow.States.Where(state => state.Status != null).ToDictionary(st => st.Status!);
 
     public IStateDefinition GetCurrentStateDefinition(TSource source)
     {
-        return this.statusMap[this.workflowDomainBindingInfo.Status.Getter(source)];
+        return this.statusMap[this.getStatus(source)];
 
         //var stateDefinition = workflow.Definition.States.Single(state => (TStatus)state.Status == this.statusExpr. );
 
