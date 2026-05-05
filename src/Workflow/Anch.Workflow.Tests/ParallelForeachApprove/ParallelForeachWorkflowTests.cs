@@ -13,7 +13,7 @@ public class ParallelForeachApproveWorkflowTests : SingleScopeWorkflowTestBase<P
         // Arrange
         var wfObj = new ParallelForeachApproveWorkflowObject
         {
-            Items = Enumerable.Range(0, 5).Select(value => new ParallelForeachApproveItemWorkflowObject { Name = "Item" + value }).ToList()
+            Items = [.. Enumerable.Range(0, 5).Select(value => new ParallelForeachApproveItemWorkflowObject { Name = "Item" + value })]
         };
 
         // Act
@@ -65,7 +65,7 @@ public class ParallelForeachApproveWorkflowTests : SingleScopeWorkflowTestBase<P
         // Arrange
         var wfObj = new ParallelForeachApproveWorkflowObject
         {
-            Items = Enumerable.Range(0, 5).Select(value => new ParallelForeachApproveItemWorkflowObject { Name = "Item" + value }).ToList()
+            Items = [.. Enumerable.Range(0, 5).Select(value => new ParallelForeachApproveItemWorkflowObject { Name = "Item" + value })]
         };
 
         // Act
@@ -102,7 +102,7 @@ public class ParallelForeachApproveWorkflowTests : SingleScopeWorkflowTestBase<P
         // Arrange
         var wfObj = new ParallelForeachApproveWorkflowObject
         {
-            Items = Enumerable.Range(0, 5).Select(value => new ParallelForeachApproveItemWorkflowObject { Name = "Item" + value }).ToList()
+            Items = [.. Enumerable.Range(0, 5).Select(value => new ParallelForeachApproveItemWorkflowObject { Name = "Item" + value })]
         };
 
         // Act

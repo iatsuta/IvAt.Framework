@@ -18,16 +18,14 @@ public interface IStateBuilder<TSource, TStatus, TState> : IWorkflowBuilder<TSou
     new StateDefinitionBuilder<TSource, TStatus, TState> StateDefinitionBuilder { get; }
 
     IStateBuilder<TSource, TStatus, TState> Input<TStateProperty, TSourceProperty>(Expression<Func<TState, TStateProperty>> getStateProperty, TSourceProperty value)
-        where TSourceProperty : TStateProperty
-    {
-        return this.Input(getStateProperty, _ => value);
-    }
+        where TSourceProperty : TStateProperty =>
+
+        this.Input(getStateProperty, _ => value);
 
     IStateBuilder<TSource, TStatus, TState> Input<TStateProperty, TSourceProperty>(Expression<Func<TState, TStateProperty>> getStateProperty, Func<TSource, TSourceProperty> getSourceProperty)
-        where TSourceProperty : TStateProperty
-    {
-        return this.Input(getStateProperty, async (TSource source, IWorkflowHost _, CancellationToken _) => getSourceProperty(source));
-    }
+        where TSourceProperty : TStateProperty =>
+
+        this.Input(getStateProperty, async (TSource source, IWorkflowHost _, CancellationToken _) => getSourceProperty(source));
 
     IStateBuilder<TSource, TStatus, TState> Input<TStateProperty, TSourceProperty, TService>(
         Expression<Func<TState, TStateProperty>> getStateProperty,
@@ -36,16 +34,14 @@ public interface IStateBuilder<TSource, TStatus, TState> : IWorkflowBuilder<TSou
         where TService : notnull;
 
     IStateBuilder<TSource, TStatus, TState> Output<TSourceProperty, TStateProperty>(Expression<Func<TSource, TSourceProperty>> propertyValueSelector, TStateProperty value)
-        where TStateProperty : TSourceProperty
-    {
-        return this.Output(propertyValueSelector, _ => value);
-    }
+        where TStateProperty : TSourceProperty =>
+
+        this.Output(propertyValueSelector, _ => value);
 
     IStateBuilder<TSource, TStatus, TState> Output<TSourceProperty, TStateProperty>(Expression<Func<TSource, TSourceProperty>> propertyValueSelector, Func<TState, TStateProperty> getStateProperty)
-        where TStateProperty : TSourceProperty
-    {
-        return this.Output(propertyValueSelector, async (TState state, IWorkflowHost _, CancellationToken _) => getStateProperty(state));
-    }
+        where TStateProperty : TSourceProperty =>
+
+        this.Output(propertyValueSelector, async (TState state, IWorkflowHost _, CancellationToken _) => getStateProperty(state));
 
     IStateBuilder<TSource, TStatus, TState> Output<TSourceProperty, TStateProperty, TService>(
         Expression<Func<TSource, TSourceProperty>> propertyValueSelector,

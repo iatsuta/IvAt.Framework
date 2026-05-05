@@ -43,7 +43,8 @@ public interface IWorkflowBuilder<TSource, TStatus>
         where TInnerWorkflow : IWorkflow<TInnerSource>
         where TInnerSource : notnull;
 
-    IStateBuilder<TSource, TStatus, StartWorkflowsState<TSource, TInnerSource>> StartWorkflows<TInnerSource, TInnerWorkflow>(Func<TSource, IEnumerable<TInnerSource>> getElements)
+    IStateBuilder<TSource, TStatus, StartWorkflowsState<TSource, TInnerSource>> StartWorkflows<TInnerSource, TInnerWorkflow>(
+        Func<TSource, IEnumerable<TInnerSource>> getElements)
         where TInnerWorkflow : IWorkflow<TInnerSource>
         where TInnerSource : notnull;
 
@@ -63,9 +64,9 @@ public interface IWorkflowBuilder<TSource, TStatus>
         this.If<TService>(async (source, service, _) => condition(source, service), trueSetupWorkflowBuilder, falseSetupWorkflowBuilder);
 
     IStateBuilder<TSource, TStatus, IfState> If<TService>(
-       Func<TSource, TService, CancellationToken, ValueTask<bool>> condition,
-       Action<IWorkflowBuilder<TSource, TStatus>> trueSetupWorkflowBuilder,
-       Action<IWorkflowBuilder<TSource, TStatus>>? falseSetupWorkflowBuilder = null)
+        Func<TSource, TService, CancellationToken, ValueTask<bool>> condition,
+        Action<IWorkflowBuilder<TSource, TStatus>> trueSetupWorkflowBuilder,
+        Action<IWorkflowBuilder<TSource, TStatus>>? falseSetupWorkflowBuilder = null)
         where TService : notnull;
 
     IStateBuilder<TSource, TStatus, SwitchState<TProperty>> Switch<TProperty>(Func<TSource, TProperty> selector,
@@ -73,7 +74,7 @@ public interface IWorkflowBuilder<TSource, TStatus>
         params (TProperty CaseValue, Action<IWorkflowBuilder<TSource, TStatus>> CaseSetupWorkflowBuilder)[] cases)
         where TProperty : notnull
     {
-        return this.Switch(selector, _ => {}, cases);
+        return this.Switch(selector, _ => { }, cases);
     }
 
     IStateBuilder<TSource, TStatus, SwitchState<TProperty>> Switch<TProperty>(
@@ -108,11 +109,11 @@ public interface IWorkflowBuilder<TSource, TStatus>
         Func<TSource, IEnumerable<TElement>> getElements,
         Action<IWorkflowBuilder<(TSource Source, TElement Element), Ignore>> setupIteratorBuilder)
     {
-        return this.ParallelForeach<TElement, IServiceProvider>(async (source, _, _) => getElements(source), setupIteratorBuilder);
+        return this.ParallelForeach<TElement, IServiceProvider>((source, _) => getElements(source).ToAsyncEnumerable(), setupIteratorBuilder);
     }
 
     public IStateBuilder<TSource, TStatus, ParallelForeachState<TSource, TElement>> ParallelForeach<TElement, TService>(
-        Func<TSource, TService, CancellationToken, ValueTask<IEnumerable<TElement>>> getElements,
+        Func<TSource, TService, IAsyncEnumerable<TElement>> getElements,
         Action<IWorkflowBuilder<(TSource Source, TElement Element), Ignore>> setupIteratorBuilder)
         where TService : notnull;
 
@@ -122,19 +123,15 @@ public interface IWorkflowBuilder<TSource, TStatus>
         Func<TSource, IEnumerable<TElement>> getElements,
         Action<IWorkflowBuilder<(TSource Source, TElement Element), Ignore>> setupIteratorBuilder)
     {
-        return this.Foreach<TElement, IServiceProvider>(async (source, _, _) => getElements(source), setupIteratorBuilder);
+        return this.Foreach<TElement, IServiceProvider>((source, _) => getElements(source).ToAsyncEnumerable(), setupIteratorBuilder);
     }
 
     IStateBuilder<TSource, TStatus, ForeachState<TSource, TElement>> Foreach<TElement, TService>(
-        Func<TSource, TService, CancellationToken, ValueTask<IEnumerable<TElement>>> getElements,
+        Func<TSource, TService, IAsyncEnumerable<TElement>> getElements,
         Action<IWorkflowBuilder<(TSource Source, TElement Element), Ignore>> setupIteratorBuilder)
         where TService : notnull;
 
-
-        IStateBuilder<TSource, TStatus, FinalState> Finish(object? result = null)
-    {
-        return this.Finish(_ => result);
-    }
+    IStateBuilder<TSource, TStatus, FinalState> Finish(object? result = null) => this.Finish(_ => result);
 
     IStateBuilder<TSource, TStatus, FinalState> Finish(Func<TSource, object?> getResult);
 

@@ -4,14 +4,7 @@ namespace Anch.Workflow.States;
 
 public class ParallelForeachState<TSource, TElement>(IWorkflowMachineFactory workflowMachineFactory) : ParallelStateBase<TSource>
 {
-    private List<TElement> elements = [];
-
-
-    public IEnumerable<TElement> Elements
-    {
-        get => this.elements;
-        set => this.elements = value.ToList();
-    }
+    public IReadOnlyList<TElement> Elements { get; set; } = [];
 
 
     public IWorkflow<(TSource, TElement)> ElementWorkflow { get; set; } = null!;

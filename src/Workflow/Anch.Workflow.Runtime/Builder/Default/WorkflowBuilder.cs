@@ -42,16 +42,11 @@ public class WorkflowBuilder<TSource, TStatus>(WorkflowDefinitionBuilder<TSource
     }
 
     public IStateBuilder<TSource, TStatus, TState> Then<TState>()
-        where TState : IState
-    {
-        return this.ThenInternal<TState>(true);
-    }
+        where TState : IState => this.ThenInternal<TState>(true);
 
     private StateBuilder<TSource, TStatus, TState> ThenInternal<TState>(bool addDoneEvent)
-        where TState : IState
-    {
-        return new StateBuilder<TSource, TStatus, TState>(workflowBuilder, addDoneEvent);
-    }
+
+        where TState : IState => new(workflowBuilder, addDoneEvent);
 
     public IWorkflowBuilder<TSource, TStatus> Then(IStateBuilder<TSource, TStatus> state)
     {
@@ -77,7 +72,7 @@ public class WorkflowBuilder<TSource, TStatus>(WorkflowDefinitionBuilder<TSource
     {
         return this.Then<StartWorkflowsState<TSource, TInnerSource>>()
             .Input(s => s.ElementWorkflow, async (TSource _, TInnerWorkflow innerWorkflow, CancellationToken _) => innerWorkflow)
-            .Input(s => s.Elements, getElements);
+            .Input(s => s.Elements, v => getElements(v).ToList());
     }
 
     public IStateBuilder<TSource, TStatus, IfState> If<TService>(
@@ -146,7 +141,7 @@ public class WorkflowBuilder<TSource, TStatus>(WorkflowDefinitionBuilder<TSource
     }
 
     public IStateBuilder<TSource, TStatus, ParallelForeachState<TSource, TElement>> ParallelForeach<TElement, TService>(
-        Func<TSource, TService, CancellationToken, ValueTask<IEnumerable<TElement>>> getElements,
+        Func<TSource, TService, IAsyncEnumerable<TElement>> getElements,
         Action<IWorkflowBuilder<(TSource Source, TElement Element), Ignore>> setupIteratorBuilder)
         where TService : notnull
     {
@@ -154,7 +149,7 @@ public class WorkflowBuilder<TSource, TStatus>(WorkflowDefinitionBuilder<TSource
 
         return this.Then<ParallelForeachState<TSource, TElement>>()
             .WithSubWorkflow([iteratorWorkflow.Definition])
-            .Input(s => s.Elements, getElements)
+            .Input(s => s.Elements, (TSource source, TService service, CancellationToken ct) => getElements(source, service).ToListAsync(ct))
             .Input(s => s.ElementWorkflow, iteratorWorkflow);
     }
 
@@ -171,7 +166,7 @@ public class WorkflowBuilder<TSource, TStatus>(WorkflowDefinitionBuilder<TSource
     }
 
     public IStateBuilder<TSource, TStatus, ForeachState<TSource, TElement>> Foreach<TElement, TService>(
-        Func<TSource, TService, CancellationToken, ValueTask<IEnumerable<TElement>>> getElements,
+        Func<TSource, TService, IAsyncEnumerable<TElement>> getElements,
         Action<IWorkflowBuilder<(TSource Source, TElement Element), Ignore>> setupIteratorBuilder)
         where TService : notnull
     {
@@ -179,7 +174,7 @@ public class WorkflowBuilder<TSource, TStatus>(WorkflowDefinitionBuilder<TSource
 
         return this.Then<ForeachState<TSource, TElement>>()
             .WithSubWorkflow([iteratorWorkflow.Definition])
-            .Input(s => s.Elements, getElements)
+            .Input(s => s.Elements, (TSource source, TService service, CancellationToken ct) => getElements(source, service).ToListAsync(ct))
             .Input(s => s.ElementWorkflow, iteratorWorkflow);
     }
 

@@ -14,7 +14,7 @@ public class StartWorkflowsWithTaskApproveWorkflowTests : SingleScopeWorkflowTes
         // Arrange
         var wfObj = new StartWorkflowsWithTaskApproveWorkflowObject
         {
-            Items = Enumerable.Range(0, 5).Select(value => new StartWorkflowsWithTaskApproveItemWorkflowObject { Name = "Item" + value }).ToList()
+            Items = [.. Enumerable.Range(0, 5).Select(value => new StartWorkflowsWithTaskApproveItemWorkflowObject { Name = "Item" + value })]
         };
 
         // Act
@@ -70,7 +70,7 @@ public class StartWorkflowsWithTaskApproveWorkflowTests : SingleScopeWorkflowTes
         // Arrange
         var wfObj = new StartWorkflowsWithTaskApproveWorkflowObject
         {
-            Items = Enumerable.Range(0, 5).Select(value => new StartWorkflowsWithTaskApproveItemWorkflowObject { Name = "Item" + value }).ToList()
+            Items = [.. Enumerable.Range(0, 5).Select(value => new StartWorkflowsWithTaskApproveItemWorkflowObject { Name = "Item" + value })]
         };
 
         // Act
@@ -109,7 +109,7 @@ public class StartWorkflowsWithTaskApproveWorkflowTests : SingleScopeWorkflowTes
         // Arrange
         var wfObj = new StartWorkflowsWithTaskApproveWorkflowObject
         {
-            Items = Enumerable.Range(0, 5).Select(value => new StartWorkflowsWithTaskApproveItemWorkflowObject { Name = "Item" + value }).ToList()
+            Items = [.. Enumerable.Range(0, 5).Select(value => new StartWorkflowsWithTaskApproveItemWorkflowObject { Name = "Item" + value })]
         };
 
         // Act

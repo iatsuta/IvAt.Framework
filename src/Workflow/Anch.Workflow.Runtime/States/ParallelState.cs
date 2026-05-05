@@ -5,14 +5,7 @@ namespace Anch.Workflow.States;
 public class ParallelState<TSource>(IWorkflowMachineFactory workflowMachineFactory) : ParallelStateBase<TSource>
     where TSource : notnull
 {
-    private List<IWorkflow<TSource>> forks = [];
-
-
-    public IEnumerable<IWorkflow<TSource>> Forks
-    {
-        get => this.forks;
-        set => this.forks = value.ToList();
-    }
+    public IReadOnlyList<IWorkflow<TSource>> Forks { get; set; } = [];
 
     protected override IEnumerable<IWorkflowMachine> CreateChildMachines(TSource source)
     {

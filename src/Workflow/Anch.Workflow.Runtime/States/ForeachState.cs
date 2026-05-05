@@ -5,14 +5,7 @@ namespace Anch.Workflow.States;
 
 public class ForeachState<TSource, TElement>(IWorkflowHost workflowHost) : IState
 {
-    private List<TElement> elements = [];
-
-
-    public IEnumerable<TElement> Elements
-    {
-        get => this.elements;
-        set => this.elements = value.ToList();
-    }
+    public IReadOnlyList<TElement> Elements { get; set; } = [];
 
     public IWorkflow<(TSource, TElement)> ElementWorkflow { get; set; } = null!;
 

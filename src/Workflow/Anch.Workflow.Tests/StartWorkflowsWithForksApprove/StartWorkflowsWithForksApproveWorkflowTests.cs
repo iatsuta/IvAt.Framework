@@ -13,7 +13,7 @@ public class StartWorkflowsWithForksApproveWorkflowTests : SingleScopeWorkflowTe
         // Arrange
         var wfObj = new StartWorkflowsWithForksApproveWorkflowObject
         {
-            Items = Enumerable.Range(0, 5).Select(value => new StartWorkflowsWithForksApproveItemWorkflowObject { Name = "Item" + value }).ToList()
+            Items = [.. Enumerable.Range(0, 5).Select(value => new StartWorkflowsWithForksApproveItemWorkflowObject { Name = "Item" + value })]
         };
 
         // Act
@@ -65,7 +65,7 @@ public class StartWorkflowsWithForksApproveWorkflowTests : SingleScopeWorkflowTe
         // Arrange
         var wfObj = new StartWorkflowsWithForksApproveWorkflowObject
         {
-            Items = Enumerable.Range(0, 5).Select(value => new StartWorkflowsWithForksApproveItemWorkflowObject { Name = "Item" + value }).ToList()
+            Items = [.. Enumerable.Range(0, 5).Select(value => new StartWorkflowsWithForksApproveItemWorkflowObject { Name = "Item" + value })]
         };
 
         // Act
@@ -103,7 +103,7 @@ public class StartWorkflowsWithForksApproveWorkflowTests : SingleScopeWorkflowTe
         // Arrange
         var wfObj = new StartWorkflowsWithForksApproveWorkflowObject
         {
-            Items = Enumerable.Range(0, 5).Select(value => new StartWorkflowsWithForksApproveItemWorkflowObject { Name = "Item" + value }).ToList()
+            Items = [.. Enumerable.Range(0, 5).Select(value => new StartWorkflowsWithForksApproveItemWorkflowObject { Name = "Item" + value })]
         };
 
         // Act

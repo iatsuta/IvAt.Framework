@@ -15,7 +15,7 @@ public class ParallelForeachWorkflowTests : SingleScopeWorkflowTestBase<Parallel
         // Arrange
         var wfObj = new ParallelForeachWorkflowObject
         {
-            Items = Enumerable.Range(0, wfCount).Select(value => new ParallelForeachItemWorkflowObject { Value = value, Name = "Item" + value }).ToList(),
+            Items = [.. Enumerable.Range(0, wfCount).Select(value => new ParallelForeachItemWorkflowObject { Value = value, Name = "Item" + value })],
             ExtraAddToResult = extraAddToResult
         };
 
