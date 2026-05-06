@@ -41,26 +41,10 @@ public class WorkflowMachine(
     {
         if (this.WorkflowInstance.Status.Role != WorkflowStatusRole.Finished)
         {
-            var prevState = this.WorkflowInstance.CurrentState;
-
-            var switchResult = this.SwitchState(this.WorkflowInstance.Definition.TerminateState);
-
-            if (prevState.OutputProcessed)
-            {
-                return switchResult;
-            }
-            else
-            {
-                var codeStateProcessor = codeStateProcessorFactory.Create(prevState);
-
-                var executionContext = this.CreateExecutionContext(cancellationToken);
-
-                var leaveResult = await codeStateProcessor.CodeState.LeavePolicy.Leave(serviceProvider, executionContext);
-
-                prevState.ReleaseWaitEvents();
-
-                return leaveResult + switchResult;
-            }
+            return await this.GetLeaveResult(
+                       codeStateProcessorFactory.Create(this.WorkflowInstance.CurrentState),
+                       this.CreateExecutionContext(cancellationToken), true)
+                   + this.SwitchState(this.WorkflowInstance.Definition.TerminateState);
         }
         else
         {
@@ -102,6 +86,31 @@ public class WorkflowMachine(
         return new WorkflowProcessResult([this.WorkflowInstance], [new UnprocessedCurrentStateResult(this.WorkflowInstance)]);
     }
 
+    private async ValueTask<WorkflowProcessResult> GetLeaveResult(ICodeStateProcessor codeStateProcessor, IExecutionContext executionContext, bool force)
+    {
+        var currentState = this.WorkflowInstance.CurrentState;
+
+        if (!currentState.OutputProcessed)
+        {
+            currentState.OutputProcessed = true;
+
+            if (!force)
+            {
+                await codeStateProcessor.BindOutput(executionContext.CancellationToken);
+            }
+
+            var leaveResult = await codeStateProcessor.CodeState.LeavePolicy.Leave(serviceProvider, executionContext);
+
+            currentState.ReleaseWaitEvents();
+
+            return leaveResult;
+        }
+        else
+        {
+            return WorkflowProcessResult.Empty;
+        }
+    }
+
     private async ValueTask<WorkflowProcessResult> ProcessCurrentState(IExecutionContext executionContext)
     {
         if (!executionContext.StateInstance.IsActual)
@@ -131,15 +140,9 @@ public class WorkflowMachine(
 
         var runResult = new WorkflowProcessResult([], [new UnprocessedStateResult(currentState, runExecutionResult)]);
 
-        if (!currentState.OutputProcessed && runExecutionResult.LeaveState)
+        if (runExecutionResult.LeaveState)
         {
-            currentState.OutputProcessed = true;
-
-            await codeStateProcessor.BindOutput(executionContext.CancellationToken);
-
-            var leaveResult = await codeStateProcessor.CodeState.LeavePolicy.Leave(serviceProvider, executionContext);
-
-            currentState.ReleaseWaitEvents();
+            var leaveResult = await this.GetLeaveResult(codeStateProcessor, executionContext, false);
 
             return modifyResult + leaveResult + runResult;
         }
@@ -156,7 +159,7 @@ public class WorkflowMachine(
         {
             case WorkflowProcessExecutionResult workflowProcessExecutionResult:
             {
-                if (workflowProcessExecutionResult.LeaveState)
+                if (workflowProcessExecutionResult.IsDone)
                 {
                     return workflowProcessExecutionResult.WorkflowProcessResult +
 

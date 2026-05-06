@@ -50,9 +50,11 @@ public class ParallelForeachApproveWorkflowTests : SingleScopeWorkflowTestBase<P
         Assert.Equal(WorkflowStatus.Finished, rejectedWf.Status);
 
         Assert.Equal(3, notUsedApprovingInstances.Length);
-        Assert.Equal(WorkflowStatus.Terminated, notUsedApprovingInstances[0].Status);
-        Assert.Equal(WorkflowStatus.Terminated, notUsedApprovingInstances[1].Status);
-        Assert.Equal(WorkflowStatus.Terminated, notUsedApprovingInstances[2].Status);
+
+        foreach (var notUsedApprovingInstance in notUsedApprovingInstances)
+        {
+            Assert.Equal(WorkflowStatus.Terminated, notUsedApprovingInstance.Status);
+        }
 
         Assert.Equal(ParallelForeachApproveStatus.Rejected, wfObj.Status);
 
