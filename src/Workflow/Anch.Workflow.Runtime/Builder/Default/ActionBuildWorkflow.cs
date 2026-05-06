@@ -11,6 +11,7 @@ public class ActionBuildWorkflow<TSource, TStatus>(Action<IWorkflowBuilder<TSour
         var header = base.CreateDefinitionHeader();
 
         header.IsRoot = false;
+        header.AllowReplaceAutoNames = false;
 
         return header;
     }

@@ -31,6 +31,8 @@ public class WorkflowDefinitionBuilder<TSource, TStatus> : IWorkflowDefinition<T
 
     public bool IsRoot { get; set; }
 
+    public bool AllowReplaceAutoNames { get; set; }
+
     public List<IStateDefinitionBuilder<TSource, TStatus>> States { get; set; } = [];
 
     public IStateDefinitionBuilder<TSource, TStatus> StartState { get; set; }

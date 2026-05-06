@@ -156,7 +156,7 @@ public class WorkflowBuilder<TSource, TStatus>(WorkflowDefinitionBuilder<TSource
     public IStateBuilder<TSource, TStatus, ParallelState<TSource>> Parallel(
         params Action<IWorkflowBuilder<TSource, TStatus>>[] setupForks)
     {
-        var subWorkflows = setupForks.Select(setupFork => new ForkBuildWorkflow<TSource, TStatus>(setupFork, workflowDefinitionBuilder));
+        var subWorkflows = setupForks.Select(setupFork => new ForkBuildWorkflow<TSource, TStatus>(setupFork, workflowDefinitionBuilder)).ToArray();
 
         var lazyDefinitions = LazyHelper.Create(() => subWorkflows.Select(sw => sw.Definition).ToArray());
 

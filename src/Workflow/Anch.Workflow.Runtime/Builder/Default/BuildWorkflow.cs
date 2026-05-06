@@ -20,7 +20,8 @@ public abstract class BuildWorkflow<TSource, TStatus> : IWorkflow<TSource, TStat
 
     public WorkflowDefinitionBuilder<TSource, TStatus> Definition => this.lazyDefinition.Value;
 
-    protected virtual WorkflowDefinitionBuilder<TSource, TStatus> CreateDefinitionHeader() => new() { Identity = new(this.GetType().Name), IsRoot = true };
+    protected virtual WorkflowDefinitionBuilder<TSource, TStatus> CreateDefinitionHeader() =>
+        new() { Identity = new(this.GetType().Name), IsRoot = true, AllowReplaceAutoNames = true };
 
     private WorkflowDefinitionBuilder<TSource, TStatus> CreateDefinition()
     {
@@ -30,7 +31,11 @@ public abstract class BuildWorkflow<TSource, TStatus> : IWorkflow<TSource, TStat
 
         workflowDefinition.Optimize();
         workflowDefinition.Validate();
-        workflowDefinition.ReplaceAutoNames();
+
+        if (workflowDefinition.AllowReplaceAutoNames)
+        {
+            workflowDefinition.ReplaceAutoNames();
+        }
 
         return workflowDefinition;
     }
