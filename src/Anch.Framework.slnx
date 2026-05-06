@@ -6,8 +6,10 @@
     <Project Path="Workflow/Anch.Workflow.Serialization.Inline/Anch.Workflow.Serialization.Inline.csproj" />
     <Project Path="Workflow/Anch.Workflow.Serialization.Memory/Anch.Workflow.Serialization.Memory.csproj" />
     <Project Path="Workflow/Anch.Workflow.Serialization/Anch.Workflow.Serialization.csproj" />
-    <Project Path="Workflow/Anch.Workflow.Tests/Anch.Workflow.Tests.csproj" />
     <Project Path="Workflow/Anch.Workflow/Anch.Workflow.csproj" />
+  </Folder>
+  <Folder Name="/Workflow/Tests/">
+    <Project Path="Workflow/Anch.Workflow.Tests/Anch.Workflow.Tests.csproj" />
   </Folder>
 
   <Folder Name="/__RootSolutionItems/">
