@@ -1,0 +1,12 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Anch.Workflow.Abstractions</PackageId>
+    <RootNamespace>Anch.Workflow</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Anch.Workflow.Domain\Anch.Workflow.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

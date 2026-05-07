@@ -43,7 +43,7 @@ public class RootAuthManager(
             var idents = await queryableSource.GetQueryable<TDomainObject>().Pipe(securityProvider.Inject).Select(identityInfo.Id.Path)
                 .GenericToListAsync(cancellationToken);
 
-            return idents.Select<TIdent, TypedSecurityIdentity<TIdent>>(TypedSecurityIdentity.Create<TIdent>).ToList();
+            return idents.Select(TypedSecurityIdentity.Create).ToList();
         });
     }
 
@@ -61,7 +61,7 @@ public class RootAuthManager(
             var securityContextId = await queryableSource.GetQueryable<TSecurityContext>().Where(filter).Select(identityInfo.Id.Path)
                 .GenericSingleAsync(cancellationToken);
 
-            return TypedSecurityIdentity.Create<TIdent>(securityContextId);
+            return TypedSecurityIdentity.Create(securityContextId);
         });
     }
 

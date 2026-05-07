@@ -1,4 +1,3 @@
-﻿namespace Anch.HierarchicalExpand.IntegrationTests
-{
-    public class MainTestsImpl(IServiceProvider rootServiceProvider) : MainTests(rootServiceProvider);
-}
+﻿namespace Anch.HierarchicalExpand.IntegrationTests;
+
+public class MainTestsImpl(IServiceProvider rootServiceProvider) : MainTests(rootServiceProvider);
