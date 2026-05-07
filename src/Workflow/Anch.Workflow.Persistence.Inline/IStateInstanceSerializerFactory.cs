@@ -2,7 +2,9 @@
 
 namespace Anch.Workflow.Persistence.Inline;
 
-public interface IStateInstanceSerializerFactory
+public interface IStateInstanceSerializerFactory<TSource, TStatus>
+    where TSource : class
+    where TStatus : struct
 {
-    IStateInstanceSerializer Create(IWorkflowDefinition workflow);
+    IStateInstanceSerializer<TSource> Create(IWorkflowDefinition<TSource, TStatus> workflowDefinition);
 }

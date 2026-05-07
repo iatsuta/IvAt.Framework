@@ -2,9 +2,9 @@
 
 namespace Anch.Workflow.Persistence.Inline;
 
-public interface IWorkflowInstanceSerializer
+public interface IWorkflowInstanceSerializer<in TSource>
 {
-    WorkflowInstance Deserialize(object source);
+    WorkflowInstance Deserialize(TSource source);
 
     void Serialize(WorkflowInstance workflowInstance);
 }

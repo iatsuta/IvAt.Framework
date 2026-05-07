@@ -4,5 +4,6 @@ namespace Anch.Workflow.Persistence.Inline;
 
 public interface IWorkflowInstanceSerializerFactory
 {
-    IWorkflowInstanceSerializer Create(IWorkflowDefinition workflowDefinition);
+    IWorkflowInstanceSerializer<TSource> Create<TSource>(IWorkflowDefinition<TSource> workflowDefinition)
+        where TSource : class;
 }

@@ -5,9 +5,10 @@ namespace Anch.Workflow.Persistence.Inline;
 
 public class WorkflowInstanceSerializerFactory(IServiceProxyFactory serviceProxyFactory) : IWorkflowInstanceSerializerFactory
 {
-    public IWorkflowInstanceSerializer Create(IWorkflowDefinition workflowDefinition) =>
+    public IWorkflowInstanceSerializer<TSource> Create<TSource>(IWorkflowDefinition<TSource> workflowDefinition)
+        where TSource : class =>
 
-        serviceProxyFactory.Create<IWorkflowInstanceSerializer>(
-            typeof(WorkflowInstanceSerializer<>).MakeGenericType(workflowDefinition.SourceType),
+        serviceProxyFactory.Create<IWorkflowInstanceSerializer<TSource>>(
+            typeof(WorkflowInstanceSerializer<,>).MakeGenericType(workflowDefinition.SourceType, workflowDefinition.StatusType),
             workflowDefinition);
 }

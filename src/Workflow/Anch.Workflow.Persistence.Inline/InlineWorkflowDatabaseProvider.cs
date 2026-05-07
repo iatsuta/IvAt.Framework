@@ -17,7 +17,7 @@ public class InlineWorkflowDatabaseProvider : IWorkflowDatabaseProvider
             .AddScoped<IInstanceIdGenerator<StateInstance>, StateInstanceInlineIdGenerator>()
             .AddScoped<IWorkflowInstanceSerializerFactory, WorkflowInstanceSerializerFactory>()
 
-            .AddScoped<IStateInstanceSerializerFactory, StateInstanceSerializerFactory>()
+            .AddScoped(typeof(IStateInstanceSerializerFactory<,>), typeof(StateInstanceSerializerFactory<,>))
 
             .AddSingleton<IStateDefinitionResolverFactory, StateDefinitionResolverFactory>()
 

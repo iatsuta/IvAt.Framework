@@ -16,7 +16,7 @@ public class InlineWorkflowRepository<TSource, TStatus>(
     where TSource : class
     where TStatus : struct
 {
-    private readonly IWorkflowInstanceSerializer workflowInstanceSerializer = workflowInstanceSerializerFactory.Create(workflowDefinition);
+    private readonly IWorkflowInstanceSerializer<TSource> workflowInstanceSerializer = workflowInstanceSerializerFactory.Create(workflowDefinition);
 
     public IWorkflowDefinition WorkflowDefinitionBuilder { get; } = workflowDefinition;
 

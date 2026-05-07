@@ -4,27 +4,26 @@ using Anch.Workflow.Domain.Runtime;
 
 namespace Anch.Workflow.Persistence.Inline;
 
-public class WorkflowInstanceSerializer<TSource>(
+public class WorkflowInstanceSerializer<TSource, TStatus>(
     IServiceProvider serviceProvider,
-    IWorkflowDefinition workflow,
-    IStateInstanceSerializerFactory stateInstanceSerializerFactory,
+    IWorkflowDefinition<TSource, TStatus> workflow,
+    IStateInstanceSerializerFactory<TSource, TStatus> stateInstanceSerializerFactory,
     IIdentityInfo<TSource, Guid> identityInfo)
-    : IWorkflowInstanceSerializer
+    : IWorkflowInstanceSerializer<TSource>
     where TSource : class
+    where TStatus : struct
 {
-    private readonly IStateInstanceSerializer stateInstanceSerializer = stateInstanceSerializerFactory.Create(workflow);
+    private readonly IStateInstanceSerializer<TSource> stateInstanceSerializer = stateInstanceSerializerFactory.Create(workflow);
 
-    public WorkflowInstance Deserialize(object source)
+    public WorkflowInstance Deserialize(TSource source)
     {
-        var typeSource = (TSource)source;
-
         var currentState = this.stateInstanceSerializer.Deserialize(source);
 
         var workflowInstance = new WorkflowInstance
         {
             Definition = workflow,
             Source = source!,
-            Id = identityInfo.Id.Getter(typeSource),
+            Id = identityInfo.Id.Getter(source),
             CurrentState = currentState,
             Status = this.GetWorkflowStatus(currentState.Definition)
         };
