@@ -32,9 +32,6 @@ public class WorkflowSetup : IWorkflowSetup, IServiceInitializer
 
             .AddSingleton<IWorkflowSource, WorkflowSource>()
 
-            .AddScoped<IInstanceIdGenerator<WorkflowInstance>, RandomIdGenerator<WorkflowInstance>>()
-            .AddScoped<IInstanceIdGenerator<StateInstance>, RandomIdGenerator<StateInstance>>()
-
             .AddKeyedScoped<IWorkflowRepositoryFactory, CachedWorkflowRepositoryFactory>(IWorkflowRepositoryFactory.CacheKey)
             .AddKeyedScoped<IWorkflowRepository, WorkflowRootRepository>(IWorkflowRepository.RootKey);
 
