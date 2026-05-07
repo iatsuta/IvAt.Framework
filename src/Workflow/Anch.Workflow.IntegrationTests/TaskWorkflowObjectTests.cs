@@ -5,7 +5,6 @@ using Anch.Workflow.IntegrationTests._Base;
 using Anch.Workflow.Persistence;
 using Anch.Workflow.Tests.TaskWorkflow;
 
-
 namespace Anch.Workflow.IntegrationTests;
 
 public abstract class TaskWorkflowObjectTests(IServiceProvider rootServiceProvider) : TestBase(rootServiceProvider)
