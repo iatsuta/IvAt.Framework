@@ -4,10 +4,12 @@ using Anch.Workflow.Domain.Runtime;
 namespace Anch.Workflow.Persistence.Inline;
 
 public class StateInstanceSerializer<TSource, TStatus>(
-    IWorkflowDefinition workflowDefinition,
+    IWorkflowDefinition<TSource, TStatus> workflowDefinition,
     IStateDefinitionResolverFactory stateDefinitionResolverFactory) : IStateInstanceSerializer<TSource>
+    where TSource : class
+    where TStatus : struct
 {
-    private readonly IStateDefinitionResolver<TSource> stateDefinitionResolver = stateDefinitionResolverFactory.Create<TSource>(workflowDefinition);
+    private readonly IStateDefinitionResolver<TSource, TStatus> stateDefinitionResolver = stateDefinitionResolverFactory.Create(workflowDefinition);
 
     public StateInstance Deserialize(TSource source)
     {

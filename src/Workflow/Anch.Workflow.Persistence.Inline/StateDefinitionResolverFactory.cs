@@ -1,16 +1,13 @@
-﻿using Anch.Core;
-using Anch.Workflow.Domain.Definition;
+﻿using Anch.Workflow.Domain.Definition;
 
 namespace Anch.Workflow.Persistence.Inline;
 
-public class StateDefinitionResolverFactory(IServiceProxyFactory serviceProxyFactory) : IStateDefinitionResolverFactory
+public class StateDefinitionResolverFactory : IStateDefinitionResolverFactory
 {
-    public IStateDefinitionResolver<TSource> Create<TSource>(IWorkflowDefinition workflow)
+    public IStateDefinitionResolver<TSource, TStatus> Create<TSource, TStatus>(IWorkflowDefinition<TSource, TStatus> workflowDefinition)
+        where TSource : class
+        where TStatus : struct
     {
-        var statusType = workflow.StatusType;
-
-        var stateDefinitionResolverType = typeof(StateDefinitionResolver<,>).MakeGenericType(typeof(TSource), statusType);
-
-        return serviceProxyFactory.Create<IStateDefinitionResolver<TSource>>(stateDefinitionResolverType, workflow);
+        return new StateDefinitionResolver<TSource, TStatus>(workflowDefinition);
     }
 }

@@ -2,7 +2,9 @@
 
 namespace Anch.Workflow.Persistence.Inline;
 
-public interface IStateDefinitionResolver<in TSource>
+public interface IStateDefinitionResolver<TSource, TStatus>
+    where TSource : class
+    where TStatus : struct
 {
-    IStateDefinition GetCurrentStateDefinition(TSource source);
+    IStateDefinition<TSource, TStatus> GetCurrentStateDefinition(TSource source);
 }

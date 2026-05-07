@@ -2,7 +2,7 @@
 
 namespace Anch.Workflow.Persistence.Inline;
 
-public class StateDefinitionResolver<TSource, TStatus>(IWorkflowDefinition<TSource, TStatus> workflow) : IStateDefinitionResolver<TSource>
+public class StateDefinitionResolver<TSource, TStatus>(IWorkflowDefinition<TSource, TStatus> workflow) : IStateDefinitionResolver<TSource, TStatus>
     where TSource : class
     where TStatus : struct
 {
@@ -13,7 +13,7 @@ public class StateDefinitionResolver<TSource, TStatus>(IWorkflowDefinition<TSour
 
     private readonly Dictionary<TStatus, IStateDefinition<TSource, TStatus>> statusMap = workflow.States.Where(state => state.Status != null).ToDictionary(st => st.Status!.Value);
 
-    public IStateDefinition GetCurrentStateDefinition(TSource source)
+    public IStateDefinition<TSource, TStatus> GetCurrentStateDefinition(TSource source)
     {
         return this.statusMap[this.getStatus(source)];
 

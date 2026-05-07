@@ -4,5 +4,7 @@ namespace Anch.Workflow.Persistence.Inline;
 
 public interface IStateDefinitionResolverFactory
 {
-    IStateDefinitionResolver<TSource> Create<TSource>(IWorkflowDefinition workflowDefinition);
+    IStateDefinitionResolver<TSource, TStatus> Create<TSource, TStatus>(IWorkflowDefinition<TSource, TStatus> workflowDefinition)
+        where TSource : class
+        where TStatus : struct;
 }
