@@ -1,4 +1,4 @@
-﻿using Anch.Workflow.Serialization;
+﻿using Anch.Workflow.Persistence;
 
 namespace Anch.Workflow.DependencyInjection;
 

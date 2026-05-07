@@ -1,6 +1,6 @@
 using Anch.GenericRepository;
 using Anch.Workflow.Domain.Runtime;
-using Anch.Workflow.Serialization;
+using Anch.Workflow.Persistence;
 
 using Microsoft.Extensions.DependencyInjection;
 

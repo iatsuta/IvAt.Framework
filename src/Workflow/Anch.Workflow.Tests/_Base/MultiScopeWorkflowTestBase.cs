@@ -1,7 +1,7 @@
 using Anch.DependencyInjection;
 using Anch.Testing.Xunit;
 using Anch.Workflow.DependencyInjection;
-using Anch.Workflow.Serialization.Memory;
+using Anch.Workflow.Persistence.Memory;
 
 using Microsoft.Extensions.DependencyInjection;
 

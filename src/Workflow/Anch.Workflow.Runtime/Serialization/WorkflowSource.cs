@@ -3,7 +3,7 @@
 using Anch.Core;
 using Anch.Workflow.Domain.Definition;
 
-namespace Anch.Workflow.Serialization;
+namespace Anch.Workflow.Persistence;
 
 public class WorkflowSource(IEnumerable<IWorkflow> rootWorkflows) : IWorkflowSource
 {

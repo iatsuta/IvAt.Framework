@@ -1,7 +1,7 @@
 ﻿using Anch.Core.DictionaryCache;
 using Anch.Workflow.Domain.Definition;
 
-namespace Anch.Workflow.Serialization;
+namespace Anch.Workflow.Persistence;
 
 public class CachedWorkflowRepositoryFactory(IWorkflowRepositoryFactory repositoryFactory) : IWorkflowRepositoryFactory
 {

@@ -2,7 +2,7 @@ using Anch.GenericQueryable;
 using Anch.Testing.Xunit;
 using Anch.Workflow.Domain.Runtime;
 using Anch.Workflow.IntegrationTests._Base;
-using Anch.Workflow.Serialization;
+using Anch.Workflow.Persistence;
 using Anch.Workflow.Tests.TaskWorkflow;
 
 

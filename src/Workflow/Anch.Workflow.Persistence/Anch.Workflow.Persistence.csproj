@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <PackageId>Anch.Workflow.Building</PackageId>
+    <PackageId>Anch.Workflow.Persistence</PackageId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -9,7 +9,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Anch.Workflow.States\Anch.Workflow.States.csproj" />
+    <ProjectReference Include="..\Anch.Workflow.Domain\Anch.Workflow.Domain.csproj" />
   </ItemGroup>
 
 </Project>

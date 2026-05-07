@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Anch.Workflow.States.Abstractions\Anch.Workflow.States.Abstractions.csproj" />
+    <ProjectReference Include="..\Anch.Workflow.Abstractions\Anch.Workflow.Abstractions.csproj" />
   </ItemGroup>
 
 </Project>

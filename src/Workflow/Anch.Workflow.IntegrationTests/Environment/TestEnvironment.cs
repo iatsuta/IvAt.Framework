@@ -4,7 +4,7 @@ using Anch.Testing.Database;
 using Anch.Testing.Database.DependencyInjection;
 using Anch.Testing.Database.Sqlite;
 using Anch.Workflow.DependencyInjection;
-using Anch.Workflow.Serialization.Inline;
+using Anch.Workflow.Persistence.Inline;
 using Anch.Workflow.Tests.TaskWorkflow;
 
 using Microsoft.Extensions.DependencyInjection;

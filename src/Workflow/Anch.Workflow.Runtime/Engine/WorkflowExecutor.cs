@@ -2,7 +2,7 @@
 using Anch.Workflow.Domain.Definition;
 using Anch.Workflow.Domain.Runtime;
 using Anch.Workflow.Execution;
-using Anch.Workflow.Serialization;
+using Anch.Workflow.Persistence;
 
 using Microsoft.Extensions.DependencyInjection;
 

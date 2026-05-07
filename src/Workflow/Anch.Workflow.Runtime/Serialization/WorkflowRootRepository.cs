@@ -4,7 +4,7 @@ using Anch.Workflow.Domain.Runtime;
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Anch.Workflow.Serialization;
+namespace Anch.Workflow.Persistence;
 
 public class WorkflowRootRepository(
     IWorkflowSource workflowSource,
