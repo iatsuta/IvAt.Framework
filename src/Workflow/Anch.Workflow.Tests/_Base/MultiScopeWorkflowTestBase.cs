@@ -1,6 +1,7 @@
 using Anch.DependencyInjection;
 using Anch.Testing.Xunit;
 using Anch.Workflow.DependencyInjection;
+using Anch.Workflow.Serialization.Memory;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -28,7 +29,7 @@ public abstract class MultiScopeWorkflowTestBase
     private IServiceProvider BuildServiceProvider()
     {
         return this.CreateServices(new ServiceCollection())
-            .AddWorkflow(this.SetupWorkflow)
+            .AddWorkflow(sw => this.SetupWorkflow(sw.SetDatabaseProvider<MemoryWorkflowDatabaseProvider>()))
             .AddValidator<DuplicateServiceUsageValidator>()
             .Validate()
             .BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });

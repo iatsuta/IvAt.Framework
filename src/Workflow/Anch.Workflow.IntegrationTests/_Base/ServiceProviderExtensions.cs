@@ -1,7 +1,6 @@
 using Anch.GenericRepository;
 using Anch.Workflow.Domain.Runtime;
 using Anch.Workflow.Serialization;
-using Anch.Workflow.Tests._Base;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -25,6 +24,6 @@ public static class ServiceProviderExtensions
             where TWorkflow : IWorkflow<TSource>
             where TSource : notnull =>
 
-            (await serviceProvider.GetWorkflowHost().CreateExecutor(WorkflowExecutionPolicy.TillTheEnd).Start<TSource, TWorkflow>(source, ct)).Modified.First();
+            (await serviceProvider.WorkflowHost.CreateExecutor(WorkflowExecutionPolicy.TillTheEnd).Start<TSource, TWorkflow>(source, ct)).Modified.First();
     }
 }

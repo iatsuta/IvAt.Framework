@@ -18,11 +18,11 @@ public abstract class SingleScopeWorkflowTestBase<TSource, TWorkflow> : MultiSco
         this.lazyScope = new Lazy<IServiceScope>(() => this.RootServiceProvider.CreateScope());
     }
 
-    protected IWorkflowHost Host => this.ScopeServiceProvider.GetWorkflowHost();
+    protected IWorkflowHost Host => this.ScopeServiceProvider.GetRequiredService<IWorkflowHost>();
 
     protected IWorkflowExecutor TillTheEndWorkflowExecutor => this.Host.CreateExecutor(WorkflowExecutionPolicy.TillTheEnd);
 
-    protected IWorkflowRepository RootRepository => this.ScopeServiceProvider.GetRootRepository();
+    protected IWorkflowRepository RootRepository => this.ScopeServiceProvider.GetRequiredKeyedService<IWorkflowRepository>(IWorkflowRepository.RootKey);
 
     protected IServiceProvider ScopeServiceProvider => this.lazyScope.Value.ServiceProvider;
 

@@ -19,11 +19,9 @@ public abstract class TestEnvironment : ITestEnvironment
 
         services
 
-            .AddWorkflow(ws => ws.Add<TaskWorkflow>())
-
-            .AddScoped<IWorkflowInstanceSerializerFactory, WorkflowInstanceSerializerFactory>()
-            .AddScoped<IStateInstanceSerializerFactory, StateInstanceSerializerFactory>()
-            .AddSingleton<IStateDefinitionResolverFactory, StateDefinitionResolverFactory>()
+            .AddWorkflow(ws => ws
+                .Add<TaskWorkflow>()
+                .SetDatabaseProvider<InlineWorkflowDatabaseProvider>())
 
             .Pipe(this.AddServices)
 

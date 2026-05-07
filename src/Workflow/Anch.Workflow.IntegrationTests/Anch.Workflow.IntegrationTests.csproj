@@ -21,7 +21,8 @@
     <ProjectReference Include="..\..\Testing\Anch.Testing.Database.Sqlite\Anch.Testing.Database.Sqlite.csproj" />
     <ProjectReference Include="..\..\Testing\Anch.Testing.Xunit\Anch.Testing.Xunit.csproj" />
     <ProjectReference Include="..\Anch.Workflow.Serialization.Inline\Anch.Workflow.Serialization.Inline.csproj" />
-    <ProjectReference Include="..\Anch.Workflow.Tests\Anch.Workflow.Tests.csproj" />
+    <ProjectReference Include="..\Anch.Workflow.Tests.Definitions\Anch.Workflow.Tests.Definitions.csproj" />
+    <ProjectReference Include="..\Anch.Workflow\Anch.Workflow.csproj" />
   </ItemGroup>
 
   <ItemGroup>
