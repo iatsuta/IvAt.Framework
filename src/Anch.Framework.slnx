@@ -9,6 +9,7 @@
     <Project Path="Workflow/Anch.Workflow/Anch.Workflow.csproj" />
   </Folder>
   <Folder Name="/Workflow/Tests/">
+    <Project Path="Workflow/Anch.Workflow.IntegrationTests/Anch.Workflow.IntegrationTests.csproj" />
     <Project Path="Workflow/Anch.Workflow.Tests/Anch.Workflow.Tests.csproj" />
   </Folder>
 

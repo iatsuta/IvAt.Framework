@@ -5,6 +5,14 @@ using Anch.Workflow.Domain.Runtime;
 
 namespace Anch.Workflow.Serialization.Inline;
 
+public class InlineWorkflowRepositoryFactory : IWorkflowRepositoryFactory
+{
+    public IWorkflowRepository Create(WorkflowDefinitionIdentity workflowDefinitionIdentity)
+    {
+        throw new NotImplementedException();
+    }
+}
+
 public class InlineWorkflowRepository<TSource>(
     IWorkflowDefinition workflowDefinition,
     IInstanceIdGenerator<WorkflowInstance> workflowInstanceIdGenerator,
