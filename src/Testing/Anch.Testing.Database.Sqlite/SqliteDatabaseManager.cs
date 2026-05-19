@@ -4,6 +4,8 @@ namespace Anch.Testing.Database.Sqlite;
 
 public class SqliteDatabaseManager(IDatabaseFilePathExtractor pathExtractor) : IDatabaseManager
 {
+    public ValueTask CreateEmpty(TestConnectionString connectionString, CancellationToken ct) => ValueTask.CompletedTask;
+
     public ValueTask<bool> Exists(TestConnectionString connectionString, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();

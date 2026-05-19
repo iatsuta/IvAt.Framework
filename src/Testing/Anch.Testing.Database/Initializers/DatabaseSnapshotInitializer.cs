@@ -53,6 +53,8 @@ public class DatabaseSnapshotInitializer(
     {
         await databaseManager.Remove(connectionStringProvider.Actual, cancellationToken);
 
+        await databaseManager.CreateEmpty(connectionStringProvider.Actual, cancellationToken);
+
         await emptySchemaInitializer.Initialize(cancellationToken);
 
         await databaseManager.Move(connectionStringProvider.Actual, connectionStringProvider.EmptySnapshot, true, cancellationToken);
