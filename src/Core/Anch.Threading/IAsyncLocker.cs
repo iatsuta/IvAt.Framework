@@ -1,6 +1,6 @@
 ﻿namespace Anch.Threading;
 
-public interface IAsyncLocker
+public interface IAsyncLocker : IDisposable
 {
     Task<IDisposable> CreateScope(CancellationToken ct = default);
 }

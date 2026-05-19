@@ -5,7 +5,7 @@ using Xunit.v3;
 
 namespace Anch.Testing.Xunit.Engine;
 
-public class AnchFrameworkExecutor(IXunitTestAssembly testAssembly, AnchTestAssemblyRunner commonXunitTestAssemblyRunner) : XunitTestFrameworkExecutor(testAssembly)
+public class AnchFrameworkExecutor(IXunitTestAssembly testAssembly, AnchTestAssemblyRunner commonXunitTestAssemblyRunner, IServiceProviderPool? serviceProviderPool) : XunitTestFrameworkExecutor(testAssembly)
 {
     public override async ValueTask RunTestCases(IReadOnlyCollection<IXunitTestCase> testCases, IMessageSink executionMessageSink,
         ITestFrameworkExecutionOptions executionOptions,
@@ -17,7 +17,17 @@ public class AnchFrameworkExecutor(IXunitTestAssembly testAssembly, AnchTestAsse
         SetEnvironment(EnvironmentVariables.PrintMaxObjectMemberCount, executionOptions.PrintMaxObjectMemberCount());
         SetEnvironment(EnvironmentVariables.PrintMaxStringLength, executionOptions.PrintMaxStringLength());
 
-        await commonXunitTestAssemblyRunner.Run(this.TestAssembly, testCases, executionMessageSink, executionOptions, cancellationToken);
+        try
+        {
+            await commonXunitTestAssemblyRunner.Run(this.TestAssembly, testCases, executionMessageSink, executionOptions, cancellationToken);
+        }
+        finally
+        {
+            if (serviceProviderPool != null)
+            {
+                await serviceProviderPool.DisposeAsync();
+            }
+        }
     }
 
     private static void SetEnvironment(

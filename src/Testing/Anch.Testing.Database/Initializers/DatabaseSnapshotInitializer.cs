@@ -12,7 +12,7 @@ public class DatabaseSnapshotInitializer(
     IInitializer testDataInitializer,
     IDatabaseManager databaseManager,
     TestDatabaseSettings settings,
-    ITestConnectionStringProvider connectionStringProvider) : IInitializer
+    ITestConnectionStringProvider connectionStringProvider) : IInitializer, IAsyncDisposable
 {
     public async Task Initialize(CancellationToken cancellationToken)
     {
@@ -98,6 +98,15 @@ public class DatabaseSnapshotInitializer(
             }
 
             throw;
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (settings.InitMode == DatabaseInitMode.RebuildSnapshot)
+        {
+            await databaseManager.Remove(connectionStringProvider.EmptySnapshot, CancellationToken.None);
+            await databaseManager.Remove(connectionStringProvider.FilledSnapshot, CancellationToken.None);
         }
     }
 }

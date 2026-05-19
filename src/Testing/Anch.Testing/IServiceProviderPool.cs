@@ -1,6 +1,6 @@
 ﻿namespace Anch.Testing;
 
-public interface IServiceProviderPool
+public interface IServiceProviderPool : IAsyncDisposable
 {
     public const string MainServiceProviderKey = "ServiceProviderPool.Main";
 
