@@ -15,4 +15,6 @@ public class AsyncLocker : IAsyncLocker
     {
         public void Dispose() => semaphoreSlim.Release();
     }
+
+    public void Dispose() => this.semaphoreSlim.Dispose();
 }

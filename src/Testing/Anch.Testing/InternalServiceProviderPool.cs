@@ -4,14 +4,18 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Anch.Testing;
 
-public class InternalServiceProviderPool(ITestEnvironment testEnvironment, IServiceProvider mainServiceProvider, MainServiceProviderSettings settings)
+public class InternalServiceProviderPool(
+    ITestEnvironment testEnvironment,
+    IServiceProvider mainServiceProvider,
+    IParallelizationSettings parallelizationSettings,
+    bool returnMainServiceProviderToPool)
     : IServiceProviderPool
 {
     private int lastIndex;
 
-    private readonly ConcurrentBag<IServiceProvider> pool = settings.ReturnToServicePool ? [mainServiceProvider] : [];
+    private readonly ConcurrentBag<IServiceProvider> pool = returnMainServiceProviderToPool ? [mainServiceProvider] : [];
 
-    private readonly SemaphoreSlim? parallelSemaphoreSlim = settings.AllowParallelization ? null : new SemaphoreSlim(1, 1);
+    private readonly SemaphoreSlim? parallelSemaphoreSlim = parallelizationSettings.AllowParallelization ? null : new SemaphoreSlim(1, 1);
 
     public async ValueTask<IServiceProvider> GetAsync(CancellationToken ct)
     {
@@ -45,10 +49,26 @@ public class InternalServiceProviderPool(ITestEnvironment testEnvironment, IServ
         }
     }
 
-    public async ValueTask ReleaseAsync(IServiceProvider serviceProvider, CancellationToken ct)
+    public ValueTask ReleaseAsync(IServiceProvider serviceProvider, CancellationToken ct)
     {
         this.pool.Add(serviceProvider);
 
         this.parallelSemaphoreSlim?.Release();
+
+        return ValueTask.CompletedTask;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        using (this.parallelSemaphoreSlim)
+        {
+            foreach (var serviceProvider in this.pool.Except([mainServiceProvider]).Concat([mainServiceProvider]))
+            {
+                if (serviceProvider is IAsyncDisposable asyncDisposable)
+                {
+                    await asyncDisposable.DisposeAsync();
+                }
+            }
+        }
     }
 }

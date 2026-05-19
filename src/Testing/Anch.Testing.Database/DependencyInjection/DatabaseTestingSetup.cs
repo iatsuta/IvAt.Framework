@@ -40,9 +40,8 @@ public class DatabaseTestingSetup : IDatabaseTestingSetup, IServiceInitializer
     {
         services
 
-            .AddSingletonFrom((TestDatabaseSettings settings) =>
-                new MainServiceProviderSettings(this.allowParallelization, settings.InitMode == DatabaseInitMode.External))
-
+            .AddSingleton(new AllowParallelizationConstraint(this.allowParallelization))
+            .AddSingleton<IMainServiceProviderSettings, DatabaseMainServiceProviderSettings>()
             .AddSingleton<ITestConnectionStringProvider, TestConnectionStringProvider>()
             .AddKeyedSingleton(typeof(IInitializer), IServiceProviderPool.MainServiceProviderKey, this.databaseSnapshotInitializerType)
             .AddSingleton<IDatabaseSnapshotManager, DatabaseSnapshotManager>()
