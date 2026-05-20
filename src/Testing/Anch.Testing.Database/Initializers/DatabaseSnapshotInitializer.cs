@@ -57,16 +57,16 @@ public class DatabaseSnapshotInitializer(
 
         await emptySchemaInitializer.Initialize(cancellationToken);
 
-        await databaseManager.Move(connectionStringProvider.Actual, connectionStringProvider.EmptySnapshot, true, cancellationToken);
+        await databaseManager.Move(connectionStringProvider.Actual, connectionStringProvider.EmptySnapshot, cancellationToken);
     }
 
     protected virtual async Task InternalInitializeTestData(CancellationToken cancellationToken)
     {
-        await databaseManager.Copy(connectionStringProvider.EmptySnapshot, connectionStringProvider.Actual, true, cancellationToken);
+        await databaseManager.Copy(connectionStringProvider.EmptySnapshot, connectionStringProvider.Actual, cancellationToken);
 
         await testDataInitializer.Initialize(cancellationToken);
 
-        await databaseManager.Move(connectionStringProvider.Actual, connectionStringProvider.FilledSnapshot, true, cancellationToken);
+        await databaseManager.Move(connectionStringProvider.Actual, connectionStringProvider.FilledSnapshot, cancellationToken);
     }
 
     private Task InitializeEmptySchema(CancellationToken cancellationToken) =>

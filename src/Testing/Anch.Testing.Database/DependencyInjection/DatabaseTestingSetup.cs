@@ -43,7 +43,7 @@ public class DatabaseTestingSetup : IDatabaseTestingSetup, IServiceInitializer
             .AddSingleton(new AllowParallelizationConstraint(this.allowParallelization))
             .AddSingleton<IMainServiceProviderSettings, DatabaseMainServiceProviderSettings>()
             .AddSingleton<ITestConnectionStringProvider, TestConnectionStringProvider>()
-            .AddKeyedSingleton(typeof(IInitializer), IServiceProviderPool.MainServiceProviderKey, this.databaseSnapshotInitializerType)
+            .AddKeyedSingleton(typeof(IInitializer), ITestEnvironment.MainServiceProviderKey, this.databaseSnapshotInitializerType)
             .AddSingleton<IDatabaseSnapshotManager, DatabaseSnapshotManager>()
             .AddSingleton<IActualTestConnectionStringFactory, ActualTestConnectionStringFactory>();
 

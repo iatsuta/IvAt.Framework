@@ -33,7 +33,7 @@ public class InternalServiceProviderPool(
             var serviceProviderIndex = new ServiceProviderIndex(Interlocked.Increment(ref this.lastIndex) - 1);
 
             var services = new ServiceCollection()
-                .AddKeyedSingleton(IServiceProviderPool.MainServiceProviderKey, mainServiceProvider)
+                .AddKeyedSingleton(ITestEnvironment.MainServiceProviderKey, mainServiceProvider)
                 .AddSingleton(serviceProviderIndex);
 
             try

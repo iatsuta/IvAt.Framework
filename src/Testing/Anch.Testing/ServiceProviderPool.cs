@@ -36,7 +36,7 @@ public class ServiceProviderPool(ITestEnvironment testEnvironment, bool? allowPa
                     var serviceProviderBuildContext = ServiceProviderBuildContext.Main;
 
                     var services = new ServiceCollection()
-                        .AddKeyedSingleton<IServiceProvider>(IServiceProviderPool.MainServiceProviderKey, (sp, _) => sp)
+                        .AddKeyedSingleton<IServiceProvider>(ITestEnvironment.MainServiceProviderKey, (sp, _) => sp)
                         .AddSingleton(serviceProviderBuildContext.Index)
                         .AddSingleton<IParallelizationSettings, ParallelizationSettings>();
 
@@ -47,7 +47,7 @@ public class ServiceProviderPool(ITestEnvironment testEnvironment, bool? allowPa
 
                     var preMainServiceProvider = testEnvironment.BuildServiceProvider(services, serviceProviderBuildContext);
 
-                    foreach (var initializer in preMainServiceProvider.GetKeyedServices<IInitializer>(IServiceProviderPool.MainServiceProviderKey))
+                    foreach (var initializer in preMainServiceProvider.GetKeyedServices<IInitializer>(ITestEnvironment.MainServiceProviderKey))
                     {
                         await initializer.Initialize(ct);
                     }

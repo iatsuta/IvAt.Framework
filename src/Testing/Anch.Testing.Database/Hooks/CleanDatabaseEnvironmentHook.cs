@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Anch.Testing.Database.Hooks;
 
 public class CleanDatabaseEnvironmentHook(
-    [FromKeyedServices(IServiceProviderPool.MainServiceProviderKey)]
+    [FromKeyedServices(ITestEnvironment.MainServiceProviderKey)]
     IServiceProvider mainServiceProvider,
     IActualTestConnectionStringSource actualTestConnectionStringSource) : ITestEnvironmentHook
 {
