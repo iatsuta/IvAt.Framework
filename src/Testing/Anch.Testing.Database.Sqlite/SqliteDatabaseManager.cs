@@ -4,11 +4,11 @@ namespace Anch.Testing.Database.Sqlite;
 
 public class SqliteDatabaseManager(IDatabaseFilePathExtractor pathExtractor) : IDatabaseManager
 {
-    public ValueTask CreateEmpty(TestConnectionString connectionString, CancellationToken ct)
+    public ValueTask CreateEmpty(TestConnectionStringRole connectionStringRole, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
 
-        var targetPath = pathExtractor.Extract(connectionString);
+        var targetPath = pathExtractor.Extract(connectionStringRole);
 
         var directory = Path.GetDirectoryName(targetPath);
 
@@ -20,20 +20,20 @@ public class SqliteDatabaseManager(IDatabaseFilePathExtractor pathExtractor) : I
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask<bool> Exists(TestConnectionString connectionString, CancellationToken ct)
+    public ValueTask<bool> Exists(TestConnectionStringRole connectionStringRole, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
 
-        var filePath = pathExtractor.Extract(connectionString);
+        var filePath = pathExtractor.Extract(connectionStringRole);
 
         return new(File.Exists(filePath) && new FileInfo(filePath).Length > 0);
     }
 
-    public ValueTask Remove(TestConnectionString connectionString, CancellationToken ct)
+    public ValueTask Remove(TestConnectionStringRole connectionStringRole, CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
 
-        var filePath = pathExtractor.Extract(connectionString);
+        var filePath = pathExtractor.Extract(connectionStringRole);
 
         if (File.Exists(filePath))
         {
@@ -43,21 +43,21 @@ public class SqliteDatabaseManager(IDatabaseFilePathExtractor pathExtractor) : I
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask Copy(TestConnectionString from, TestConnectionString to, CancellationToken ct) => this.CopyMove(from, to, false, ct);
+    public ValueTask Copy(TestConnectionStringRole source, TestConnectionStringRole target, CancellationToken ct) => this.CopyMove(source, target, false, ct);
 
-    public ValueTask Move(TestConnectionString from, TestConnectionString to, CancellationToken ct) => this.CopyMove(from, to, true, ct);
+    public ValueTask Move(TestConnectionStringRole source, TestConnectionStringRole target, CancellationToken ct) => this.CopyMove(source, target, true, ct);
 
 
     private ValueTask CopyMove(
-        TestConnectionString from,
-        TestConnectionString to,
+        TestConnectionStringRole source,
+        TestConnectionStringRole target,
         bool move,
         CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
 
-        var sourcePath = pathExtractor.Extract(from);
-        var targetPath = pathExtractor.Extract(to);
+        var sourcePath = pathExtractor.Extract(source);
+        var targetPath = pathExtractor.Extract(target);
 
         if (File.Exists(sourcePath))
         {

@@ -4,9 +4,11 @@ using Anch.Testing.Database.ConnectionStringManagement;
 
 namespace Anch.Testing.Database.Sqlite;
 
-public class SqliteDatabaseFilePathExtractor : IDatabaseFilePathExtractor
+public class SqliteDatabaseFilePathExtractor(ITestConnectionStringProvider testConnectionStringProvider) : IDatabaseFilePathExtractor
 {
-    public string Extract(TestConnectionString connectionString)
+    public string Extract(TestConnectionStringRole connectionStringRole) => this.Extract(testConnectionStringProvider.GetConnectionString(connectionStringRole));
+
+    private string Extract(TestConnectionString connectionString)
     {
         var builder = new DbConnectionStringBuilder
         {
