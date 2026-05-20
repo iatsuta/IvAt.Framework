@@ -2,13 +2,13 @@
 
 public interface IDatabaseManager
 {
-    ValueTask CreateEmpty(TestConnectionString connectionString, CancellationToken ct);
+    ValueTask CreateEmpty(TestConnectionStringRole connectionStringRole, CancellationToken ct);
 
-    ValueTask<bool> Exists(TestConnectionString connectionString, CancellationToken ct);
+    ValueTask<bool> Exists(TestConnectionStringRole connectionStringRole, CancellationToken ct);
 
-    ValueTask Remove(TestConnectionString connectionString, CancellationToken ct);
+    ValueTask Remove(TestConnectionStringRole connectionStringRole, CancellationToken ct);
 
-    ValueTask Copy(TestConnectionString from, TestConnectionString to, bool force, CancellationToken ct);
+    ValueTask Copy(TestConnectionStringRole source, TestConnectionStringRole target, CancellationToken ct);
 
-    ValueTask Move(TestConnectionString from, TestConnectionString to, bool force, CancellationToken ct);
+    ValueTask Move(TestConnectionStringRole source, TestConnectionStringRole target, CancellationToken ct);
 }

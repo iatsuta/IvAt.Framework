@@ -2,11 +2,11 @@
 
 namespace Anch.Testing.Database.Initializers;
 
-public class DatabaseSnapshotManager(IDatabaseManager databaseManager, ITestConnectionStringProvider testConnectionStringProvider) : IDatabaseSnapshotManager
+public class DatabaseSnapshotManager(IDatabaseManager databaseManager) : IDatabaseSnapshotManager
 {
-    public ValueTask RestoreDatabaseSnapshot(TestConnectionString actualConnectionString, CancellationToken ct) =>
-        databaseManager.Copy(testConnectionStringProvider.FilledSnapshot, actualConnectionString, true, ct);
+    public ValueTask RestoreDatabaseSnapshot(ServiceProviderIndex serviceProviderIndex, CancellationToken ct) =>
+        databaseManager.Copy(TestConnectionStringRole.FilledSnapshot, new PoolTestConnectionStringRole(serviceProviderIndex), ct);
 
-    public ValueTask RemoveRestoredDatabase(TestConnectionString actualConnectionString, CancellationToken ct) =>
-        databaseManager.Remove(actualConnectionString, ct);
+    public ValueTask RemoveRestoredDatabase(ServiceProviderIndex serviceProviderIndex, CancellationToken ct) =>
+        databaseManager.Remove(new PoolTestConnectionStringRole(serviceProviderIndex), ct);
 }

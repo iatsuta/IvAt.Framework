@@ -33,8 +33,8 @@ public abstract class DatabaseTestEnvironment : ITestEnvironment
 
         buildContext switch
         {
-            PooledServiceProviderBuildContext pooledContext => pooledContext.MainServiceProvider.GetRequiredService<IActualTestConnectionStringFactory>()
-                .Create(buildContext.Index),
+            PooledServiceProviderBuildContext pooledContext => pooledContext.MainServiceProvider.GetRequiredService<ITestConnectionStringProvider>()
+                .GetConnectionString(new PoolTestConnectionStringRole(buildContext.Index)),
             { Index.IsMain: true } => this.RawConnectionString,
             _ => throw new InvalidOperationException("Unsupported build context.")
         };

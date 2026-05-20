@@ -4,5 +4,5 @@ namespace Anch.Testing.Database.Sqlite;
 
 public interface IDatabaseFilePathExtractor
 {
-    string Extract(TestConnectionString connectionString);
+    string Extract(TestConnectionStringRole connectionStringRole);
 }

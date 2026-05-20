@@ -1,13 +1,14 @@
-﻿namespace Anch.Testing.Database.ConnectionStringManagement;
+﻿using System.Collections.Concurrent;
+
+namespace Anch.Testing.Database.ConnectionStringManagement;
 
 public class TestConnectionStringProvider(
     ITestConnectionStringFactory testConnectionStringFactory,
-    IActualTestConnectionStringSource actualTestConnectionStringSource)
+    ITestConnectionStringPostfixFactory testConnectionStringPostfixFactory)
     : ITestConnectionStringProvider
 {
-    public TestConnectionString EmptySnapshot { get; } = testConnectionStringFactory.Create("_empty");
+    private readonly ConcurrentDictionary<TestConnectionStringRole, TestConnectionString> connectionStrings = [];
 
-    public TestConnectionString FilledSnapshot { get; } = testConnectionStringFactory.Create("_filled");
-
-    public TestConnectionString Actual { get; } = actualTestConnectionStringSource.ActualConnectionString;
+    public TestConnectionString GetConnectionString(TestConnectionStringRole role) =>
+        this.connectionStrings.GetOrAdd(role, _ => testConnectionStringFactory.Create(testConnectionStringPostfixFactory.Create(role)));
 }

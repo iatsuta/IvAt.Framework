@@ -10,7 +10,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Core\Anch.Core\Anch.Core.csproj" />
     <ProjectReference Include="..\Anch.Testing\Anch.Testing.csproj" />
   </ItemGroup>
 
