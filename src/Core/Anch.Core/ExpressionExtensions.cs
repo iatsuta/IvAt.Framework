@@ -126,25 +126,21 @@ public static class ExpressionExtensions
             return Expression.Lambda<Func<IEnumerable<T>, IEnumerable<T>>>(Expression.Call(null, whereMethod, param, expr), param);
         }
 
-        public Expression<Func<T, bool>> BuildAnd(Expression<Func<T, bool>> otherExpr) =>
+        public Expression<Func<T, bool>> BuildAnd(Expression<Func<T, bool>> otherExpr) => expr.BuildBinary(otherExpr, true);
 
-            expr.TryFoldConstant(otherExpr, true).Or(() => otherExpr.TryFoldConstant(expr, true))
+        public Expression<Func<T, bool>> BuildOr(Expression<Func<T, bool>> otherExpr) => expr.BuildBinary(otherExpr, false);
+
+        private Expression<Func<T, bool>> BuildBinary(Expression<Func<T, bool>> otherExpr, bool isAnd) =>
+
+            expr.TryFoldConstant(otherExpr, isAnd).Or(() => otherExpr.TryFoldConstant(expr, isAnd))
                 .GetValueOrDefault(() =>
                 {
                     var p = expr.Parameters.Single();
 
-                    return Expression.Lambda<Func<T, bool>>(Expression.AndAlso(expr.Body, otherExpr.Body.Override(otherExpr.Parameters.Single(), p)), p);
+                    return Expression.Lambda<Func<T, bool>>(
+                        Expression.MakeBinary(isAnd ? ExpressionType.AndAlso : ExpressionType.OrElse, expr.Body,
+                            otherExpr.Body.Override(otherExpr.Parameters.Single(), p)), p);
                 });
-
-        public Expression<Func<T, bool>> BuildOr(Expression<Func<T, bool>> otherExpr) =>
-
-            expr.TryFoldConstant(otherExpr, false).Or(() => otherExpr.TryFoldConstant(expr, false))
-            .GetValueOrDefault(() =>
-            {
-                var p = expr.Parameters.Single();
-
-                return Expression.Lambda<Func<T, bool>>(Expression.OrElse(expr.Body, otherExpr.Body.Override(otherExpr.Parameters.Single(), p)), p);
-            });
 
         private Maybe<Expression<Func<T, bool>>> TryFoldConstant(Expression<Func<T, bool>> otherExpr, bool isAnd) =>
 
