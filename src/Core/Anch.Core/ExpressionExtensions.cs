@@ -126,17 +126,27 @@ public static class ExpressionExtensions
             return Expression.Lambda<Func<IEnumerable<T>, IEnumerable<T>>>(Expression.Call(null, whereMethod, param, expr), param);
         }
 
-        public Expression<Func<T, bool>> BuildAnd(Expression<Func<T, bool>> expr2) =>
+        public Expression<Func<T, bool>> BuildAnd(Expression<Func<T, bool>> otherExpr) => expr.BuildBinary(otherExpr, true);
 
-            from v1 in expr
-            from v2 in expr2
-            select v1 && v2;
+        public Expression<Func<T, bool>> BuildOr(Expression<Func<T, bool>> otherExpr) => expr.BuildBinary(otherExpr, false);
 
-        public Expression<Func<T, bool>> BuildOr(Expression<Func<T, bool>> expr2) =>
+        private Expression<Func<T, bool>> BuildBinary(Expression<Func<T, bool>> otherExpr, bool isAnd) =>
 
-            from v1 in expr
-            from v2 in expr2
-            select v1 || v2;
+            expr.TryFoldConstant(otherExpr, isAnd).Or(() => otherExpr.TryFoldConstant(expr, isAnd))
+                .GetValueOrDefault(() =>
+                {
+                    var p = expr.Parameters.Single();
+
+                    return Expression.Lambda<Func<T, bool>>(
+                        Expression.MakeBinary(isAnd ? ExpressionType.AndAlso : ExpressionType.OrElse, expr.Body,
+                            otherExpr.Body.Override(otherExpr.Parameters.Single(), p)), p);
+                });
+
+        private Maybe<Expression<Func<T, bool>>> TryFoldConstant(Expression<Func<T, bool>> otherExpr, bool isAnd) =>
+
+            from constValue in expr.Body.GetConstantValue<bool>()
+
+            select constValue == isAnd ? otherExpr : expr;
     }
 
     extension<TDelegate>(Expression<TDelegate> expression)
