@@ -128,37 +128,29 @@ public static class ExpressionExtensions
 
         public Expression<Func<T, bool>> BuildAnd(Expression<Func<T, bool>> otherExpr) =>
 
-            (from constValue in expr.Body.GetConstantValue<bool>()
+            expr.TryFoldConstant(otherExpr, true).Or(() => otherExpr.TryFoldConstant(expr, true))
+                .GetValueOrDefault(() =>
+                {
+                    var p = expr.Parameters.Single();
 
-                select constValue ? otherExpr : expr)
-
-            .Or(() => from otherConstValue in otherExpr.Body.GetConstantValue<bool>()
-
-                select otherConstValue ? expr : otherExpr)
-
-            .GetValueOrDefault(() =>
-            {
-                var p = expr.Parameters.Single();
-
-                return Expression.Lambda<Func<T, bool>>(Expression.AndAlso(expr.Body, otherExpr.Body.Override(otherExpr.Parameters.Single(), p)), p);
-            });
+                    return Expression.Lambda<Func<T, bool>>(Expression.AndAlso(expr.Body, otherExpr.Body.Override(otherExpr.Parameters.Single(), p)), p);
+                });
 
         public Expression<Func<T, bool>> BuildOr(Expression<Func<T, bool>> otherExpr) =>
 
-            (from constValue in expr.Body.GetConstantValue<bool>()
-
-                select constValue ? expr : otherExpr)
-
-            .Or(() => from otherConstValue in otherExpr.Body.GetConstantValue<bool>()
-
-                select otherConstValue ? otherExpr : expr)
-
+            expr.TryFoldConstant(otherExpr, false).Or(() => otherExpr.TryFoldConstant(expr, false))
             .GetValueOrDefault(() =>
             {
                 var p = expr.Parameters.Single();
 
                 return Expression.Lambda<Func<T, bool>>(Expression.OrElse(expr.Body, otherExpr.Body.Override(otherExpr.Parameters.Single(), p)), p);
             });
+
+        private Maybe<Expression<Func<T, bool>>> TryFoldConstant(Expression<Func<T, bool>> otherExpr, bool isAnd) =>
+
+            from constValue in expr.Body.GetConstantValue<bool>()
+
+            select constValue == isAnd ? otherExpr : expr;
     }
 
     extension<TDelegate>(Expression<TDelegate> expression)
