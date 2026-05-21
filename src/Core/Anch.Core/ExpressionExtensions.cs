@@ -126,17 +126,39 @@ public static class ExpressionExtensions
             return Expression.Lambda<Func<IEnumerable<T>, IEnumerable<T>>>(Expression.Call(null, whereMethod, param, expr), param);
         }
 
-        public Expression<Func<T, bool>> BuildAnd(Expression<Func<T, bool>> expr2) =>
+        public Expression<Func<T, bool>> BuildAnd(Expression<Func<T, bool>> otherExpr) =>
 
-            from v1 in expr
-            from v2 in expr2
-            select v1 && v2;
+            (from constValue in expr.Body.GetConstantValue<bool>()
 
-        public Expression<Func<T, bool>> BuildOr(Expression<Func<T, bool>> expr2) =>
+                select constValue ? otherExpr : expr)
 
-            from v1 in expr
-            from v2 in expr2
-            select v1 || v2;
+            .Or(() => from otherConstValue in otherExpr.Body.GetConstantValue<bool>()
+
+                select otherConstValue ? expr : otherExpr)
+
+            .GetValueOrDefault(() =>
+            {
+                var p = expr.Parameters.Single();
+
+                return Expression.Lambda<Func<T, bool>>(Expression.AndAlso(expr.Body, otherExpr.Body.Override(otherExpr.Parameters.Single(), p)), p);
+            });
+
+        public Expression<Func<T, bool>> BuildOr(Expression<Func<T, bool>> otherExpr) =>
+
+            (from constValue in expr.Body.GetConstantValue<bool>()
+
+                select constValue ? expr : otherExpr)
+
+            .Or(() => from otherConstValue in otherExpr.Body.GetConstantValue<bool>()
+
+                select otherConstValue ? otherExpr : expr)
+
+            .GetValueOrDefault(() =>
+            {
+                var p = expr.Parameters.Single();
+
+                return Expression.Lambda<Func<T, bool>>(Expression.OrElse(expr.Body, otherExpr.Body.Override(otherExpr.Parameters.Single(), p)), p);
+            });
     }
 
     extension<TDelegate>(Expression<TDelegate> expression)
