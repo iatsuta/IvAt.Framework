@@ -5,7 +5,7 @@ namespace Anch.Testing.Xunit.Engine;
 
 public class AnchTestCaseRunner : XunitTestCaseRunner
 {
-    public new static AnchTestCaseRunner Instance { get; } = new ();
+    public new static AnchTestCaseRunner Instance { get; } = new();
 
     protected override ValueTask<RunSummary> RunTest(XunitTestCaseRunnerContext ctxt, IXunitTest test)
     {

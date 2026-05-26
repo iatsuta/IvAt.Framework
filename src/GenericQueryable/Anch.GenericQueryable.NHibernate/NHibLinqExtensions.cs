@@ -28,7 +28,7 @@ public static class NHibLinqExtensions
 
     public static IAsyncEnumerable<TSource> AsAsyncEnumerable<TSource>(IQueryable<TSource> source) => source.AsAsyncEnumerableInternal();
 
-    private static async IAsyncEnumerable<TSource> AsAsyncEnumerableInternal<TSource>(this IQueryable<TSource> source, [EnumeratorCancellation]CancellationToken cancellationToken = default)
+    private static async IAsyncEnumerable<TSource> AsAsyncEnumerableInternal<TSource>(this IQueryable<TSource> source, [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
         foreach (var item in await source.ToFuture().GetEnumerableAsync(cancellationToken))
         {

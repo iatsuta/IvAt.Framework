@@ -30,18 +30,18 @@ public record UntypedSecurityIdentity(string Id) : SecurityIdentity
 
 public abstract record TypedSecurityIdentity : SecurityIdentity
 {
-	public abstract Type IdentType { get; }
+    public abstract Type IdentType { get; }
 
 
     public static implicit operator TypedSecurityIdentity(Guid id)
-	{
-		return Create(id);
-	}
+    {
+        return Create(id);
+    }
 
-	public static implicit operator TypedSecurityIdentity(int id)
-	{
-		return Create(id);
-	}
+    public static implicit operator TypedSecurityIdentity(int id)
+    {
+        return Create(id);
+    }
 
     public static TypedSecurityIdentity<TIdent> Create<TIdent>(TIdent ident)
         where TIdent : notnull
@@ -51,14 +51,14 @@ public abstract record TypedSecurityIdentity : SecurityIdentity
 }
 
 public record TypedSecurityIdentity<TIdent>(TIdent Id) : TypedSecurityIdentity
-	where TIdent : notnull
+    where TIdent : notnull
 {
     public override bool IsDefault => EqualityComparer<TIdent>.Default.Equals(this.Id, default);
 
     public override Type IdentType { get; } = typeof(TIdent);
 
-	public override object GetId()
-	{
-		return this.Id;
-	}
+    public override object GetId()
+    {
+        return this.Id;
+    }
 }

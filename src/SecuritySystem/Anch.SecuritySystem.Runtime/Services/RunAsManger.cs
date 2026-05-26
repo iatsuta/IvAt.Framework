@@ -8,7 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Anch.SecuritySystem.Services;
 
 public class RunAsManager<TUser>(
-    [FromKeyedServices(ICurrentUser.ImpersonatedKey)]ICurrentUser impersonatedCurrentUser,
+    [FromKeyedServices(ICurrentUser.ImpersonatedKey)] ICurrentUser impersonatedCurrentUser,
     ISecuritySystemFactory securitySystemFactory,
     IEnumerable<IRunAsValidator> validators,
     IUserSource<TUser> userSource,

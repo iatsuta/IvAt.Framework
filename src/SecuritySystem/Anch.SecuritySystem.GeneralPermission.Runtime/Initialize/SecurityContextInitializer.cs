@@ -53,17 +53,17 @@ public class SecurityContextInitializer<TSecurityContextType>(
                         $"Unexpected entity type in database: {mergeResult.RemovingItems.Join(", ")}");
 
                 case UnexpectedSecurityElementMode.Remove:
-                {
-                    foreach (var removingItem in mergeResult.RemovingItems)
                     {
-                        logger.LogDebug("SecurityContextType removed: {Name} {Id}", visualIdentityInfo.Name.Getter(removingItem),
-                            securityIdentityManager.GetIdentity(removingItem));
+                        foreach (var removingItem in mergeResult.RemovingItems)
+                        {
+                            logger.LogDebug("SecurityContextType removed: {Name} {Id}", visualIdentityInfo.Name.Getter(removingItem),
+                                securityIdentityManager.GetIdentity(removingItem));
 
-                        await genericRepository.RemoveAsync(removingItem, cancellationToken);
+                            await genericRepository.RemoveAsync(removingItem, cancellationToken);
+                        }
+
+                        break;
                     }
-
-                    break;
-                }
             }
         }
 

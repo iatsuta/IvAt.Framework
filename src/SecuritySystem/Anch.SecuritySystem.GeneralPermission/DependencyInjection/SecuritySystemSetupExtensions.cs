@@ -28,7 +28,7 @@ public static class SecuritySystemSetupExtensions
                 .Initialize<ISecuritySystemSetup,
                     GeneralPermissionSetup<TPrincipal, TPermission, TSecurityRole, TPermissionRestriction, TSecurityContextType,
                         TSecurityContextObjectIdent>>
-                (new (principalAccessors, securityRoleAccessors, permissionAccessors, securityContextTypeAccessors, securityContextObjectIdAccessors),
+                (new(principalAccessors, securityRoleAccessors, permissionAccessors, securityContextTypeAccessors, securityContextObjectIdAccessors),
                     setupAction);
 
         public ISecuritySystemSetup AddGeneralPermission<TPrincipal, TPermission, TSecurityRole, TPermissionRestriction, TSecurityContextType,

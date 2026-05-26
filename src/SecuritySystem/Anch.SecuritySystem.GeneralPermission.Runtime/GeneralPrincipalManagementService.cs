@@ -167,7 +167,7 @@ public class GeneralPrincipalManagementService<TPrincipal, TPermission, TPermiss
         await principalValidator.ValidateAsync(
             new PrincipalData<TPrincipal, TPermission, TPermissionRestriction>(
                 dbPrincipal,
-                [..updatedPermissions.Select(pair => pair.PermissonData), .. newPermissions]),
+                [.. updatedPermissions.Select(pair => pair.PermissonData), .. newPermissions]),
             cancellationToken);
 
         return new MergeResult<PermissionData, PermissionData>(

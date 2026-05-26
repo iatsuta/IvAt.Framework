@@ -63,7 +63,7 @@ internal class CacheContainsCallVisitor : ExpressionVisitor
                     node.GetConstantValue<HashSet<TIdent>>().Select(IEnumerable<TIdent> (v) => v!)
                         .Or(() => node.GetConstantValue<IQueryable<TIdent>>().Select(IEnumerable<TIdent> (v) => v!))
 
-                select this.constCache.GetValueOrCreate(enumerable, () => Expression.Constant(enumerable.ToHashSet(), typeof(HashSet<TIdent>)));
+                   select this.constCache.GetValueOrCreate(enumerable, () => Expression.Constant(enumerable.ToHashSet(), typeof(HashSet<TIdent>)));
         }
     }
 

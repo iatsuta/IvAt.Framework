@@ -2,5 +2,5 @@
 
 public interface IUserCredentialMatcher<in TUser>
 {
-	bool IsMatch(UserCredential userCredential, TUser user);
+    bool IsMatch(UserCredential userCredential, TUser user);
 }

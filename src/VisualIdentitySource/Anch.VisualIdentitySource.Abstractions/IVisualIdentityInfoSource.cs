@@ -2,9 +2,9 @@
 
 public interface IVisualIdentityInfoSource
 {
-	VisualIdentityInfo<TDomainObject> GetVisualIdentityInfo<TDomainObject>();
+    VisualIdentityInfo<TDomainObject> GetVisualIdentityInfo<TDomainObject>();
 
-	VisualIdentityInfo<TDomainObject>? TryGetVisualIdentityInfo<TDomainObject>();
+    VisualIdentityInfo<TDomainObject>? TryGetVisualIdentityInfo<TDomainObject>();
 
     VisualIdentityInfo GetVisualIdentityInfo(Type domainObjectType);
 

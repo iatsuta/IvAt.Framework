@@ -2,7 +2,7 @@
 
 public interface IUserQueryableSource<out TUser>
 {
-	IQueryable<TUser> GetQueryable(UserCredential userCredential);
+    IQueryable<TUser> GetQueryable(UserCredential userCredential);
 
-	IUserQueryableSource<User> ToSimple();
+    IUserQueryableSource<User> ToSimple();
 }

@@ -7,7 +7,7 @@ namespace Anch.RelativePath;
 
 public record ManyRelativeDomainPathInfo<TFrom, TTo>(Expression<Func<TFrom, IEnumerable<TTo>>> Path) : IRelativeDomainPathInfo<TFrom, TTo>
 {
-	private readonly Lazy<Func<TFrom, IEnumerable<TTo>>> lazyPathFunc = new(Path.Compile);
+    private readonly Lazy<Func<TFrom, IEnumerable<TTo>>> lazyPathFunc = new(Path.Compile);
 
     public IRelativeDomainPathInfo<TNewFrom, TTo> OverrideInput<TNewFrom>(Expression<Func<TNewFrom, TFrom>> selector)
     {
@@ -41,6 +41,6 @@ public record ManyRelativeDomainPathInfo<TFrom, TTo>(Expression<Func<TFrom, IEnu
 
     public IEnumerable<TTo> GetRelativeObjects(TFrom source)
     {
-	    return this.lazyPathFunc.Value(source);
+        return this.lazyPathFunc.Value(source);
     }
 }

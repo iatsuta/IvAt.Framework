@@ -6,7 +6,7 @@ namespace Anch.RelativePath;
 
 public record SingleRelativeDomainPathInfo<TFrom, TTo>(Expression<Func<TFrom, TTo>> Path) : IRelativeDomainPathInfo<TFrom, TTo>
 {
-	private readonly Lazy<Func<TFrom, TTo>> lazyPathFunc = new(Path.Compile);
+    private readonly Lazy<Func<TFrom, TTo>> lazyPathFunc = new(Path.Compile);
 
     public IRelativeDomainPathInfo<TNewFrom, TTo> OverrideInput<TNewFrom>(Expression<Func<TNewFrom, TFrom>> selector)
     {

@@ -8,7 +8,7 @@ public class DeepEqualsCollection<T>(ImmutableArray<T> baseSource, IEqualityComp
     private int? hashCode;
 
     public DeepEqualsCollection(IEnumerable<T> baseSource, IEqualityComparer<T>? comparer = null)
-        : this([..baseSource], comparer ?? EqualityComparer<T>.Default)
+        : this([.. baseSource], comparer ?? EqualityComparer<T>.Default)
     {
     }
 
@@ -56,7 +56,7 @@ public class DeepEqualsCollection<T>(ImmutableArray<T> baseSource, IEqualityComp
     }
 
 
-    public static implicit operator DeepEqualsCollection<T>(T[] source) => new (source);
+    public static implicit operator DeepEqualsCollection<T>(T[] source) => new(source);
 }
 
 public static class DeepEqualsCollection

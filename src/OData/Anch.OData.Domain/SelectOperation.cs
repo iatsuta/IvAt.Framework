@@ -1,8 +1,9 @@
-﻿using SExpressions = System.Linq.Expressions;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
 
 using Anch.Core;
 using Anch.OData.Domain.QueryLanguage;
+
+using SExpressions = System.Linq.Expressions;
 
 namespace Anch.OData.Domain;
 
@@ -26,7 +27,7 @@ public record SelectOperation<TDomainObject>(
 
     public SelectOperation<TDomainObject> AddOrder<TOrderKey>(SExpressions.Expression<Func<TDomainObject, TOrderKey>> path, OrderType type) =>
 
-        this with { Orders = [..this.Orders, new SelectOrder<TDomainObject, TOrderKey>(path) { OrderType = type }] };
+        this with { Orders = [.. this.Orders, new SelectOrder<TDomainObject, TOrderKey>(path) { OrderType = type }] };
 
     public SelectOperation<TDomainObject> ToCountOperation() => Default with { Filter = this.Filter };
 

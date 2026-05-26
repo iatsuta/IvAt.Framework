@@ -9,7 +9,7 @@ namespace Anch.GenericQueryable.Fetching;
 public class FetchRuleHeaderExpander(IEnumerable<FetchRuleHeaderInfo> fetchRuleHeaderInfoList) : IFetchRuleExpander
 {
     private readonly FrozenDictionary<Type, ImmutableArray<FetchRuleHeaderInfo>> headersDict =
-        fetchRuleHeaderInfoList.GroupBy(v => v.SourceType).ToFrozenDictionary(g => g.Key, ImmutableArray<FetchRuleHeaderInfo> (g) => [..g]);
+        fetchRuleHeaderInfoList.GroupBy(v => v.SourceType).ToFrozenDictionary(g => g.Key, ImmutableArray<FetchRuleHeaderInfo> (g) => [.. g]);
 
     private readonly ConcurrentDictionary<Type, object> cache = [];
 

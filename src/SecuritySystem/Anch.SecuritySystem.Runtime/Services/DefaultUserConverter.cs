@@ -6,6 +6,7 @@ using Anch.SecuritySystem.UserSource;
 using Anch.VisualIdentitySource;
 
 namespace Anch.SecuritySystem.Services;
+
 public class DefaultUserConverter<TUser>(
     ISecurityIdentityManager<TUser> securityIdentityManager,
     IVisualIdentityInfo<TUser> visualIdentityInfo) : IDefaultUserConverter<TUser>

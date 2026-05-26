@@ -7,12 +7,12 @@ namespace Anch.IdentitySource;
 public record IdentityInfo<TDomainObject, TIdent>(PropertyAccessors<TDomainObject, TIdent> Id) : IdentityInfo<TDomainObject>, IIdentityInfo<TDomainObject, TIdent>
     where TIdent : notnull
 {
-	public IdentityInfo(Expression<Func<TDomainObject, TIdent>> idPath) :
-		this(idPath.ToPropertyAccessors())
-	{
-	}
+    public IdentityInfo(Expression<Func<TDomainObject, TIdent>> idPath) :
+        this(idPath.ToPropertyAccessors())
+    {
+    }
 
-	public override Type IdentityType { get; } = typeof(TIdent);
+    public override Type IdentityType { get; } = typeof(TIdent);
 
     public Expression<Func<TDomainObject, bool>> CreateFilter(IEnumerable<TIdent> idents)
     {
@@ -26,7 +26,7 @@ public record IdentityInfo<TDomainObject, TIdent>(PropertyAccessors<TDomainObjec
 
     public override object GetId(TDomainObject domainObject)
     {
-	    return this.Id.Getter(domainObject);
+        return this.Id.Getter(domainObject);
     }
 }
 

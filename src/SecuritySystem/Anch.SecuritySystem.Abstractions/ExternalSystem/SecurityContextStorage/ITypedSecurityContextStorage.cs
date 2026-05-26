@@ -18,5 +18,5 @@ public interface ITypedSecurityContextStorage<TSecurityContextIdent> : ITypedSec
 
     IEnumerable<SecurityContextData<TSecurityContextIdent>> GetSecurityContextsWithMasterExpand(TSecurityContextIdent startSecurityEntityId);
 
-    bool IsExists (TSecurityContextIdent securityContextId);
+    bool IsExists(TSecurityContextIdent securityContextId);
 }

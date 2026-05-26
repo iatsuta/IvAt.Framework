@@ -1,7 +1,7 @@
 ﻿namespace Anch.SecuritySystem.Services;
 
 public interface ISecurityRepository<TDomainObject>
-	where TDomainObject : class
+    where TDomainObject : class
 {
-	Task<TDomainObject> GetObjectAsync(SecurityIdentity securityIdentity, CancellationToken cancellationToken);
+    Task<TDomainObject> GetObjectAsync(SecurityIdentity securityIdentity, CancellationToken cancellationToken);
 }

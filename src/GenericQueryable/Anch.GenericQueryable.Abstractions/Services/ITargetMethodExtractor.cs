@@ -4,5 +4,5 @@ namespace Anch.GenericQueryable.Services;
 
 public interface ITargetMethodExtractor
 {
-	MethodInfo? TryGetTargetMethod(MethodInfo baseMethod);
+    MethodInfo? TryGetTargetMethod(MethodInfo baseMethod);
 }

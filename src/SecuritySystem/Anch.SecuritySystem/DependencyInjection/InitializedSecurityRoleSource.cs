@@ -20,10 +20,10 @@ public class InitializedSecurityRoleSource(IEnumerable<PreInitializerFullSecurit
             var otherRoles = securityRoles.Select(sr => sr.FullSecurityRole).Except(this.ExceptAdministratorRoles);
 
             var newInfo = securityRole.Information with
-                          {
-                              Children = [..info.Children.Concat(otherRoles).Distinct()],
-                              Restriction = SecurityPathRestriction.Ignored
-                          };
+            {
+                Children = [.. info.Children.Concat(otherRoles).Distinct()],
+                Restriction = SecurityPathRestriction.Ignored
+            };
 
             return new FullSecurityRole(securityRole.Name, newInfo);
         }

@@ -6,7 +6,7 @@ using Anch.Core;
 namespace Anch.VisualIdentitySource;
 
 public class VisualIdentityInfoSource(IVisualIdentityPropertyExtractor propertyExtractor, IEnumerable<VisualIdentityInfo> customInfoList)
-	: IVisualIdentityInfoSource
+    : IVisualIdentityInfoSource
 {
     private readonly ConcurrentDictionary<Type, VisualIdentityInfo?> cache = [];
 
@@ -51,9 +51,9 @@ public class VisualIdentityInfoSource(IVisualIdentityPropertyExtractor propertyE
     }
 
     public VisualIdentityInfo<TDomainObject> GetVisualIdentityInfo<TDomainObject>()
-	{
-		return this.TryGetVisualIdentityInfo<TDomainObject>() ?? throw GetMissedError(typeof(TDomainObject));
-	}
+    {
+        return this.TryGetVisualIdentityInfo<TDomainObject>() ?? throw GetMissedError(typeof(TDomainObject));
+    }
 
     private static Exception GetMissedError(Type domainObjectType)
     {
@@ -61,7 +61,7 @@ public class VisualIdentityInfoSource(IVisualIdentityPropertyExtractor propertyE
     }
 
     private static VisualIdentityInfo<TDomainObject> CreateVisualIdentityInfo<TDomainObject>(Expression<Func<TDomainObject, string>> path)
-	{
-		return new VisualIdentityInfo<TDomainObject>(path);
-	}
+    {
+        return new VisualIdentityInfo<TDomainObject>(path);
+    }
 }

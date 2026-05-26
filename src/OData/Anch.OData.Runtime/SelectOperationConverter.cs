@@ -29,5 +29,5 @@ public class SelectOperationConverter(ILambdaExpressionConverter lambdaExpressio
 
     private SelectOrder<TDomainObject, TOrderKey> ToTypedOrder<TDomainObject, TOrderKey>(SelectOrder selectOrder) =>
         new(lambdaExpressionConverter.Convert<Func<TDomainObject, TOrderKey>>(selectOrder.Path))
-            { OrderType = selectOrder.OrderType };
+        { OrderType = selectOrder.OrderType };
 }

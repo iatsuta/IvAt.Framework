@@ -2,5 +2,5 @@
 
 public record ServiceProviderBuildContext(ServiceProviderIndex Index)
 {
-    public static ServiceProviderBuildContext Main { get; } = new (ServiceProviderIndex.Main);
+    public static ServiceProviderBuildContext Main { get; } = new(ServiceProviderIndex.Main);
 }

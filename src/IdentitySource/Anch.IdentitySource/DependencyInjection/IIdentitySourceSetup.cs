@@ -4,8 +4,8 @@ namespace Anch.IdentitySource.DependencyInjection;
 
 public interface IIdentitySourceSetup
 {
-	IIdentitySourceSetup SetSettings(IdentityPropertySourceSettings settings);
+    IIdentitySourceSetup SetSettings(IdentityPropertySourceSettings settings);
 
-	IIdentitySourceSetup SetId<TDomainObject, TIdent>(Expression<Func<TDomainObject, TIdent>> idPath)
-		where TIdent : notnull;
+    IIdentitySourceSetup SetId<TDomainObject, TIdent>(Expression<Func<TDomainObject, TIdent>> idPath)
+        where TIdent : notnull;
 }

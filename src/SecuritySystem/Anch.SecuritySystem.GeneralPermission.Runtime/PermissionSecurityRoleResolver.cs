@@ -1,6 +1,7 @@
 ﻿using Anch.SecuritySystem.Services;
 
 namespace Anch.SecuritySystem.GeneralPermission;
+
 public class PermissionSecurityRoleResolver<TPermission, TSecurityRole>(
     GeneralPermissionBindingInfo<TPermission, TSecurityRole> generalBindingInfo,
     ISecurityIdentityManager<TSecurityRole> securityRoleIdentityManager,

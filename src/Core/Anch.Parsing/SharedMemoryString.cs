@@ -55,7 +55,7 @@ public record SharedMemoryString(ReadOnlyMemory<char> Chars) : IComparable<Share
 
     public string ToString(int charLimit)
     {
-        return new string(this.Chars.Span[.. Math.Min(this.Length, charLimit)]);
+        return new string(this.Chars.Span[..Math.Min(this.Length, charLimit)]);
     }
 
     public override int GetHashCode()

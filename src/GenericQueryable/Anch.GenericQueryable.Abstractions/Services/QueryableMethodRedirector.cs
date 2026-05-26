@@ -7,17 +7,17 @@ namespace Anch.GenericQueryable.Services;
 
 public class QueryableMethodRedirector(ITargetMethodExtractor targetMethodExtractor) : MethodRedirector(targetMethodExtractor)
 {
-	private static readonly MethodInfo TaskFromResultMethod = typeof(Task).GetMethod(nameof(Task.FromResult))!;
+    private static readonly MethodInfo TaskFromResultMethod = typeof(Task).GetMethod(nameof(Task.FromResult))!;
 
-	protected override Expression CreateCallExpression(MethodInfo targetMethod, IEnumerable<Expression> args)
+    protected override Expression CreateCallExpression(MethodInfo targetMethod, IEnumerable<Expression> args)
     {
         return base.CreateCallExpression(targetMethod, args).Pipe(WrapToAsync);
     }
 
-	private static Expression WrapToAsync(Expression callExpression)
-	{
-		return Expression.Call(TaskFromResultMethod.MakeGenericMethod(callExpression.Type), callExpression);
-	}
+    private static Expression WrapToAsync(Expression callExpression)
+    {
+        return Expression.Call(TaskFromResultMethod.MakeGenericMethod(callExpression.Type), callExpression);
+    }
 
-	public static IMethodRedirector Default { get; } = new QueryableMethodRedirector(QueryableTargetMethodExtractor.Default);
+    public static IMethodRedirector Default { get; } = new QueryableMethodRedirector(QueryableTargetMethodExtractor.Default);
 }

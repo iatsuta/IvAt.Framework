@@ -210,11 +210,11 @@ public class HierarchicalObjectAncestorLinkExpander<TDomainObject, TDirectedAnce
         switch (expandType)
         {
             case HierarchicalExpandType.None:
-            {
-                var filter = identityInfo.Id.Path.Select(domainObjectId => idents.Contains(domainObjectId));
+                {
+                    var filter = identityInfo.Id.Path.Select(domainObjectId => idents.Contains(domainObjectId));
 
-                return queryableSource.GetQueryable<TDomainObject>().Where(filter);
-            }
+                    return queryableSource.GetQueryable<TDomainObject>().Where(filter);
+                }
 
             case HierarchicalExpandType.Children:
                 return this.ExpandDomainObject(idents, fullAncestorLinkInfo.Directed);

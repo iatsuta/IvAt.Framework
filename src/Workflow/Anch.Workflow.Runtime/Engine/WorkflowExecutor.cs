@@ -92,18 +92,18 @@ public class WorkflowExecutor(
         switch (unprocessedStateResultBase)
         {
             case UnprocessedStateResult unprocessedStateResult:
-            {
-                var machine = workflowMachineFactory.Create(unprocessedStateResult.StateInstance.Workflow);
+                {
+                    var machine = workflowMachineFactory.Create(unprocessedStateResult.StateInstance.Workflow);
 
-                return await machine.ProcessWorkflow(unprocessedStateResult.ExecutionResult, cancellationToken);
-            }
+                    return await machine.ProcessWorkflow(unprocessedStateResult.ExecutionResult, cancellationToken);
+                }
 
             case UnprocessedCurrentStateResult unprocessedCurrentStateResult:
-            {
-                var machine = workflowMachineFactory.Create(unprocessedCurrentStateResult.WorkflowInstance);
+                {
+                    var machine = workflowMachineFactory.Create(unprocessedCurrentStateResult.WorkflowInstance);
 
-                return await machine.ProcessWorkflow(cancellationToken);
-            }
+                    return await machine.ProcessWorkflow(cancellationToken);
+                }
 
             default:
                 throw new ArgumentOutOfRangeException(nameof(unprocessedStateResultBase), unprocessedStateResultBase, null);

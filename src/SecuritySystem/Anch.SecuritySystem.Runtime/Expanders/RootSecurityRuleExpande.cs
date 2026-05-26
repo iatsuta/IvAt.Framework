@@ -1,4 +1,5 @@
 ﻿using Anch.SecuritySystem.Services;
+
 using static Anch.SecuritySystem.SecurityRule;
 
 namespace Anch.SecuritySystem.Expanders;

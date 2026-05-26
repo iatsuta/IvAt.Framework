@@ -4,5 +4,5 @@ namespace Anch.SecuritySystem.UserSource;
 
 public interface IUserFilterFactory<TUser>
 {
-	Expression<Func<TUser, bool>> CreateFilter(UserCredential userCredential);
+    Expression<Func<TUser, bool>> CreateFilter(UserCredential userCredential);
 }

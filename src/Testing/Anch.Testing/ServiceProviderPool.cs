@@ -4,15 +4,7 @@ namespace Anch.Testing;
 
 public class ServiceProviderPool(ITestEnvironment testEnvironment, bool? allowParallelization) : IServiceProviderPool
 {
-    private readonly IServiceProviderPool internalServiceProviderPool = CreateInternal(testEnvironment, allowParallelization);
-
-    public ValueTask<IServiceProvider> GetAsync(CancellationToken ct) => this.internalServiceProviderPool.GetAsync(ct);
-
-    public ValueTask ReleaseAsync(IServiceProvider serviceProvider, CancellationToken ct) => this.internalServiceProviderPool.ReleaseAsync(serviceProvider, ct);
-
-    public ValueTask DisposeAsync() => this.internalServiceProviderPool.DisposeAsync();
-
-    private static IServiceProviderPool CreateInternal(ITestEnvironment testEnvironment, bool? allowParallelization)
+    private readonly Lazy<IServiceProviderPool> lazyInternalServiceProviderPool = new(() =>
     {
         var serviceProviderBuildContext = ServiceProviderBuildContext.Main;
 
@@ -35,5 +27,18 @@ public class ServiceProviderPool(ITestEnvironment testEnvironment, bool? allowPa
             mainServiceProvider,
             mainServiceProvider.GetRequiredService<IParallelizationSettings>(),
             mainServiceProviderSettings?.ReturnToPool ?? true);
+    });
+
+    public ValueTask<IServiceProvider> GetAsync(CancellationToken ct) => this.lazyInternalServiceProviderPool.Value.GetAsync(ct);
+
+    public ValueTask ReleaseAsync(IServiceProvider serviceProvider, CancellationToken ct) =>
+        this.lazyInternalServiceProviderPool.Value.ReleaseAsync(serviceProvider, ct);
+
+    public async ValueTask DisposeAsync()
+    {
+        if (this.lazyInternalServiceProviderPool.IsValueCreated)
+        {
+            await this.lazyInternalServiceProviderPool.Value.DisposeAsync();
+        }
     }
 }

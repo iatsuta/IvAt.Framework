@@ -26,11 +26,11 @@ public class AncestorDenormalizer<TDomainObject>(IServiceProxyFactory servicePro
     private readonly IAncestorDenormalizer<TDomainObject> innerService =
         serviceProxyFactory.Create<IAncestorDenormalizer<TDomainObject>>();
 
-	public Task Initialize(CancellationToken cancellationToken) =>
-		this.innerService.Initialize(cancellationToken);
+    public Task Initialize(CancellationToken cancellationToken) =>
+        this.innerService.Initialize(cancellationToken);
 
-	public Task SyncAsync(IEnumerable<TDomainObject> updatedDomainObjectsBase, IEnumerable<TDomainObject> removedDomainObjects, CancellationToken cancellationToken) =>
-		this.innerService.SyncAsync(updatedDomainObjectsBase, removedDomainObjects, cancellationToken);
+    public Task SyncAsync(IEnumerable<TDomainObject> updatedDomainObjectsBase, IEnumerable<TDomainObject> removedDomainObjects, CancellationToken cancellationToken) =>
+        this.innerService.SyncAsync(updatedDomainObjectsBase, removedDomainObjects, cancellationToken);
 }
 
 public class AncestorDenormalizer<TDomainObject, TDirectAncestorLink>(
@@ -85,7 +85,7 @@ public class AncestorDenormalizer<TDomainObject, TDirectAncestorLink>(
         var link = new TDirectAncestorLink();
 
         fullAncestorLinkInfo.Directed.From.Setter(link, ancestor);
-		fullAncestorLinkInfo.Directed.To.Setter(link, child);
+        fullAncestorLinkInfo.Directed.To.Setter(link, child);
 
         return link;
     }

@@ -84,7 +84,7 @@ public abstract record DomainSecurityRule : SecurityRule
 
         public SecurityPathRestriction? CustomRestriction { get; init; } = null;
 
-        public HierarchicalExpandType GetSafeExpandType () => this.CustomExpandType ?? HierarchicalExpandType.Children;
+        public HierarchicalExpandType GetSafeExpandType() => this.CustomExpandType ?? HierarchicalExpandType.Children;
 
         public IEnumerable<SecurityContextRestriction> GetSafeSecurityContextRestrictions() =>
             (this.CustomRestriction?.SecurityContextRestrictions).EmptyIfNull();
@@ -196,7 +196,7 @@ public abstract record DomainSecurityRule : SecurityRule
     public record ExpandedRolesSecurityRule(DeepEqualsCollection<SecurityRole> SecurityRoles) : RoleBaseSecurityRule
     {
         public ExpandedRolesSecurityRule(IEnumerable<SecurityRole> securityRoles)
-            :this(securityRoles.ToArray())
+            : this(securityRoles.ToArray())
         {
         }
 

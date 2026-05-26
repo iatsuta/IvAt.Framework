@@ -16,21 +16,21 @@ public class UserNameResolver(IEnumerable<IUserSource> userSourceList) : IUserNa
                 return name;
 
             case UserCredential.IdentUserCredential { Identity: var identity }:
-            {
-                var request =
+                {
+                    var request =
 
-                    await userSourceList
-                        .ToAsyncEnumerable()
-                        .Select(async (userSource, ct) => await userSource.ToSimple().TryGetUserAsync(userCredential, ct))
-                        .Where(user => user != null)
-                        .Select(user => user!.Name)
-                        .Distinct()
-                        .ToArrayAsync(cancellationToken);
+                        await userSourceList
+                            .ToAsyncEnumerable()
+                            .Select(async (userSource, ct) => await userSource.ToSimple().TryGetUserAsync(userCredential, ct))
+                            .Where(user => user != null)
+                            .Select(user => user!.Name)
+                            .Distinct()
+                            .ToArrayAsync(cancellationToken);
 
-                return request.Single(
-                    () => new SecuritySystemException($"{nameof(UserCredential)} with id {identity.GetId()} not found"),
-                    names => new SecuritySystemException($"More one {nameof(UserCredential)} with id {identity.GetId()}: {names.Join(", ", name => $"\"{name}\"")}"));
-            }
+                    return request.Single(
+                        () => new SecuritySystemException($"{nameof(UserCredential)} with id {identity.GetId()} not found"),
+                        names => new SecuritySystemException($"More one {nameof(UserCredential)} with id {identity.GetId()}: {names.Join(", ", name => $"\"{name}\"")}"));
+                }
 
             default: throw new ArgumentOutOfRangeException(nameof(userCredential));
         }

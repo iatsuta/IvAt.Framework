@@ -32,15 +32,15 @@ public class NotificationPermissionExtractor<TPermission>(
 
         var parsedLevelInfoResult =
             permissionInfoResult.Select(principalInfo => new
-                {
-                    principalInfo.Permission,
-                    LevelDict = principalInfo.LevelInfo
+            {
+                principalInfo.Permission,
+                LevelDict = principalInfo.LevelInfo
                         .Split(LevelsSeparator, StringSplitOptions.RemoveEmptyEntries)
                         .Select<string, string[]>(levelData => levelData.Split(LevelValueSeparator))
                         .ToDictionary(
                             levelParts => typeArr[int.Parse(levelParts[0])],
                             levelParts => int.Parse(levelParts[1]))
-                });
+            });
 
         var optimalRequest = notificationFilterGroups.Aggregate(parsedLevelInfoResult, (state, notificationFilterGroup) =>
         {

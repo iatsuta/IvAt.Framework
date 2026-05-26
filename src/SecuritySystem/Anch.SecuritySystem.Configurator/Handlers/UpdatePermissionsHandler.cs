@@ -14,7 +14,7 @@ public class UpdatePermissionsHandler(
     ISecurityRoleSource securityRoleSource,
     ISecurityContextInfoSource securityContextInfoSource,
     IDomainObjectIdentsParser domainObjectIdentsParser,
-	IPrincipalManagementService principalManagementService,
+    IPrincipalManagementService principalManagementService,
     IConfiguratorIntegrationEvents? configuratorIntegrationEvents = null) : BaseWriteHandler, IUpdatePermissionsHandler
 {
     public async Task Execute(HttpContext context, CancellationToken cancellationToken)

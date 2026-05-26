@@ -16,5 +16,5 @@ public interface ISecurityIdentityConverter<TIdent> : ISecurityIdentityConverter
 
     new TypedSecurityIdentity<TIdent> Convert(SecurityIdentity securityIdentity);
 
-	Expression<Func<TSourceIdent, TIdent>> GetConvertExpression<TSourceIdent>();
+    Expression<Func<TSourceIdent, TIdent>> GetConvertExpression<TSourceIdent>();
 }

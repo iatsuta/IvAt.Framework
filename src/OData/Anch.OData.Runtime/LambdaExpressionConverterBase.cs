@@ -1,7 +1,7 @@
-﻿using SExpressions = System.Linq.Expressions;
-
-using Anch.OData.Domain.QueryLanguage;
+﻿using Anch.OData.Domain.QueryLanguage;
 using Anch.OData.Domain.QueryLanguage.Constant.Base;
+
+using SExpressions = System.Linq.Expressions;
 
 namespace Anch.OData;
 
@@ -39,7 +39,7 @@ public abstract class LambdaExpressionConverterBase : ILambdaExpressionConverter
 
     protected abstract SExpressions.BinaryExpression Convert(BinaryExpression expression, Dictionary<ParameterExpression, SExpressions.ParameterExpression> parameters);
 
-    protected abstract SExpressions.MethodCallExpression Convert(MethodExpression expression, Dictionary <ParameterExpression, SExpressions.ParameterExpression> parameters);
+    protected abstract SExpressions.MethodCallExpression Convert(MethodExpression expression, Dictionary<ParameterExpression, SExpressions.ParameterExpression> parameters);
 
     protected abstract SExpressions.ParameterExpression Convert(ParameterExpression expression, Dictionary<ParameterExpression, SExpressions.ParameterExpression> parameters);
 

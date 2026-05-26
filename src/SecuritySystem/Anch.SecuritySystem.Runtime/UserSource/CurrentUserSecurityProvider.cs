@@ -15,7 +15,7 @@ namespace Anch.SecuritySystem.UserSource;
 
 public class CurrentUserSecurityProvider<TDomainObject>(
     IServiceProvider serviceProvider,
-	IServiceProxyFactory serviceProxyFactory,
+    IServiceProxyFactory serviceProxyFactory,
     IEnumerable<UserSourceInfo> userSourceInfoList,
     IIdentityInfoSource identityInfoSource,
     SecurityRuleCredential? securityRuleCredential = null,
@@ -23,10 +23,10 @@ public class CurrentUserSecurityProvider<TDomainObject>(
 {
     private readonly Lazy<ISecurityProvider<TDomainObject>> lazyInnerService = new(() =>
     {
-	    var (actualUserSourceInfo, actualRelativeDomainPathInfo) =
-		    TryGetActualUserSourceInfo() ?? throw new SecuritySystemException($"Can't found RelativePath for {typeof(TDomainObject)}");
+        var (actualUserSourceInfo, actualRelativeDomainPathInfo) =
+            TryGetActualUserSourceInfo() ?? throw new SecuritySystemException($"Can't found RelativePath for {typeof(TDomainObject)}");
 
-	    var userIdentityInfo = identityInfoSource.GetIdentityInfo(actualUserSourceInfo.UserType);
+        var userIdentityInfo = identityInfoSource.GetIdentityInfo(actualUserSourceInfo.UserType);
 
         var innerServiceType =
             typeof(CurrentUserSecurityProvider<,,>).MakeGenericType(typeof(TDomainObject), actualUserSourceInfo.UserType, userIdentityInfo.IdentityType);
@@ -41,29 +41,29 @@ public class CurrentUserSecurityProvider<TDomainObject>(
 
         return serviceProxyFactory.Create<ISecurityProvider<TDomainObject>>(innerServiceType, innerServiceArgs);
 
-		(UserSourceInfo, object)? TryGetActualUserSourceInfo()
-		{
-			foreach (var userSourceInfo in userSourceInfoList)
-			{
-				var relativeDomainPathInfoType = typeof(IRelativeDomainPathInfo<,>).MakeGenericType(typeof(TDomainObject), userSourceInfo.UserType);
+        (UserSourceInfo, object)? TryGetActualUserSourceInfo()
+        {
+            foreach (var userSourceInfo in userSourceInfoList)
+            {
+                var relativeDomainPathInfoType = typeof(IRelativeDomainPathInfo<,>).MakeGenericType(typeof(TDomainObject), userSourceInfo.UserType);
 
-				var relativePathKey = key?.Name;
+                var relativePathKey = key?.Name;
 
-				var relativeDomainPathInfo = relativePathKey == null
-					? serviceProvider.GetService(relativeDomainPathInfoType)
-					: serviceProvider.GetKeyedService(relativeDomainPathInfoType, relativePathKey);
+                var relativeDomainPathInfo = relativePathKey == null
+                    ? serviceProvider.GetService(relativeDomainPathInfoType)
+                    : serviceProvider.GetKeyedService(relativeDomainPathInfoType, relativePathKey);
 
-				if (relativeDomainPathInfo != null)
-				{
-					return (userSourceInfo, relativeDomainPathInfo);
-				}
-			}
+                if (relativeDomainPathInfo != null)
+                {
+                    return (userSourceInfo, relativeDomainPathInfo);
+                }
+            }
 
-			return null;
-		}
-	});
+            return null;
+        }
+    });
 
-	private ISecurityProvider<TDomainObject> InnerService => this.lazyInnerService.Value;
+    private ISecurityProvider<TDomainObject> InnerService => this.lazyInnerService.Value;
 
     public IQueryable<TDomainObject> Inject(IQueryable<TDomainObject> queryable) => this.InnerService.Inject(queryable);
 

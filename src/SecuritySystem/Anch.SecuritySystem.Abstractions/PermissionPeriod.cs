@@ -24,5 +24,5 @@ public record struct PermissionPeriod(DateTime? StartDate, DateTime? EndDate)
         return start1 <= start2 && end2 <= end1;
     }
 
-    public static PermissionPeriod Eternity { get; } = new (null, null);
+    public static PermissionPeriod Eternity { get; } = new(null, null);
 }

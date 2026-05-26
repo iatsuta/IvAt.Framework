@@ -15,9 +15,9 @@ public readonly struct Maybe<T> : IEquatable<Maybe<T>>
 
     public T Value => !this.HasValue ? throw new InvalidOperationException("No value present") : this.value;
 
-    public static Maybe<T> Nothing => new (default!, false);
+    public static Maybe<T> Nothing => new(default!, false);
 
-    public static Maybe<T> Just(T value) => new (value, true);
+    public static Maybe<T> Just(T value) => new(value, true);
 
     public override string ToString() => this.HasValue ? $"{this.value}" : "";
 

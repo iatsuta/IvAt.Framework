@@ -16,7 +16,7 @@ public record PermissionData<TPermission, TPermissionRestriction>(TPermission Pe
     : PermissionData<TPermission>(Permission)
 {
     public PermissionData(TPermission permission, IEnumerable<TPermissionRestriction> restrictions)
-        : this(permission, [..restrictions])
+        : this(permission, [.. restrictions])
     {
     }
 }

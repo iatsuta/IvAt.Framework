@@ -21,26 +21,28 @@ public class AnchTestCollectionRunner(AnchTestClassRunner commonTestClassRunner,
                 sendTestClassMessages: true
             );
 
-        var ct = serviceProviderPool == null ? CancellationToken.None : ctxt.CancellationTokenSource.Token;
-        var serviceProvider = serviceProviderPool == null ? null : await serviceProviderPool.GetAsync(ct);
+        await using var scope = await serviceProviderPool.CreateScopeAsync(false, ctxt.CancellationTokenSource.Token);
 
-        try
+        if (scope.Exception != null)
         {
-            return await commonTestClassRunner.Run(
-                testClass,
-                testCases,
-                ctxt.ExplicitOption,
+            return XunitRunnerHelper.FailTestCases(
                 ctxt.MessageBus,
-                ctxt.TestCaseOrderer,
-                ctxt.Aggregator.Clone(),
                 ctxt.CancellationTokenSource,
-                ctxt.CollectionFixtureMappings,
-                serviceProvider);
+                testCases,
+                scope.Exception,
+                sendTestClassMessages: true
+            );
         }
-        finally
-        {
-            if (serviceProviderPool != null && serviceProvider is not null)
-                await serviceProviderPool.ReleaseAsync(serviceProvider, ct);
-        }
+
+        return await commonTestClassRunner.Run(
+            testClass,
+            testCases,
+            ctxt.ExplicitOption,
+            ctxt.MessageBus,
+            ctxt.TestCaseOrderer,
+            ctxt.Aggregator.Clone(),
+            ctxt.CancellationTokenSource,
+            ctxt.CollectionFixtureMappings,
+            scope.ServiceProvider);
     }
 }

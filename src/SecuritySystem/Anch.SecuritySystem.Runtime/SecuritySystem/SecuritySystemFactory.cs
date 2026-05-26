@@ -13,7 +13,7 @@ public class SecuritySystemFactory(
     {
         return new SecuritySystem(
             accessDeniedExceptionService,
-            [..permissionSystems.Select(f => f.Create(securityRuleCredential))],
+            [.. permissionSystems.Select(f => f.Create(securityRuleCredential))],
             domainSecurityRoleExtractor);
     }
 }
