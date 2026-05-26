@@ -4,6 +4,12 @@ namespace Anch.Testing.Tests;
 
 public class ServiceProviderTests(IServiceProvider serviceProvider)
 {
+    [Fact]
+    public async Task Test0()
+    {
+
+    }
+
     [Theory]
     [AnchMemberData(nameof(GetTest1Cases))]
     public async Task Test1(decimal value, CancellationToken ct)
