@@ -63,11 +63,6 @@ public class AnchMemberDataAttribute(string memberName, params object?[] argumen
         MethodInfo testMethod,
         DisposalTracker disposalTracker)
     {
-        if (this.ServiceProviderPool == null)
-        {
-            return await base.GetData(testMethod, disposalTracker);
-        }
-
         if (this.MemberType is null)
             return [];
 
