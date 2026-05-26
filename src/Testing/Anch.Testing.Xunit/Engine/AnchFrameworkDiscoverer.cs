@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 
+using Xunit;
 using Xunit.Sdk;
 using Xunit.v3;
 
@@ -11,7 +12,7 @@ public class AnchFrameworkDiscoverer(IXunitTestAssembly testAssembly, IServicePr
     protected override ValueTask<bool> FindTestsForMethod(IXunitTestMethod testMethod, ITestFrameworkDiscoveryOptions discoveryOptions,
         Func<ITestCase, ValueTask<bool>> discoveryCallback)
     {
-        var actualTestMethod = testMethod.Method.GetCustomAttributes<AnchMemberDataAttribute>().Any() ? new AnchTheoryTestMethod(testMethod, serviceProviderPool) : testMethod;
+        var actualTestMethod = testMethod.Method.GetCustomAttributes<TheoryAttribute>().Any() ? new AnchTheoryTestMethod(testMethod, serviceProviderPool) : testMethod;
 
         return base.FindTestsForMethod(actualTestMethod, discoveryOptions, discoveryCallback);
     }

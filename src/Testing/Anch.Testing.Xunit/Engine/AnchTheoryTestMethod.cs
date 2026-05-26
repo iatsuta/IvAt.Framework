@@ -22,9 +22,9 @@ public class AnchTheoryTestMethod(IXunitTestMethod baseMethod, IServiceProviderP
     [
         .. baseMethod.DataAttributes.Select(attr =>
         {
-            if (attr is AnchMemberDataAttribute commonMemberDataAttribute)
+            if (attr is IServiceProviderPoolAttribute serviceProviderPoolAttribute)
             {
-                commonMemberDataAttribute.ServiceProviderPool = serviceProviderPool;
+                serviceProviderPoolAttribute.ServiceProviderPool = serviceProviderPool;
             }
 
             return attr;
@@ -59,7 +59,21 @@ public class AnchTheoryTestMethod(IXunitTestMethod baseMethod, IServiceProviderP
         string? label,
         object?[]? testMethodArguments,
         Type[]? methodGenericTypes)
-        => baseMethod.GetDisplayName(baseDisplayName, label, testMethodArguments, methodGenericTypes);
+    {
+        var displayName = baseMethod.GetDisplayName(baseDisplayName, label, testMethodArguments, methodGenericTypes);
+
+        if (testMethodArguments != null && baseMethod.Method.LastParameterIsCt() && baseMethod.Method.LastParameterIsCt() && displayName.EndsWith("???)"))
+        {
+            var skipPattern = $", {baseMethod.Method.GetParameters().Last().Name}: ???)";
+
+            if (displayName.EndsWith(skipPattern))
+            {
+                return displayName[..^skipPattern.Length] + ")";
+            }
+        }
+
+        return displayName;
+    }
 
     public MethodInfo MakeGenericMethod(Type[] genericTypes)
         => baseMethod.MakeGenericMethod(genericTypes);

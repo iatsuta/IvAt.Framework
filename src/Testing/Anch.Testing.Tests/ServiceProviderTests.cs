@@ -18,6 +18,14 @@ public class ServiceProviderTests(IServiceProvider serviceProvider)
 
     }
 
+    [Theory]
+    [AnchInlineData(123)]
+    [AnchInlineData(234)]
+    public async Task Test3(int value, CancellationToken ct)
+    {
+
+    }
+
     public IEnumerable<object[]> GetTest1Cases()
     {
         yield return new object[] { 123M };

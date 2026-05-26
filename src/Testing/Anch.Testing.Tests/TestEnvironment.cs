@@ -1,5 +1,4 @@
-﻿using Anch.Core;
-using Anch.Testing.Tests;
+﻿using Anch.Testing.Tests;
 using Anch.Testing.Xunit;
 
 using Microsoft.Extensions.DependencyInjection;
