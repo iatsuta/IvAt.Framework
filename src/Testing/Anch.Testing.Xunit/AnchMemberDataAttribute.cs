@@ -4,6 +4,8 @@ using System.Globalization;
 using System.Reflection;
 using System.Runtime.ExceptionServices;
 
+using Anch.Testing.Xunit.Engine;
+
 using Microsoft.Extensions.DependencyInjection;
 
 using Xunit;
@@ -14,9 +16,10 @@ using Xunit.v3;
 namespace Anch.Testing.Xunit;
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-public class AnchMemberDataAttribute(string memberName, params object?[] arguments) : MemberDataAttributeBase(memberName, arguments)
+public class AnchMemberDataAttribute(string memberName, params object?[] arguments)
+    : MemberDataAttributeBase(memberName, arguments), IServiceProviderPoolAttribute
 {
-    internal IServiceProviderPool? ServiceProviderPool { get; set; }
+    private IServiceProviderPool? serviceProviderPool;
 
     private readonly ConcurrentDictionary<MethodInfo, object?> testInstanceCache = [];
 
@@ -28,9 +31,9 @@ public class AnchMemberDataAttribute(string memberName, params object?[] argumen
             var dataSignatures = new List<string>(18);
 
             foreach (var enumerable in new[] { "IEnumerable<{0}>", "IAsyncEnumerable<{0}>" })
-                foreach (var dataType in new[] { "ITheoryDataRow", "object[]", "Tuple<...>" })
-                    foreach (var wrapper in new[] { "- {0}", "- Task<{0}>", "- ValueTask<{0}>" })
-                        dataSignatures.Add(string.Format(CultureInfo.CurrentCulture, wrapper, string.Format(CultureInfo.CurrentCulture, enumerable, dataType)));
+            foreach (var dataType in new[] { "ITheoryDataRow", "object[]", "Tuple<...>" })
+            foreach (var wrapper in new[] { "- {0}", "- Task<{0}>", "- ValueTask<{0}>" })
+                dataSignatures.Add(string.Format(CultureInfo.CurrentCulture, wrapper, string.Format(CultureInfo.CurrentCulture, enumerable, dataType)));
 
             return string.Join(Environment.NewLine, dataSignatures);
         });
@@ -63,11 +66,6 @@ public class AnchMemberDataAttribute(string memberName, params object?[] argumen
         MethodInfo testMethod,
         DisposalTracker disposalTracker)
     {
-        if (this.ServiceProviderPool == null)
-        {
-            return await base.GetData(testMethod, disposalTracker);
-        }
-
         if (this.MemberType is null)
             return [];
 
@@ -88,7 +86,7 @@ public class AnchMemberDataAttribute(string memberName, params object?[] argumen
 
         var ct = TestContext.Current.CancellationToken;
 
-        await using var scope = await this.ServiceProviderPool.CreateScopeAsync(true, ct);
+        await using var scope = await this.serviceProviderPool.CreateScopeAsync(true, ct);
 
         if (scope.Exception != null)
         {
@@ -299,4 +297,10 @@ public class AnchMemberDataAttribute(string memberName, params object?[] argumen
     /// <inheritdoc/>
     public override bool SupportsDiscoveryEnumeration() =>
         !this.DisableDiscoveryEnumeration;
+
+    IServiceProviderPool? IServiceProviderPoolAttribute.ServiceProviderPool
+    {
+        get => this.serviceProviderPool;
+        set => this.serviceProviderPool = value;
+    }
 }

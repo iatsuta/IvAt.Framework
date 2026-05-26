@@ -13,12 +13,14 @@ public class AnchTestRunner : XunitTestRunner
 
     protected override object? InvokeTestMethod(XunitTestRunnerContext ctxt, object? testClassInstance)
     {
-        if (!ctxt.TestMethod.LastParameterIsCt())
+        if (ctxt.TestMethod.LastParameterIsCt())
+        {
+            return Guard.ArgumentNotNull(ctxt).TestMethod.Invoke(testClassInstance, [.. ctxt.TestMethodArguments, TestContext.Current.CancellationToken]);
+        }
+        else
         {
             return base.InvokeTestMethod(ctxt, testClassInstance);
         }
-
-        return Guard.ArgumentNotNull(ctxt).TestMethod.Invoke(testClassInstance, [.. ctxt.TestMethodArguments, TestContext.Current.CancellationToken]);
     }
 
 

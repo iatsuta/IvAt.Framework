@@ -49,7 +49,7 @@ public class DatabaseTestingSetup : IDatabaseTestingSetup, IServiceInitializer
 
         (this.initEmptySchemaAction ?? throw new InvalidOperationException("Empty schema initializer is not set.")).Invoke(services);
 
-        (this.initTestDataAction ?? throw new InvalidOperationException("Shared test data initializer is not set.")).Invoke(services);
+        (this.initTestDataAction ?? throw new InvalidOperationException("Test data initializer is not set.")).Invoke(services);
 
         (this.initSettingsAction ?? throw new InvalidOperationException("Settings initializer is not set.")).Invoke(services);
 
