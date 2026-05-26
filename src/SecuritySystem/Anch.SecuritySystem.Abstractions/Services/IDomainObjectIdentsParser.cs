@@ -2,5 +2,5 @@
 
 public interface IDomainObjectIdentsParser
 {
-	Array Parse(Type domainObjectType, IEnumerable<string> idents);
+    Array Parse(Type domainObjectType, IEnumerable<string> idents);
 }

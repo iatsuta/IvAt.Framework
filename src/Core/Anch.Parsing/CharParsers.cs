@@ -54,7 +54,7 @@ public class CharParsers(CultureInfo culture) : CharParsers<SharedMemoryString>(
                 return input.ToError();
             }
 
-            index ++;
+            index++;
 
             while (index < input.Length && predicate(input.Span[index], index))
             {
@@ -210,18 +210,18 @@ public abstract class CharParsers<TInput>(CultureInfo culture) : Parsers<TInput>
     {
         return from v in this.TakeWhile(c => c != '\r' && c != '\n')
 
-            from _ in this.TryEndLine()
+               from _ in this.TryEndLine()
 
-            select v;
+               select v;
     }
 
     public Parser<TInput, bool> TryEndLine()
     {
         return from v1 in this.TryChar('\r')
 
-            from v2 in this.TryChar('\n')
+               from v2 in this.TryChar('\n')
 
-            select v1 || v2;
+               select v1 || v2;
     }
 
     public abstract Parser<TInput, SharedMemoryString> TakeText(int charCount);
@@ -284,5 +284,5 @@ public abstract class CharParsers<TInput>(CultureInfo culture) : Parsers<TInput>
         where TKey : notnull =>
 
         dictionary.Aggregate(this.Fault<TValue>(), (state, pair) => state.Or(() => from _ in getKeyParser(pair.Key)
-            select pair.Value));
+                                                                                   select pair.Value));
 }

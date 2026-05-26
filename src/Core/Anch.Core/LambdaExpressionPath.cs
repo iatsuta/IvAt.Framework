@@ -9,7 +9,7 @@ namespace Anch.Core;
 public sealed record LambdaExpressionPath(ImmutableArray<LambdaExpression> Properties)
 {
     public LambdaExpressionPath(IEnumerable<LambdaExpression> properties)
-        : this([..properties])
+        : this([.. properties])
     {
     }
 

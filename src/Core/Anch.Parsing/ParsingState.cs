@@ -4,7 +4,7 @@ public readonly record struct ParsingState<TInput, TValue>(TValue Value, TInput 
 {
     public static implicit operator ParsingState<TInput, TValue>(ValueTuple<TValue, TInput> value)
     {
-        return new (value.Item1, value.Item2);
+        return new(value.Item1, value.Item2);
     }
 
     public ParsingState<TInput, TValue> ToError()

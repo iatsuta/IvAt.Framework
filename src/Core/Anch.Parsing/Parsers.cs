@@ -29,19 +29,19 @@ public abstract class Parsers<TInput>
 
         return from processResult in this.SubOfTable(table, separator)
 
-            let v1 = (T1)processResult.GetValueOrDefault("p1", () => p1.GetDefaultValue())
+               let v1 = (T1)processResult.GetValueOrDefault("p1", () => p1.GetDefaultValue())
 
-            let v2 = (T2)processResult.GetValueOrDefault("p2", () => p2.GetDefaultValue())
+               let v2 = (T2)processResult.GetValueOrDefault("p2", () => p2.GetDefaultValue())
 
-            let v3 = (T3)processResult.GetValueOrDefault("p3", () => p3.GetDefaultValue())
+               let v3 = (T3)processResult.GetValueOrDefault("p3", () => p3.GetDefaultValue())
 
-            let v4 = (T4)processResult.GetValueOrDefault("p4", () => p4.GetDefaultValue())
+               let v4 = (T4)processResult.GetValueOrDefault("p4", () => p4.GetDefaultValue())
 
-            let v5 = (T5)processResult.GetValueOrDefault("p5", () => p5.GetDefaultValue())
+               let v5 = (T5)processResult.GetValueOrDefault("p5", () => p5.GetDefaultValue())
 
-            let v6 = (T6)processResult.GetValueOrDefault("p6", () => p6.GetDefaultValue())
+               let v6 = (T6)processResult.GetValueOrDefault("p6", () => p6.GetDefaultValue())
 
-            select resultSelector(v1, v2, v3, v4, v5, v6);
+               select resultSelector(v1, v2, v3, v4, v5, v6);
     }
 
 
@@ -54,9 +54,9 @@ public abstract class Parsers<TInput>
 
                 from subParseResult in (from sep in separator
 
-                    from subPairs in this.SubOfTable(table.Where(pair => pair.Key != rowPair.Key).ToDictionary(), separator)
+                                        from subPairs in this.SubOfTable(table.Where(pair => pair.Key != rowPair.Key).ToDictionary(), separator)
 
-                    select subPairs).Or(() => this.Return(new Dictionary<string, object>()))
+                                        select subPairs).Or(() => this.Return(new Dictionary<string, object>()))
 
                 select new[] { rowPair }.ToDictionary().Concat(subParseResult))
 

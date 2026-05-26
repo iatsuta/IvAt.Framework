@@ -32,17 +32,17 @@ public record VirtualPermissionBindingInfo<TPermission> : VirtualPermissionBindi
 
     public override Type PermissionType { get; } = typeof(TPermission);
 
-    public override ImmutableArray<VirtualPermissionSecurityRoleItemBindingInfo> BaseItems => this.baseItems ??= [..this.Items];
+    public override ImmutableArray<VirtualPermissionSecurityRoleItemBindingInfo> BaseItems => this.baseItems ??= [.. this.Items];
 
     public ImmutableArray<VirtualPermissionSecurityRoleItemBindingInfo<TPermission>> Items { get; init; } = [];
 
     public Expression<Func<TPermission, Array>> GetRestrictionsArrayExpr(LambdaExpression? filter, IdentityInfo identityInfo)
-	{
-		return new Func<Expression<Func<ISecurityContext, bool>>?, IIdentityInfo<ISecurityContext, Ignore>, Expression<Func<TPermission, Array>>>(
-				this.GetRestrictionsArrayExpr)
-			.CreateGenericMethod(identityInfo.DomainObjectType, identityInfo.IdentityType)
-			.Invoke<Expression<Func<TPermission, Array>>>(this, filter, identityInfo);
-	}
+    {
+        return new Func<Expression<Func<ISecurityContext, bool>>?, IIdentityInfo<ISecurityContext, Ignore>, Expression<Func<TPermission, Array>>>(
+                this.GetRestrictionsArrayExpr)
+            .CreateGenericMethod(identityInfo.DomainObjectType, identityInfo.IdentityType)
+            .Invoke<Expression<Func<TPermission, Array>>>(this, filter, identityInfo);
+    }
 
     public Expression<Func<TPermission, Array>> GetRestrictionsArrayExpr<TSecurityContext, TSecurityContextIdent>(
         Expression<Func<TSecurityContext, bool>>? filter,
@@ -60,18 +60,18 @@ public record VirtualPermissionBindingInfo<TPermission> : VirtualPermissionBindi
     public Expression<Func<TPermission, IEnumerable<TResult>>> GetRestrictionsExpr<TSecurityContext, TResult>(
         Expression<Func<TSecurityContext, bool>>? filter,
         Expression<Func<TSecurityContext, TResult>> selector)
-		where TSecurityContext : ISecurityContext
-	{
-		var expressions = this.GetManyRestrictionsExpr(filter, selector);
+        where TSecurityContext : ISecurityContext
+    {
+        var expressions = this.GetManyRestrictionsExpr(filter, selector);
 
-		return expressions.Match(
-			() => _ => Array.Empty<TResult>(),
-			single => single,
-			many => many.Aggregate((state, expr) =>
-				from ids1 in state
-				from ide2 in expr
-				select ids1.Concat(ide2)));
-	}
+        return expressions.Match(
+            () => _ => Array.Empty<TResult>(),
+            single => single,
+            many => many.Aggregate((state, expr) =>
+                from ids1 in state
+                from ide2 in expr
+                select ids1.Concat(ide2)));
+    }
 
     private IEnumerable<Expression<Func<TPermission, IEnumerable<TResult>>>> GetManyRestrictionsExpr<TSecurityContext, TResult>(
         Expression<Func<TSecurityContext, bool>>? filter,

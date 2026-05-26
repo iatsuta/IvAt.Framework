@@ -34,33 +34,33 @@ public class EfFetchService(IFetchRuleExpander fetchRuleExpander) : RootFetchSer
     }
 
     private static MethodInfo GetFetchMethod<TSource>(LambdaExpression prop, LambdaExpression? prevProp)
-		where TSource : class
-	{
-		if (prevProp == null)
-		{
-			return new Func<IQueryable<TSource>, Expression<Func<TSource, Ignore>>, IIncludableQueryable<TSource, Ignore>>(EntityFrameworkQueryableExtensions.Include)
-				.CreateGenericMethod(typeof(TSource), prop.Body.Type);
-		}
-		else
-		{
-			var prevElementType = prop.Parameters.Single().Type;
+        where TSource : class
+    {
+        if (prevProp == null)
+        {
+            return new Func<IQueryable<TSource>, Expression<Func<TSource, Ignore>>, IIncludableQueryable<TSource, Ignore>>(EntityFrameworkQueryableExtensions.Include)
+                .CreateGenericMethod(typeof(TSource), prop.Body.Type);
+        }
+        else
+        {
+            var prevElementType = prop.Parameters.Single().Type;
 
-			var prevPropRealType = prevProp.ReturnType;
+            var prevPropRealType = prevProp.ReturnType;
 
-			var nextPropertyType = prop.Body.Type;
+            var nextPropertyType = prop.Body.Type;
 
-			if (prevPropRealType.IsGenericType && typeof(IEnumerable<>).MakeGenericType(prevElementType).IsAssignableFrom(prevPropRealType))
-			{
-				return new Func<IIncludableQueryable<TSource, IEnumerable<Ignore>>, Expression<Func<Ignore, Ignore>>, IIncludableQueryable<TSource, Ignore>>(
+            if (prevPropRealType.IsGenericType && typeof(IEnumerable<>).MakeGenericType(prevElementType).IsAssignableFrom(prevPropRealType))
+            {
+                return new Func<IIncludableQueryable<TSource, IEnumerable<Ignore>>, Expression<Func<Ignore, Ignore>>, IIncludableQueryable<TSource, Ignore>>(
                         EntityFrameworkQueryableExtensions.ThenInclude)
-					.CreateGenericMethod(typeof(TSource), prevElementType, nextPropertyType);
-			}
-			else
-			{
-				return new Func<IIncludableQueryable<TSource, Ignore>, Expression<Func<Ignore, Ignore>>, IIncludableQueryable<TSource, Ignore>>(
+                    .CreateGenericMethod(typeof(TSource), prevElementType, nextPropertyType);
+            }
+            else
+            {
+                return new Func<IIncludableQueryable<TSource, Ignore>, Expression<Func<Ignore, Ignore>>, IIncludableQueryable<TSource, Ignore>>(
                         EntityFrameworkQueryableExtensions.ThenInclude)
-					.CreateGenericMethod(typeof(TSource), prevElementType, nextPropertyType);
-			}
-		}
-	}
+                    .CreateGenericMethod(typeof(TSource), prevElementType, nextPropertyType);
+            }
+        }
+    }
 }

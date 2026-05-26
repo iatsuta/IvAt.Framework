@@ -19,7 +19,7 @@ public class SecurityRoleSource : ISecurityRoleSource
 
     public SecurityRoleSource(IServiceProxyFactory serviceProxyFactory, IEnumerable<FullSecurityRole> securityRoles)
     {
-        this.SecurityRoles = [..securityRoles];
+        this.SecurityRoles = [.. securityRoles];
 
         this.identityDict = this.SecurityRoles.ToFrozenDictionary(v => v.Identity);
 

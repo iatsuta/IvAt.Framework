@@ -22,6 +22,6 @@ public class ClientSecurityRuleResolver(
 
                 select clientSecurityRuleInfo.Rule;
 
-            return [..request];
+            return [.. request];
         });
 }

@@ -22,7 +22,7 @@ public class SecurityContextInfoSource : ISecurityContextInfoSource
 
     public SecurityContextInfoSource(IServiceProxyFactory serviceProxyFactory, IEnumerable<SecurityContextInfo> securityContextInfoList)
     {
-        this.SecurityContextInfoList = [..securityContextInfoList];
+        this.SecurityContextInfoList = [.. securityContextInfoList];
 
         this.typeDict = this.SecurityContextInfoList.ToFrozenDictionary(v => v.Type);
         this.identityDict = this.typeDict.Values.ToFrozenDictionary(v => v.Identity);

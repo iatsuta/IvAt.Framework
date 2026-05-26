@@ -10,12 +10,12 @@ public record SelectOperationResult<T>(ImmutableArray<T> Items, int TotalCount)
     }
 
     public SelectOperationResult(IEnumerable<T> items)
-        : this([..items])
+        : this([.. items])
     {
     }
 
     public SelectOperationResult(IEnumerable<T> items, int totalCount)
-        : this([..items], totalCount)
+        : this([.. items], totalCount)
     {
     }
 }

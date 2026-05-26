@@ -42,7 +42,7 @@ public class UserCredentialManager(
         }
         else
         {
-            var updatedPrincipal = existsPrincipal with { Permissions = [..existsPrincipal.Permissions, .. newPermissions] };
+            var updatedPrincipal = existsPrincipal with { Permissions = [.. existsPrincipal.Permissions, .. newPermissions] };
 
             await principalManagementService.UpdatePermissionsAsync(
                 updatedPrincipal.Header.Identity,

@@ -8,7 +8,7 @@ using Anch.Testing.Xunit;
 using Microsoft.Extensions.DependencyInjection;
 
 using NHibernate;
-[assembly:AnchTestFramework<NHibTestEnvironment>]
+[assembly: AnchTestFramework<NHibTestEnvironment>]
 
 namespace Anch.GenericQueryable.IntegrationTests.Environment;
 

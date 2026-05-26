@@ -5,27 +5,27 @@ namespace Anch.GenericQueryable.Services;
 
 public class MethodRedirector(ITargetMethodExtractor targetMethodExtractor) : IMethodRedirector
 {
-	public Expression<Func<TResult>>? TryRedirect<TResult>(Expression<Func<TResult>> callExpression)
-	{
-		if (callExpression.Body is MethodCallExpression methodCallExpression)
-		{
-			var targetMethod = targetMethodExtractor.TryGetTargetMethod(methodCallExpression.Method);
+    public Expression<Func<TResult>>? TryRedirect<TResult>(Expression<Func<TResult>> callExpression)
+    {
+        if (callExpression.Body is MethodCallExpression methodCallExpression)
+        {
+            var targetMethod = targetMethodExtractor.TryGetTargetMethod(methodCallExpression.Method);
 
-			if (targetMethod != null)
-			{
-				var args = methodCallExpression.Arguments.Take(targetMethod.GetParameters().Length);
+            if (targetMethod != null)
+            {
+                var args = methodCallExpression.Arguments.Take(targetMethod.GetParameters().Length);
 
-				var newCallExpression = this.CreateCallExpression(targetMethod, args);
+                var newCallExpression = this.CreateCallExpression(targetMethod, args);
 
-				return Expression.Lambda<Func<TResult>>(newCallExpression);
-			}
-		}
+                return Expression.Lambda<Func<TResult>>(newCallExpression);
+            }
+        }
 
-		return null;
-	}
+        return null;
+    }
 
-	protected virtual Expression CreateCallExpression(MethodInfo targetMethod, IEnumerable<Expression> args)
-	{
-		return Expression.Call(targetMethod, args);
-	}
+    protected virtual Expression CreateCallExpression(MethodInfo targetMethod, IEnumerable<Expression> args)
+    {
+        return Expression.Call(targetMethod, args);
+    }
 }

@@ -4,7 +4,7 @@ namespace Anch.SecuritySystem.ExternalSystem.Management;
 
 public abstract record PrincipalData
 {
-	public abstract Type PrincipalType { get; }
+    public abstract Type PrincipalType { get; }
 
     public abstract Type PermissionType { get; }
 
@@ -16,7 +16,7 @@ public record PrincipalData<TPrincipal, TPermission, TPermissionRestriction>(
     ImmutableArray<PermissionData<TPermission, TPermissionRestriction>> PermissionDataList) : PrincipalData<TPrincipal>(Principal)
 {
     public PrincipalData(TPrincipal principal, IEnumerable<PermissionData<TPermission, TPermissionRestriction>> permissionDataList)
-        : this(principal, [..permissionDataList])
+        : this(principal, [.. permissionDataList])
     {
     }
 

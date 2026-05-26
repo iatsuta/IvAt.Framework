@@ -33,11 +33,11 @@ public class DuplicateServiceUsageValidator(Type[] exceptServices) : IServiceCol
         return new ValidationResult(errors);
     }
 
-    private static List<(Type ServiceType, ServiceLifetime Lifetime, Tuple<object?>? ActualServiceKey, List<ServiceDescriptor> UsedFor)> GetWrongMultiUsage(IServiceCollection serviceCollection)
+    private static List<(Type ServiceType, ServiceLifetime Lifetime, Tuple<object?>? ActualServiceKey, List<ServiceDescriptor> UsedFor)> GetWrongMultiUsage(IServiceCollection services)
     {
         var usedParametersRequest =
 
-            from service in serviceCollection
+            from service in services
 
             let actualImplementationType = service.IsKeyedService ? service.KeyedImplementationType : service.ImplementationType
 
@@ -72,7 +72,7 @@ public class DuplicateServiceUsageValidator(Type[] exceptServices) : IServiceCol
 
         var wrongMultiUsageRequest =
 
-            from service in serviceCollection
+            from service in services
 
             let actualServiceKey = service.IsKeyedService ? Tuple.Create(service.ServiceKey) : null
 

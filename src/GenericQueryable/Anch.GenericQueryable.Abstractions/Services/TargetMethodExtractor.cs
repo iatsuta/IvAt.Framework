@@ -8,11 +8,11 @@ namespace Anch.GenericQueryable.Services;
 
 public class TargetMethodExtractor(ImmutableArray<Type> extensionsTypes) : ITargetMethodExtractor
 {
-	private readonly ConcurrentDictionary<MethodInfo, MethodInfo?> mappingMethodCache = [];
+    private readonly ConcurrentDictionary<MethodInfo, MethodInfo?> mappingMethodCache = [];
 
-	public MethodInfo? TryGetTargetMethod(MethodInfo baseMethod)
-	{
-		return this.mappingMethodCache.GetOrAdd(baseMethod, _ =>
+    public MethodInfo? TryGetTargetMethod(MethodInfo baseMethod)
+    {
+        return this.mappingMethodCache.GetOrAdd(baseMethod, _ =>
         {
             if (this.TryGetTargetMethodName(baseMethod) is { } targetMethodName)
             {
@@ -41,20 +41,20 @@ public class TargetMethodExtractor(ImmutableArray<Type> extensionsTypes) : ITarg
                 return null;
             }
         });
-	}
+    }
 
-	protected virtual string? TryGetTargetMethodName(MethodInfo baseMethod)
+    protected virtual string? TryGetTargetMethodName(MethodInfo baseMethod)
     {
         return baseMethod.Name.StartsWith("Generic") ? baseMethod.Name.Skip("Generic", true) : null;
     }
 
-	protected virtual IEnumerable<Type> GetExpectedParameterTypes(MethodInfo baseMethod)
-	{
-		return baseMethod.GetParameters().Select(p => p.ParameterType);
-	}
+    protected virtual IEnumerable<Type> GetExpectedParameterTypes(MethodInfo baseMethod)
+    {
+        return baseMethod.GetParameters().Select(p => p.ParameterType);
+    }
 
-	protected virtual IEnumerable<Type> GetTargetMethodParameterTypes(MethodInfo targetMethod)
-	{
-		return targetMethod.GetParameters().Select(p => p.ParameterType);
-	}
+    protected virtual IEnumerable<Type> GetTargetMethodParameterTypes(MethodInfo targetMethod)
+    {
+        return targetMethod.GetParameters().Select(p => p.ParameterType);
+    }
 }

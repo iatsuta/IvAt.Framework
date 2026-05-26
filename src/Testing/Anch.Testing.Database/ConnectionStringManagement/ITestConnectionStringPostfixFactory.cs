@@ -1,6 +1,4 @@
-﻿using System.Collections.Concurrent;
-
-namespace Anch.Testing.Database.ConnectionStringManagement;
+﻿namespace Anch.Testing.Database.ConnectionStringManagement;
 
 public interface ITestConnectionStringPostfixFactory
 {

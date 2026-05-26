@@ -59,16 +59,16 @@ public class SecurityRoleInitializer<TPermission, TSecurityRole>(
                         $"Unexpected roles in database: {mergeResult.RemovingItems.Join(", ")}");
 
                 case UnexpectedSecurityElementMode.Remove:
-                {
-                    foreach (var removingItem in mergeResult.RemovingItems)
                     {
-                        logger.LogDebug("Role removed: {Name} {Id}", visualIdentityInfo.Name.Getter(removingItem), securityIdentityManager.GetIdentity(removingItem));
+                        foreach (var removingItem in mergeResult.RemovingItems)
+                        {
+                            logger.LogDebug("Role removed: {Name} {Id}", visualIdentityInfo.Name.Getter(removingItem), securityIdentityManager.GetIdentity(removingItem));
 
-                        await genericRepository.RemoveAsync(removingItem, cancellationToken);
+                            await genericRepository.RemoveAsync(removingItem, cancellationToken);
+                        }
+
+                        break;
                     }
-
-                    break;
-                }
             }
         }
 

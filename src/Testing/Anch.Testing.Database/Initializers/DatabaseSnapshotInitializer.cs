@@ -20,27 +20,27 @@ public class DatabaseSnapshotInitializer(
         switch (settings.InitMode)
         {
             case DatabaseInitMode.RebuildSnapshot:
-            {
-                await this.InitializeEmptySchema(cancellationToken);
-                await this.InitializeTestData(cancellationToken);
-
-                break;
-            }
-
-            case DatabaseInitMode.ReuseSnapshot:
-            {
-                if (!await databaseManager.Exists(TestConnectionStringRole.EmptySnapshot, cancellationToken))
                 {
                     await this.InitializeEmptySchema(cancellationToken);
-                }
-
-                if (!await databaseManager.Exists(TestConnectionStringRole.FilledSnapshot, cancellationToken))
-                {
                     await this.InitializeTestData(cancellationToken);
+
+                    break;
                 }
 
-                break;
-            }
+            case DatabaseInitMode.ReuseSnapshot:
+                {
+                    if (!await databaseManager.Exists(TestConnectionStringRole.EmptySnapshot, cancellationToken))
+                    {
+                        await this.InitializeEmptySchema(cancellationToken);
+                    }
+
+                    if (!await databaseManager.Exists(TestConnectionStringRole.FilledSnapshot, cancellationToken))
+                    {
+                        await this.InitializeTestData(cancellationToken);
+                    }
+
+                    break;
+                }
 
             case DatabaseInitMode.External:
                 break;

@@ -13,7 +13,7 @@ public class OptimizeBooleanLogicVisitor : ExpressionVisitor
         var visitedTest = this.Visit(node.Test);
 
         var evalReq =
-            
+
             from testObj in visitedTest.GetConstantValue<bool>()
 
             select this.Visit(testObj ? node.IfTrue : node.IfFalse);

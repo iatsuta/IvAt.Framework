@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace ExampleApp.Infrastructure.Services;
 
-public class ExampleDataInitializer([FromKeyedServices(ICurrentUser.RawKey)]ICurrentUser rawCurrentUser, IGenericRepository genericRepository) : IInitializer
+public class ExampleDataInitializer([FromKeyedServices(ICurrentUser.RawKey)] ICurrentUser rawCurrentUser, IGenericRepository genericRepository) : IInitializer
 {
     public const string Key = "ExampleData";
 

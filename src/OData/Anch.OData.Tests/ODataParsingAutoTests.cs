@@ -92,7 +92,8 @@ public class ODataParsingAutoTests : TestBase
                                 SelectOperation.Default.Filter,
                                 SelectOperation.Default.Orders,
                                 skipCount,
-                                takeCount) { Expands = [expand0, expand1], Selects = [select0, select1] };
+                                takeCount)
+        { Expands = [expand0, expand1], Selects = [select0, select1] };
 
         this.Test(testStr, expectedOperation);
     }

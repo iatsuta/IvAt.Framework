@@ -4,15 +4,15 @@ using Anch.GenericRepository;
 namespace Anch.SecuritySystem.Services;
 
 public class SecurityRepository<TDomainObject>(IQueryableSource queryableSource, ISecurityIdentityFilterFactory<TDomainObject> filterFactory)
-	: ISecurityRepository<TDomainObject>
-	where TDomainObject : class
+    : ISecurityRepository<TDomainObject>
+    where TDomainObject : class
 {
-	public async Task<TDomainObject> GetObjectAsync(SecurityIdentity securityIdentity, CancellationToken cancellationToken)
-	{
-		var result = await queryableSource.GetQueryable<TDomainObject>().Where(filterFactory.CreateFilter(securityIdentity))
-			.GenericSingleOrDefaultAsync(cancellationToken);
+    public async Task<TDomainObject> GetObjectAsync(SecurityIdentity securityIdentity, CancellationToken cancellationToken)
+    {
+        var result = await queryableSource.GetQueryable<TDomainObject>().Where(filterFactory.CreateFilter(securityIdentity))
+            .GenericSingleOrDefaultAsync(cancellationToken);
 
-		return result ?? throw new ArgumentOutOfRangeException(nameof(securityIdentity),
-			$"{typeof(TDomainObject).Name} with {nameof(securityIdentity)} '{securityIdentity}' not found");
-	}
+        return result ?? throw new ArgumentOutOfRangeException(nameof(securityIdentity),
+            $"{typeof(TDomainObject).Name} with {nameof(securityIdentity)} '{securityIdentity}' not found");
+    }
 }

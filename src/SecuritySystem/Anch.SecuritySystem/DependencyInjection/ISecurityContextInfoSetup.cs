@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 namespace Anch.SecuritySystem.DependencyInjection;
 
 public interface ISecurityContextInfoSetup<TSecurityContext>
-	where TSecurityContext : class, ISecurityContext
+    where TSecurityContext : class, ISecurityContext
 {
     ISecurityContextInfoSetup<TSecurityContext> SetName(string name);
 

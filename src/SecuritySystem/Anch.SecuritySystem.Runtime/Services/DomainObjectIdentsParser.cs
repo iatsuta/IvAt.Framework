@@ -8,15 +8,15 @@ namespace Anch.SecuritySystem.Services;
 
 public class DomainObjectIdentsParser(IServiceProvider serviceProvider, IIdentityInfoSource identityInfoSource) : IDomainObjectIdentsParser
 {
-	private readonly ConcurrentDictionary<Type, IIdentsParser> parsersCache = new();
+    private readonly ConcurrentDictionary<Type, IIdentsParser> parsersCache = new();
 
-	public Array Parse(Type domainObjectType, IEnumerable<string> idents) =>
+    public Array Parse(Type domainObjectType, IEnumerable<string> idents) =>
         this.parsersCache.GetOrAdd(domainObjectType, _ =>
-			{
-				var identityInfo = identityInfoSource.GetIdentityInfo(domainObjectType);
+            {
+                var identityInfo = identityInfoSource.GetIdentityInfo(domainObjectType);
 
-				return (IIdentsParser)serviceProvider.GetRequiredService(typeof(IIdentsParser<>).MakeGenericType(identityInfo.IdentityType));
-			})
-			.Parse(idents);
+                return (IIdentsParser)serviceProvider.GetRequiredService(typeof(IIdentsParser<>).MakeGenericType(identityInfo.IdentityType));
+            })
+            .Parse(idents);
 
 }

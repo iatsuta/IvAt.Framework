@@ -6,7 +6,7 @@ namespace Anch.GenericQueryable.Services;
 
 public interface IGenericQueryableExecutor
 {
-	IFetchService FetchService { get; }
+    IFetchService FetchService { get; }
 
     TResult Execute<TResult>(Expression<Func<TResult>> callExpression);
 }

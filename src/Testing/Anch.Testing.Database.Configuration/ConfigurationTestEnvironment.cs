@@ -35,7 +35,7 @@ public abstract class ConfigurationTestEnvironment : DatabaseTestEnvironment
             return new ConfigurationBuilder()
                 .AddConfiguration(this.RawConfiguration)
                 .AddInMemoryCollection(new Dictionary<string, string?>
-                    { [$"ConnectionStrings:{this.ConnectionStringName}"] = actualConnectionString.Value })
+                { [$"ConnectionStrings:{this.ConnectionStringName}"] = actualConnectionString.Value })
                 .Build();
         }
     }

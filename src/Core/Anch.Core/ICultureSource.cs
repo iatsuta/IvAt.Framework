@@ -4,5 +4,5 @@ namespace Anch.Core;
 
 public interface ICultureSource
 {
-	CultureInfo Culture { get; }
+    CultureInfo Culture { get; }
 }

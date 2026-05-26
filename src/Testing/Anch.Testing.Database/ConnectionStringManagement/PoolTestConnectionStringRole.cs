@@ -2,5 +2,5 @@
 
 public record PoolTestConnectionStringRole(ServiceProviderIndex ServiceProviderIndex) : TestConnectionStringRole("Actual")
 {
-    public static PoolTestConnectionStringRole Main { get; } = new (ServiceProviderIndex.Main);
+    public static PoolTestConnectionStringRole Main { get; } = new(ServiceProviderIndex.Main);
 }

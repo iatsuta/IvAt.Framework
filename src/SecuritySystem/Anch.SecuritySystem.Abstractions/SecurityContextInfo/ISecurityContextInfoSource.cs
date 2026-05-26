@@ -11,5 +11,5 @@ public interface ISecurityContextInfoSource
 
     SecurityContextInfo GetSecurityContextInfo(string name);
 
-	SecurityContextInfo GetSecurityContextInfo(SecurityIdentity identity);
+    SecurityContextInfo GetSecurityContextInfo(SecurityIdentity identity);
 }

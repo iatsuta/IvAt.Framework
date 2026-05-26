@@ -31,10 +31,10 @@ public class UserCredentialMatcher<TUser, TIdent>(
     {
         switch (userCredential)
         {
-            case UserCredential.IdentUserCredential { Identity : var identity } when securityIdentityConverter.TryConvert(identity) is { } typedIdentity:
-            {
-                return EqualityComparer<TIdent>.Default.Equals(identityInfo.Id.Getter(user), typedIdentity.Id);
-            }
+            case UserCredential.IdentUserCredential { Identity: var identity } when securityIdentityConverter.TryConvert(identity) is { } typedIdentity:
+                {
+                    return EqualityComparer<TIdent>.Default.Equals(identityInfo.Id.Getter(user), typedIdentity.Id);
+                }
 
             case UserCredential.NamedUserCredential { Name: var name }:
                 return name.Equals(visualIdentityInfo.Name.Getter(user), StringComparison.CurrentCultureIgnoreCase);

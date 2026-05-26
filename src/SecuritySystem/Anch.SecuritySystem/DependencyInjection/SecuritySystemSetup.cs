@@ -329,15 +329,15 @@ public class SecuritySystemSetup : ISecuritySystemSetup, IServiceInitializer
         return this;
     }
 
-    private void AddSecurityRole(IServiceCollection serviceCollection, FullSecurityRole fullSecurityRole)
+    private void AddSecurityRole(IServiceCollection services, FullSecurityRole fullSecurityRole)
     {
         if (this.InitializeDefaultRoles)
         {
-            serviceCollection.AddSingleton(new PreInitializerFullSecurityRole(fullSecurityRole));
+            services.AddSingleton(new PreInitializerFullSecurityRole(fullSecurityRole));
         }
         else
         {
-            serviceCollection.AddSingleton(fullSecurityRole);
+            services.AddSingleton(fullSecurityRole);
         }
     }
 

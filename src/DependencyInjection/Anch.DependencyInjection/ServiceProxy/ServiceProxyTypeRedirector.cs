@@ -7,7 +7,7 @@ namespace Anch.DependencyInjection.ServiceProxy;
 
 public class ServiceProxyTypeRedirector(IEnumerable<ServiceProxyTypeRedirectInfo> infoList, INativeActivator nativeActivator) : IServiceProxyTypeRedirector
 {
-    private readonly ImmutableArray<ServiceProxyTypeRedirectInfo> cachedList = [..infoList];
+    private readonly ImmutableArray<ServiceProxyTypeRedirectInfo> cachedList = [.. infoList];
 
     private readonly ConcurrentDictionary<Type, Type?> cache = [];
 

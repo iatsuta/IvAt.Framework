@@ -129,50 +129,50 @@ public class InjectMaybeVisitor : ExpressionVisitor
             switch (node.NodeType)
             {
                 case ExpressionType.OrElse:
-                {
-                    var wrappedLeft = visitedLeft.SafeWrapToMaybe();
-                    var wrappedRight = Expression.Lambda(visitedRight.SafeWrapToMaybe());
+                    {
+                        var wrappedLeft = visitedLeft.SafeWrapToMaybe();
+                        var wrappedRight = Expression.Lambda(visitedRight.SafeWrapToMaybe());
 
-                    if (visitedLeft.Type.IsMaybe() || visitedRight.Type.IsMaybe())
-                    {
-                        return Expression.Call(LogicOrMethod, wrappedLeft, wrappedRight);
+                        if (visitedLeft.Type.IsMaybe() || visitedRight.Type.IsMaybe())
+                        {
+                            return Expression.Call(LogicOrMethod, wrappedLeft, wrappedRight);
+                        }
+                        else
+                        {
+                            return Expression.OrElse(visitedLeft, visitedRight);
+                        }
                     }
-                    else
-                    {
-                        return Expression.OrElse(visitedLeft, visitedRight);
-                    }
-                }
 
                 case ExpressionType.AndAlso:
-                {
-                    var wrappedLeft = visitedLeft.SafeWrapToMaybe();
-                    var wrappedRight = Expression.Lambda(visitedRight.SafeWrapToMaybe());
+                    {
+                        var wrappedLeft = visitedLeft.SafeWrapToMaybe();
+                        var wrappedRight = Expression.Lambda(visitedRight.SafeWrapToMaybe());
 
-                    if (visitedLeft.Type.IsMaybe() || visitedRight.Type.IsMaybe())
-                    {
-                        return Expression.Call(LogicAndMethod, wrappedLeft, wrappedRight);
+                        if (visitedLeft.Type.IsMaybe() || visitedRight.Type.IsMaybe())
+                        {
+                            return Expression.Call(LogicAndMethod, wrappedLeft, wrappedRight);
+                        }
+                        else
+                        {
+                            return Expression.AndAlso(visitedLeft, visitedRight);
+                        }
                     }
-                    else
-                    {
-                        return Expression.AndAlso(visitedLeft, visitedRight);
-                    }
-                }
 
                 case ExpressionType.Equal:
-                {
-                    var unwrappedLeft = visitedLeft.TryGetValueOrDefault();
-                    var unwrappedRight = visitedRight.TryGetValueOrDefault();
+                    {
+                        var unwrappedLeft = visitedLeft.TryGetValueOrDefault();
+                        var unwrappedRight = visitedRight.TryGetValueOrDefault();
 
-                    return Expression.Equal(unwrappedLeft, unwrappedRight, false, node.Method);
-                }
+                        return Expression.Equal(unwrappedLeft, unwrappedRight, false, node.Method);
+                    }
 
                 case ExpressionType.NotEqual:
-                {
-                    var unwrappedLeft = visitedLeft.TryGetValueOrDefault();
-                    var unwrappedRight = visitedRight.TryGetValueOrDefault();
+                    {
+                        var unwrappedLeft = visitedLeft.TryGetValueOrDefault();
+                        var unwrappedRight = visitedRight.TryGetValueOrDefault();
 
-                    return Expression.NotEqual(unwrappedLeft, unwrappedRight, false, node.Method);
-                }
+                        return Expression.NotEqual(unwrappedLeft, unwrappedRight, false, node.Method);
+                    }
             }
         }
 

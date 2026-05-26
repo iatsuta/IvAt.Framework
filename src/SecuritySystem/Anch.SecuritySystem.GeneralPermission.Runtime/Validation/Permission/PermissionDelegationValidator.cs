@@ -143,7 +143,7 @@ public class PermissionDelegationValidator<TPrincipal, TPermission, TPermissionR
 
                     if (missedAccessElements.Length > 0)
                     {
-                        yield return new (securityContextInfo, missedAccessElements);
+                        yield return new(securityContextInfo, missedAccessElements);
                     }
                 }
             }

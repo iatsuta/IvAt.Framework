@@ -38,33 +38,33 @@ public class PrincipalDomainService<TPrincipal>(
 public class PrincipalDomainService<TPrincipal, TPermission, TPrincipalIdent>(
     PermissionBindingInfo<TPermission, TPrincipal> bindingInfo,
     IQueryableSource queryableSource,
-	IGenericRepository genericRepository,
-	IEnumerable<IUserSource> userSources,
-	ISecurityIdentityConverter<TPrincipalIdent> identityConverter,
-	IIdentityInfo<TPrincipal, TPrincipalIdent> identityInfo,
-	IVisualIdentityInfo<TPrincipal> visualIdentityInfo) : IPrincipalDomainService<TPrincipal>
-	where TPrincipal : class, new()
-	where TPrincipalIdent : notnull
-	where TPermission : class
+    IGenericRepository genericRepository,
+    IEnumerable<IUserSource> userSources,
+    ISecurityIdentityConverter<TPrincipalIdent> identityConverter,
+    IIdentityInfo<TPrincipal, TPrincipalIdent> identityInfo,
+    IVisualIdentityInfo<TPrincipal> visualIdentityInfo) : IPrincipalDomainService<TPrincipal>
+    where TPrincipal : class, new()
+    where TPrincipalIdent : notnull
+    where TPermission : class
 {
-	public async Task<TPrincipal> GetOrCreateAsync(string name, CancellationToken cancellationToken)
-	{
-		var principal = await queryableSource.GetQueryable<TPrincipal>()
-			.GenericSingleOrDefaultAsync(visualIdentityInfo.Name.Path.Select(ExpressionHelper.GetEqualityWithExpr(name)), cancellationToken);
+    public async Task<TPrincipal> GetOrCreateAsync(string name, CancellationToken cancellationToken)
+    {
+        var principal = await queryableSource.GetQueryable<TPrincipal>()
+            .GenericSingleOrDefaultAsync(visualIdentityInfo.Name.Path.Select(ExpressionHelper.GetEqualityWithExpr(name)), cancellationToken);
 
-		if (principal is null)
-		{
-			principal = new TPrincipal();
+        if (principal is null)
+        {
+            principal = new TPrincipal();
 
-			visualIdentityInfo.Name.Setter(principal, name);
+            visualIdentityInfo.Name.Setter(principal, name);
 
             await this.TryInitIdent(principal, cancellationToken);
 
-			await genericRepository.SaveAsync(principal, cancellationToken);
-		}
+            await genericRepository.SaveAsync(principal, cancellationToken);
+        }
 
-		return principal;
-	}
+        return principal;
+    }
 
     private async Task TryInitIdent(TPrincipal principal, CancellationToken cancellationToken)
     {
@@ -99,13 +99,13 @@ public class PrincipalDomainService<TPrincipal, TPermission, TPrincipalIdent>(
     }
 
     public async Task RemoveAsync(TPrincipal principal, bool force, CancellationToken cancellationToken)
-	{
-		if (!force && await queryableSource.GetQueryable<TPermission>()
-			    .GenericAnyAsync(bindingInfo.Principal.Path.Select(p => p == principal), cancellationToken))
-		{
-			throw new SecuritySystemException($"Removing principal \"{visualIdentityInfo.Name.Getter(principal)}\" must be empty");
-		}
+    {
+        if (!force && await queryableSource.GetQueryable<TPermission>()
+                .GenericAnyAsync(bindingInfo.Principal.Path.Select(p => p == principal), cancellationToken))
+        {
+            throw new SecuritySystemException($"Removing principal \"{visualIdentityInfo.Name.Getter(principal)}\" must be empty");
+        }
 
-		await genericRepository.RemoveAsync(principal, cancellationToken);
-	}
+        await genericRepository.RemoveAsync(principal, cancellationToken);
+    }
 }

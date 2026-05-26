@@ -1,12 +1,13 @@
-﻿using SExpressions = System.Linq.Expressions;
-using System.Collections.Immutable;
+﻿using System.Collections.Immutable;
+
+using SExpressions = System.Linq.Expressions;
 
 namespace Anch.OData.Domain.QueryLanguage;
 
 public record LambdaExpression(Expression Body, ImmutableArray<ParameterExpression> Parameters) : Expression
 {
     public LambdaExpression(SExpressions.LambdaExpression expression)
-        : this(Create(expression.Body), [..expression.Parameters.Select(p => new ParameterExpression(p.Name!))])
+        : this(Create(expression.Body), [.. expression.Parameters.Select(p => new ParameterExpression(p.Name!))])
     {
     }
 
@@ -27,16 +28,16 @@ public record LambdaExpression(Expression Body, ImmutableArray<ParameterExpressi
                 yield break;
 
             case PropertyExpression propertyExpression:
-            {
-                yield return propertyExpression;
-
-                foreach (var baseNode in this.ExtractPropertyPath(propertyExpression.Source))
                 {
-                    yield return baseNode;
-                }
+                    yield return propertyExpression;
 
-                break;
-            }
+                    foreach (var baseNode in this.ExtractPropertyPath(propertyExpression.Source))
+                    {
+                        yield return baseNode;
+                    }
+
+                    break;
+                }
             default:
                 throw new Exception("invalid expression");
         }

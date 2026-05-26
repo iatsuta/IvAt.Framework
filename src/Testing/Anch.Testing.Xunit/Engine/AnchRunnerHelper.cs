@@ -183,82 +183,82 @@ public static class AnchRunnerHelper
 
         if (sendTestCollectionMessages)
             if (!messageBus.QueueMessage(new TestCollectionStarting
-                {
-                    AssemblyUniqueID = assemblyUniqueID,
-                    TestCollectionClassName = testCase.TestCollection.TestCollectionClassName,
-                    TestCollectionDisplayName = testCase.TestCollection.TestCollectionDisplayName,
-                    TestCollectionUniqueID = testCollectionUniqueID,
-                    Traits = testCase.TestCollection.Traits,
-                }))
+            {
+                AssemblyUniqueID = assemblyUniqueID,
+                TestCollectionClassName = testCase.TestCollection.TestCollectionClassName,
+                TestCollectionDisplayName = testCase.TestCollection.TestCollectionDisplayName,
+                TestCollectionUniqueID = testCollectionUniqueID,
+                Traits = testCase.TestCollection.Traits,
+            }))
                 cancellationTokenSource.Cancel();
 
         if (sendTestClassMessages && testCase.TestClass is not null)
             if (!messageBus.QueueMessage(new TestClassStarting
-                {
-                    AssemblyUniqueID = assemblyUniqueID,
-                    TestClassName = testCase.TestClass.TestClassName,
-                    TestClassNamespace = testCase.TestClass.TestClassNamespace,
-                    TestClassSimpleName = testCase.TestClass.TestClassSimpleName,
-                    TestClassUniqueID = testClassUniqueID,
-                    TestCollectionUniqueID = testCollectionUniqueID,
-                    Traits = testCase.TestClass.Traits,
-                }))
+            {
+                AssemblyUniqueID = assemblyUniqueID,
+                TestClassName = testCase.TestClass.TestClassName,
+                TestClassNamespace = testCase.TestClass.TestClassNamespace,
+                TestClassSimpleName = testCase.TestClass.TestClassSimpleName,
+                TestClassUniqueID = testClassUniqueID,
+                TestCollectionUniqueID = testCollectionUniqueID,
+                Traits = testCase.TestClass.Traits,
+            }))
                 cancellationTokenSource.Cancel();
 
         if (sendTestMethodMessages && testCase.TestMethod is not null)
             if (!messageBus.QueueMessage(new TestMethodStarting
-                {
-                    AssemblyUniqueID = assemblyUniqueID,
-                    MethodArity = testCase.TestMethod.MethodArity,
-                    MethodName = testCase.TestMethod.MethodName,
-                    TestClassUniqueID = testClassUniqueID,
-                    TestCollectionUniqueID = testCollectionUniqueID,
-                    TestMethodUniqueID = testMethodUniqueID,
-                    Traits = testCase.TestMethod.Traits,
-                }))
+            {
+                AssemblyUniqueID = assemblyUniqueID,
+                MethodArity = testCase.TestMethod.MethodArity,
+                MethodName = testCase.TestMethod.MethodName,
+                TestClassUniqueID = testClassUniqueID,
+                TestCollectionUniqueID = testCollectionUniqueID,
+                TestMethodUniqueID = testMethodUniqueID,
+                Traits = testCase.TestMethod.Traits,
+            }))
                 cancellationTokenSource.Cancel();
 
         if (sendTestCaseMessages)
             if (!messageBus.QueueMessage(new TestCaseStarting
-                {
-                    AssemblyUniqueID = assemblyUniqueID,
-                    Explicit = testCase.Explicit,
-                    SkipReason = testCase.SkipReason,
-                    SourceFilePath = testCase.SourceFilePath,
-                    SourceLineNumber = testCase.SourceLineNumber,
-                    TestCaseDisplayName = testCase.TestCaseDisplayName,
-                    TestCaseUniqueID = testCaseUniqueID,
-                    TestClassMetadataToken = testCase.TestClassMetadataToken,
-                    TestClassName = testCase.TestClassName,
-                    TestClassNamespace = testCase.TestClassNamespace,
-                    TestClassSimpleName = testCase.TestClassSimpleName,
-                    TestClassUniqueID = testClassUniqueID,
-                    TestCollectionUniqueID = testCollectionUniqueID,
-                    TestMethodArity = testCase.TestMethodArity,
-                    TestMethodMetadataToken = testCase.TestMethodMetadataToken,
-                    TestMethodName = testCase.TestMethod?.MethodName,
-                    TestMethodParameterTypesVSTest = testCase.TestMethodParameterTypesVSTest,
-                    TestMethodReturnTypeVSTest = testCase.TestMethodReturnTypeVSTest,
-                    TestMethodUniqueID = testMethodUniqueID,
-                    Traits = testCase.Traits,
-                }))
+            {
+                AssemblyUniqueID = assemblyUniqueID,
+                Explicit = testCase.Explicit,
+                SkipReason = testCase.SkipReason,
+                SourceFilePath = testCase.SourceFilePath,
+                SourceLineNumber = testCase.SourceLineNumber,
+                TestCaseDisplayName = testCase.TestCaseDisplayName,
+                TestCaseUniqueID = testCaseUniqueID,
+                TestClassMetadataToken = testCase.TestClassMetadataToken,
+                TestClassName = testCase.TestClassName,
+                TestClassNamespace = testCase.TestClassNamespace,
+                TestClassSimpleName = testCase.TestClassSimpleName,
+                TestClassUniqueID = testClassUniqueID,
+                TestCollectionUniqueID = testCollectionUniqueID,
+                TestMethodArity = testCase.TestMethodArity,
+                TestMethodMetadataToken = testCase.TestMethodMetadataToken,
+                TestMethodName = testCase.TestMethod?.MethodName,
+                TestMethodParameterTypesVSTest = testCase.TestMethodParameterTypesVSTest,
+                TestMethodReturnTypeVSTest = testCase.TestMethodReturnTypeVSTest,
+                TestMethodUniqueID = testMethodUniqueID,
+                Traits = testCase.Traits,
+            }))
                 cancellationTokenSource.Cancel();
 
         if (sendTestMessages)
             if (!messageBus.QueueMessage(new TestStarting
-                {
-                    AssemblyUniqueID = assemblyUniqueID,
-                    Explicit = false,
-                    StartTime = now,
-                    TestCaseUniqueID = testCaseUniqueID,
-                    TestClassUniqueID = testClassUniqueID,
-                    TestCollectionUniqueID = testCollectionUniqueID,
-                    TestDisplayName = testCase.TestCaseDisplayName,
-                    TestMethodUniqueID = testMethodUniqueID,
-                    TestUniqueID = testUniqueID,
-                    Timeout = 0,
-                    Traits = testCase.Traits,
-                }))
+            {
+                AssemblyUniqueID = assemblyUniqueID,
+                Explicit = false,
+                StartTime = now,
+                TestCaseUniqueID = testCaseUniqueID,
+                TestClassUniqueID = testClassUniqueID,
+                TestCollectionUniqueID = testCollectionUniqueID,
+                TestDisplayName = testCase.TestCaseDisplayName,
+                TestMethodUniqueID = testMethodUniqueID,
+                TestUniqueID = testUniqueID,
+                Timeout = 0,
+                Traits = testCase.Traits,
+            }))
                 cancellationTokenSource.Cancel();
 
         testResultMessage.FinishTime = now;
@@ -268,77 +268,77 @@ public static class AnchRunnerHelper
 
         if (sendTestMessages)
             if (!messageBus.QueueMessage(new TestFinished
-                {
-                    AssemblyUniqueID = assemblyUniqueID,
-                    Attachments = ImmutableDictionary<string, TestAttachment>.Empty,
-                    ExecutionTime = 0m,
-                    FinishTime = now,
-                    Output = string.Empty,
-                    TestCaseUniqueID = testCaseUniqueID,
-                    TestClassUniqueID = testClassUniqueID,
-                    TestCollectionUniqueID = testCollectionUniqueID,
-                    TestMethodUniqueID = testMethodUniqueID,
-                    TestUniqueID = testUniqueID,
-                    Warnings = null,
-                }))
+            {
+                AssemblyUniqueID = assemblyUniqueID,
+                Attachments = ImmutableDictionary<string, TestAttachment>.Empty,
+                ExecutionTime = 0m,
+                FinishTime = now,
+                Output = string.Empty,
+                TestCaseUniqueID = testCaseUniqueID,
+                TestClassUniqueID = testClassUniqueID,
+                TestCollectionUniqueID = testCollectionUniqueID,
+                TestMethodUniqueID = testMethodUniqueID,
+                TestUniqueID = testUniqueID,
+                Warnings = null,
+            }))
                 cancellationTokenSource.Cancel();
 
         if (sendTestCaseMessages)
             if (!messageBus.QueueMessage(new TestCaseFinished
-                {
-                    AssemblyUniqueID = assemblyUniqueID,
-                    ExecutionTime = 0m,
-                    TestCaseUniqueID = testCaseUniqueID,
-                    TestClassUniqueID = testClassUniqueID,
-                    TestCollectionUniqueID = testCollectionUniqueID,
-                    TestMethodUniqueID = testMethodUniqueID,
-                    TestsFailed = 1,
-                    TestsNotRun = 0,
-                    TestsSkipped = 0,
-                    TestsTotal = 1,
-                }))
+            {
+                AssemblyUniqueID = assemblyUniqueID,
+                ExecutionTime = 0m,
+                TestCaseUniqueID = testCaseUniqueID,
+                TestClassUniqueID = testClassUniqueID,
+                TestCollectionUniqueID = testCollectionUniqueID,
+                TestMethodUniqueID = testMethodUniqueID,
+                TestsFailed = 1,
+                TestsNotRun = 0,
+                TestsSkipped = 0,
+                TestsTotal = 1,
+            }))
                 cancellationTokenSource.Cancel();
 
         if (sendTestMethodMessages)
             if (!messageBus.QueueMessage(new TestMethodFinished
-                {
-                    AssemblyUniqueID = assemblyUniqueID,
-                    ExecutionTime = 0m,
-                    TestClassUniqueID = testClassUniqueID,
-                    TestCollectionUniqueID = testCollectionUniqueID,
-                    TestMethodUniqueID = testMethodUniqueID,
-                    TestsFailed = 1,
-                    TestsNotRun = 0,
-                    TestsSkipped = 0,
-                    TestsTotal = 1,
-                }))
+            {
+                AssemblyUniqueID = assemblyUniqueID,
+                ExecutionTime = 0m,
+                TestClassUniqueID = testClassUniqueID,
+                TestCollectionUniqueID = testCollectionUniqueID,
+                TestMethodUniqueID = testMethodUniqueID,
+                TestsFailed = 1,
+                TestsNotRun = 0,
+                TestsSkipped = 0,
+                TestsTotal = 1,
+            }))
                 cancellationTokenSource.Cancel();
 
         if (sendTestClassMessages)
             if (!messageBus.QueueMessage(new TestClassFinished
-                {
-                    AssemblyUniqueID = assemblyUniqueID,
-                    ExecutionTime = 0m,
-                    TestClassUniqueID = testClassUniqueID,
-                    TestCollectionUniqueID = testCollectionUniqueID,
-                    TestsFailed = 1,
-                    TestsNotRun = 0,
-                    TestsSkipped = 0,
-                    TestsTotal = 1,
-                }))
+            {
+                AssemblyUniqueID = assemblyUniqueID,
+                ExecutionTime = 0m,
+                TestClassUniqueID = testClassUniqueID,
+                TestCollectionUniqueID = testCollectionUniqueID,
+                TestsFailed = 1,
+                TestsNotRun = 0,
+                TestsSkipped = 0,
+                TestsTotal = 1,
+            }))
                 cancellationTokenSource.Cancel();
 
         if (sendTestCollectionMessages)
             if (!messageBus.QueueMessage(new TestCollectionFinished
-                {
-                    AssemblyUniqueID = assemblyUniqueID,
-                    ExecutionTime = 0m,
-                    TestCollectionUniqueID = testCollectionUniqueID,
-                    TestsFailed = 1,
-                    TestsNotRun = 0,
-                    TestsSkipped = 0,
-                    TestsTotal = 1,
-                }))
+            {
+                AssemblyUniqueID = assemblyUniqueID,
+                ExecutionTime = 0m,
+                TestCollectionUniqueID = testCollectionUniqueID,
+                TestsFailed = 1,
+                TestsNotRun = 0,
+                TestsSkipped = 0,
+                TestsTotal = 1,
+            }))
                 cancellationTokenSource.Cancel();
     }
 

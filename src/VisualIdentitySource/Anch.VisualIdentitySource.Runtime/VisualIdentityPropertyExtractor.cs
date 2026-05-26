@@ -4,18 +4,18 @@ namespace Anch.VisualIdentitySource;
 
 public class VisualIdentityPropertyExtractor(VisualIdentityPropertySourceSettings settings) : IVisualIdentityPropertyExtractor
 {
-	public PropertyInfo? TryExtract(Type domainType)
-	{
-		var request =
+    public PropertyInfo? TryExtract(Type domainType)
+    {
+        var request =
 
-			from propertyName in settings.PropertyNameList
+            from propertyName in settings.PropertyNameList
 
-			let property = domainType.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance)
+            let property = domainType.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance)
 
-			where property != null && property.PropertyType == typeof(string)
+            where property != null && property.PropertyType == typeof(string)
 
-			select property;
+            select property;
 
-		return request.FirstOrDefault();
-	}
+        return request.FirstOrDefault();
+    }
 }

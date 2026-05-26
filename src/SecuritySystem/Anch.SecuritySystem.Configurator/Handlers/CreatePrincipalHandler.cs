@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 namespace Anch.SecuritySystem.Configurator.Handlers;
 
 public class CreatePrincipalHandler(
-    [WithoutRunAs]ISecuritySystem securitySystem,
+    [WithoutRunAs] ISecuritySystem securitySystem,
     IPrincipalManagementService principalManagementService,
     IConfiguratorIntegrationEvents? configuratorIntegrationEvents = null)
     : BaseWriteHandler, ICreatePrincipalHandler

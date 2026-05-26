@@ -14,7 +14,7 @@ namespace Anch.SecuritySystem.Builders.MaterializedBuilder;
 
 public class SecurityFilterBuilderFactory<TDomainObject>(
     IIdentityInfoSource identityInfoSource,
-	IExpressionEvaluatorStorage expressionEvaluatorStorage,
+    IExpressionEvaluatorStorage expressionEvaluatorStorage,
     IEnumerable<IPermissionSystem> permissionSystems,
     IHierarchicalObjectExpanderFactory hierarchicalObjectExpanderFactory,
     IRuntimePermissionOptimizationService permissionOptimizationService) :

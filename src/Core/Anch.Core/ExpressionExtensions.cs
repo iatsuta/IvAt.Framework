@@ -229,7 +229,7 @@ public static class ExpressionExtensions
 
                     result,
 
-                MemberExpression { Expression: {} baseExpr, Member : { IsStatic: false } member }
+                MemberExpression { Expression: { } baseExpr, Member: { IsStatic: false } member }
 
                     when baseExpr.TryGetConstantExpression() is { Value: { } baseValue }
 

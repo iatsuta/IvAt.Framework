@@ -4,5 +4,5 @@ namespace Anch.VisualIdentitySource;
 
 public interface IVisualIdentityPropertyExtractor
 {
-	PropertyInfo? TryExtract(Type domainType);
+    PropertyInfo? TryExtract(Type domainType);
 }

@@ -27,7 +27,7 @@ public class VirtualPermissionRootSetup<TPrincipal, TPermission>(PropertyAccesso
         Expression<Func<TPermission, IEnumerable<TSecurityContext>>> path)
         where TSecurityContext : ISecurityContext
     {
-        this.virtualBindingInit.Add(permissionBinding => permissionBinding with { Restrictions = [..permissionBinding.Restrictions, path] });
+        this.virtualBindingInit.Add(permissionBinding => permissionBinding with { Restrictions = [.. permissionBinding.Restrictions, path] });
 
         return this;
     }
@@ -36,7 +36,7 @@ public class VirtualPermissionRootSetup<TPrincipal, TPermission>(PropertyAccesso
         Expression<Func<TPermission, TSecurityContext?>> path)
         where TSecurityContext : ISecurityContext
     {
-        this.virtualBindingInit.Add(permissionBinding => permissionBinding with { Restrictions = [..permissionBinding.Restrictions, path] });
+        this.virtualBindingInit.Add(permissionBinding => permissionBinding with { Restrictions = [.. permissionBinding.Restrictions, path] });
 
         return this;
     }
@@ -92,7 +92,7 @@ public class VirtualPermissionRootSetup<TPrincipal, TPermission>(PropertyAccesso
         var bindingInfo = this.permissionBindingInit.Aggregate(new PermissionBindingInfo<TPermission, TPrincipal> { IsReadonly = true, Principal = principalAccessors },
                 (state, f) => f(state));
 
-        var virtualBindingInfo = this.virtualBindingInit.Aggregate(new VirtualPermissionBindingInfo<TPermission> { Items = [..this.itemBindingInfoList] },
+        var virtualBindingInfo = this.virtualBindingInit.Aggregate(new VirtualPermissionBindingInfo<TPermission> { Items = [.. this.itemBindingInfoList] },
             (state, f) => f(state));
 
         securitySystemSetup.AddExtensions(services =>

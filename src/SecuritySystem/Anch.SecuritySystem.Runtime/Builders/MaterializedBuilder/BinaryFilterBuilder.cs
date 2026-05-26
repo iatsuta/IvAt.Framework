@@ -5,7 +5,7 @@ namespace Anch.SecuritySystem.Builders.MaterializedBuilder;
 
 public abstract class BinaryFilterBuilder<TDomainObject, TSecurityPath>(
     SecurityFilterBuilderFactory<TDomainObject> builderFactory,
-    TSecurityPath securityPath,IReadOnlyList<SecurityContextRestriction> securityContextRestrictions)
+    TSecurityPath securityPath, IReadOnlyList<SecurityContextRestriction> securityContextRestrictions)
     : SecurityFilterBuilder<TDomainObject>
     where TSecurityPath : SecurityPath<TDomainObject>.BinarySecurityPath
 {

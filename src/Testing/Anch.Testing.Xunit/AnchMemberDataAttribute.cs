@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Globalization;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -27,9 +28,9 @@ public class AnchMemberDataAttribute(string memberName, params object?[] argumen
             var dataSignatures = new List<string>(18);
 
             foreach (var enumerable in new[] { "IEnumerable<{0}>", "IAsyncEnumerable<{0}>" })
-            foreach (var dataType in new[] { "ITheoryDataRow", "object[]", "Tuple<...>" })
-            foreach (var wrapper in new[] { "- {0}", "- Task<{0}>", "- ValueTask<{0}>" })
-                dataSignatures.Add(string.Format(CultureInfo.CurrentCulture, wrapper, string.Format(CultureInfo.CurrentCulture, enumerable, dataType)));
+                foreach (var dataType in new[] { "ITheoryDataRow", "object[]", "Tuple<...>" })
+                    foreach (var wrapper in new[] { "- {0}", "- Task<{0}>", "- ValueTask<{0}>" })
+                        dataSignatures.Add(string.Format(CultureInfo.CurrentCulture, wrapper, string.Format(CultureInfo.CurrentCulture, enumerable, dataType)));
 
             return string.Join(Environment.NewLine, dataSignatures);
         });
@@ -85,69 +86,51 @@ public class AnchMemberDataAttribute(string memberName, params object?[] argumen
                            )
                        );
 
-        var testContext = TestContext.Current;
+        var ct = TestContext.Current.CancellationToken;
 
-        var serviceProvider = this.ServiceProviderPool == null ? null : await this.ServiceProviderPool.GetAsync(testContext.CancellationToken);
+        await using var scope = await this.ServiceProviderPool.CreateScopeAsync(true, ct);
 
-        if (serviceProvider != null)
+        if (scope.Exception != null)
         {
-            await serviceProvider.RunEnvironmentHooks(EnvironmentHookType.Before, testContext.CancellationToken);
+            ExceptionDispatchInfo.Capture(scope.Exception).Throw();
+        }
+
+        var testInstance = this.GetTestInstance(testMethod, scope.ServiceProvider);
+
+        if (testInstance is IAsyncLifetime asyncInit)
+        {
+            await asyncInit.InitializeAsync();
         }
 
         try
         {
-            var testInstance = this.GetTestInstance(testMethod, serviceProvider);
+            var returnValue =
+                accessor(testInstance)
+                ?? throw new ArgumentException(
+                    string.Format(
+                        CultureInfo.CurrentCulture,
+                        "Member '{0}' on '{1}' returned null when queried for test data", this.MemberName,
+                        this.MemberType.SafeName()
+                    ));
 
-            if (testInstance is IAsyncLifetime asyncInit)
+            if (returnValue is IEnumerable dataItems)
             {
-                await asyncInit.InitializeAsync();
+                var result = new List<ITheoryDataRow>();
+
+                foreach (var dataItem in dataItems)
+                    if (dataItem is not null)
+                        result.Add(this.ConvertDataRow(dataItem));
+
+                return result.CastOrToReadOnlyCollection();
             }
 
-            try
-            {
-                var returnValue =
-                    accessor(testInstance)
-                    ?? throw new ArgumentException(
-                        string.Format(
-                            CultureInfo.CurrentCulture,
-                            "Member '{0}' on '{1}' returned null when queried for test data", this.MemberName,
-                            this.MemberType.SafeName()
-                        ));
-
-                if (returnValue is IEnumerable dataItems)
-                {
-                    var result = new List<ITheoryDataRow>();
-
-                    foreach (var dataItem in dataItems)
-                        if (dataItem is not null)
-                            result.Add(this.ConvertDataRow(dataItem));
-
-                    return result.CastOrToReadOnlyCollection();
-                }
-
-                return await this.GetDataAsync(returnValue, this.MemberType);
-            }
-            finally
-            {
-                if (testInstance is IAsyncLifetime asyncDispose)
-                {
-                    try
-                    {
-                        await asyncDispose.DisposeAsync();
-                    }
-                    catch
-                    {
-                    }
-                }
-            }
+            return await this.GetDataAsync(returnValue, this.MemberType);
         }
         finally
         {
-            if (serviceProvider != null && this.ServiceProviderPool != null)
+            if (testInstance is IAsyncLifetime asyncDispose)
             {
-                await serviceProvider.RunEnvironmentHooks(EnvironmentHookType.After, testContext.CancellationToken);
-
-                await this.ServiceProviderPool.ReleaseAsync(serviceProvider, testContext.CancellationToken);
+                await asyncDispose.DisposeAsync();
             }
         }
     }
