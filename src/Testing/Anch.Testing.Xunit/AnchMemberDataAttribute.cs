@@ -21,7 +21,7 @@ public class AnchMemberDataAttribute(string memberName, params object?[] argumen
 {
     private IServiceProviderPool? serviceProviderPool;
 
-    private readonly ConcurrentDictionary<MethodInfo, object?> testInstanceCache = [];
+    private readonly ConcurrentDictionary<MethodInfo, Task<IReadOnlyCollection<ITheoryDataRow>>> testDataCache = [];
 
     static readonly Lazy<string> supportedDataSignatures;
 
@@ -38,100 +38,100 @@ public class AnchMemberDataAttribute(string memberName, params object?[] argumen
             return string.Join(Environment.NewLine, dataSignatures);
         });
 
-    private object? GetTestInstance(MethodInfo testMethod, IServiceProvider? serviceProvider) =>
-
-        this.testInstanceCache.GetOrAdd(testMethod, _ =>
+    private object? TryCreateTestInstance(MethodInfo testMethod, IServiceProvider? serviceProvider)
+    {
+        if (testMethod.IsStatic)
         {
-            if (testMethod.IsStatic)
+            return null;
+        }
+        else
+        {
+            var testType = testMethod.ReflectedType!;
+
+            if (serviceProvider == null)
             {
-                return null;
+                return Activator.CreateInstance(testType);
             }
             else
             {
-                var testType = testMethod.ReflectedType!;
-
-                if (serviceProvider == null)
-                {
-                    return Activator.CreateInstance(testType);
-                }
-                else
-                {
-                    return ActivatorUtilities.CreateInstance(serviceProvider, testType);
-                }
+                return ActivatorUtilities.CreateInstance(serviceProvider, testType);
             }
-        });
+        }
+    }
 
     /// <inheritdoc/>
     public override async ValueTask<IReadOnlyCollection<ITheoryDataRow>> GetData(
         MethodInfo testMethod,
-        DisposalTracker disposalTracker)
-    {
-        if (this.MemberType is null)
-            return [];
+        DisposalTracker _) =>
 
-        var accessor = this.GetPropertyAccessor(this.MemberType)
-                       ?? this.GetFieldAccessor(this.MemberType)
-                       ?? this.GetMethodAccessor(this.MemberType)
-                       ?? throw new ArgumentException(
-                           string.Format(
-                               CultureInfo.CurrentCulture,
-                               "Could not find public static member (property, field, or method) named '{0}' on '{1}'{2}",
-                               this.MemberName, this.MemberType.SafeName(), this.Arguments.Length > 0
-                                   ? string.Format(CultureInfo.CurrentCulture, " with parameter types: {0}",
-                                       string.Join(", ",
-                                           this.Arguments.Select(p => p?.GetType().SafeName() ?? "(null)")))
-                                   : ""
-                           )
-                       );
-
-        var ct = TestContext.Current.CancellationToken;
-
-        await using var scope = await this.serviceProviderPool.CreateScopeAsync(true, ct);
-
-        if (scope.Exception != null)
+        await this.testDataCache.GetOrAdd(testMethod, async _ =>
         {
-            ExceptionDispatchInfo.Capture(scope.Exception).Throw();
-        }
+            if (this.MemberType is null)
+                return [];
 
-        var testInstance = this.GetTestInstance(testMethod, scope.ServiceProvider);
+            var accessor = this.GetPropertyAccessor(this.MemberType)
+                           ?? this.GetFieldAccessor(this.MemberType)
+                           ?? this.GetMethodAccessor(this.MemberType)
+                           ?? throw new ArgumentException(
+                               string.Format(
+                                   CultureInfo.CurrentCulture,
+                                   "Could not find public static member (property, field, or method) named '{0}' on '{1}'{2}",
+                                   this.MemberName, this.MemberType.SafeName(), this.Arguments.Length > 0
+                                       ? string.Format(CultureInfo.CurrentCulture, " with parameter types: {0}",
+                                           string.Join(", ",
+                                               this.Arguments.Select(p => p?.GetType().SafeName() ?? "(null)")))
+                                       : ""
+                               )
+                           );
 
-        if (testInstance is IAsyncLifetime asyncInit)
-        {
-            await asyncInit.InitializeAsync();
-        }
+            var ct = TestContext.Current.CancellationToken;
 
-        try
-        {
-            var returnValue =
-                accessor(testInstance)
-                ?? throw new ArgumentException(
-                    string.Format(
-                        CultureInfo.CurrentCulture,
-                        "Member '{0}' on '{1}' returned null when queried for test data", this.MemberName,
-                        this.MemberType.SafeName()
-                    ));
+            await using var scope = await this.serviceProviderPool.CreateScopeAsync(true, ct);
 
-            if (returnValue is IEnumerable dataItems)
+            if (scope.Exception != null)
             {
-                var result = new List<ITheoryDataRow>();
-
-                foreach (var dataItem in dataItems)
-                    if (dataItem is not null)
-                        result.Add(this.ConvertDataRow(dataItem));
-
-                return result.CastOrToReadOnlyCollection();
+                ExceptionDispatchInfo.Capture(scope.Exception).Throw();
             }
 
-            return await this.GetDataAsync(returnValue, this.MemberType);
-        }
-        finally
-        {
-            if (testInstance is IAsyncLifetime asyncDispose)
+            var testInstance = this.TryCreateTestInstance(testMethod, scope.ServiceProvider);
+
+            if (testInstance is IAsyncLifetime asyncInit)
             {
-                await asyncDispose.DisposeAsync();
+                await asyncInit.InitializeAsync();
             }
-        }
-    }
+
+            try
+            {
+                var returnValue =
+                    accessor(testInstance)
+                    ?? throw new ArgumentException(
+                        string.Format(
+                            CultureInfo.CurrentCulture,
+                            "Member '{0}' on '{1}' returned null when queried for test data", this.MemberName,
+                            this.MemberType.SafeName()
+                        ));
+
+                if (returnValue is IEnumerable dataItems)
+                {
+                    var result = new List<ITheoryDataRow>();
+
+                    foreach (var dataItem in dataItems)
+                        if (dataItem is not null)
+                            result.Add(this.ConvertDataRow(dataItem));
+
+                    return result.CastOrToReadOnlyCollection();
+                }
+
+                return await this.GetDataAsync(returnValue, this.MemberType);
+            }
+            finally
+            {
+                if (testInstance is IAsyncLifetime asyncDispose)
+                {
+                    await asyncDispose.DisposeAsync();
+                }
+            }
+        });
 
     async ValueTask<IReadOnlyCollection<ITheoryDataRow>> GetDataAsync(
         object? returnValue,

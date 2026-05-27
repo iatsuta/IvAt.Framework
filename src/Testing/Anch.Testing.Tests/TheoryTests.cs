@@ -6,7 +6,7 @@ public class TheoryTests(IServiceProvider serviceProvider)
 {
     [Theory]
     [AnchMemberData(nameof(GetTest1Cases))]
-    public async Task Test1(decimal value, CancellationToken ct)
+    public async Task Test1(ABC abc, CancellationToken ct)
     {
     }
 
@@ -36,15 +36,20 @@ public class TheoryTests(IServiceProvider serviceProvider)
     {
     }
 
-    public IEnumerable<object[]> GetTest1Cases()
+    public IEnumerable<object?[]> GetTest1Cases()
     {
-        yield return new object[] { 123M };
-        yield return new object[] { 234M };
+        yield return new object?[] { new ABC(123M) };
+        yield return new object?[] { new ABC(234M) };
     }
 
-    public static IEnumerable<object[]> GetTest2Cases()
+    public static IEnumerable<object?[]> GetTest2Cases()
     {
-        yield return new object[] { "345" };
-        yield return new object[] { "567" };
+        yield return new object?[] { "345" };
+        yield return new object?[] { "567" };
+    }
+
+    public record ABC(decimal Value)
+    {
+
     }
 }
