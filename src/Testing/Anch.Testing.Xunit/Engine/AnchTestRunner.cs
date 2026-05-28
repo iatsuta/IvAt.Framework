@@ -18,9 +18,9 @@ public class AnchTestRunner(IServiceProviderPool? serviceProviderPool) : XunitTe
         CancellationTokenSource cancellationTokenSource,
         IReadOnlyCollection<IBeforeAfterTestAttribute> beforeAfterAttributes)
     {
-        await using var scope = await serviceProviderPool.CreateScopeAsync(cancellationTokenSource.Token);
+        await using var serviceProviderPoolScope = await serviceProviderPool.TryCreateScopeAsync(cancellationTokenSource.Token);
 
-        if (scope.Exception == null)
+        if (serviceProviderPoolScope?.Exception == null)
         {
             await using var ctxt = new XunitTestRunnerContext(
                 test,
@@ -29,7 +29,7 @@ public class AnchTestRunner(IServiceProviderPool? serviceProviderPool) : XunitTe
                 aggregator,
                 cancellationTokenSource,
                 beforeAfterAttributes,
-                constructorArguments.Select(arg => arg == HandledServiceProvider.Instance ? scope.ServiceProvider : arg).ToArray()
+                constructorArguments.Select(arg => arg == HandledServiceProvider.Instance ? serviceProviderPoolScope?.ServiceProvider : arg).ToArray()
             );
 
             await ctxt.InitializeAsync();
@@ -38,7 +38,7 @@ public class AnchTestRunner(IServiceProviderPool? serviceProviderPool) : XunitTe
         }
         else
         {
-            return XunitRunnerHelper.FailTest(messageBus, cancellationTokenSource, test, scope.Exception);
+            return XunitRunnerHelper.FailTest(messageBus, cancellationTokenSource, test, serviceProviderPoolScope.Exception);
         }
     }
 

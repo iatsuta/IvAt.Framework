@@ -40,9 +40,9 @@ public class AnchTheoryTestMethod(IXunitTestMethod baseMethod) : IXunitTestMetho
     [
         .. baseMethod.DataAttributes.Select(attr =>
         {
-            if (attr is IServiceProviderPoolContainer serviceProviderPoolAttribute)
+            if (attr is IServiceProviderPoolContainer serviceProviderPoolContainer)
             {
-                serviceProviderPoolAttribute.ServiceProviderPool = this.ServiceProviderPool;
+                serviceProviderPoolContainer.ServiceProviderPool = this.ServiceProviderPool;
             }
 
             return attr;

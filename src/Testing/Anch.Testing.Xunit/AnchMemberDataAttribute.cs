@@ -85,51 +85,38 @@ public class AnchMemberDataAttribute(string memberName, params object?[] argumen
 
             var ct = TestContext.Current.CancellationToken;
 
-            await using var scope = await this.serviceProviderPool.CreateScopeAsync(ct);
+            await using var serviceProviderPoolScope = await this.serviceProviderPool.TryCreateScopeAsync(ct);
 
-            if (scope.Exception != null)
+            if (serviceProviderPoolScope?.Exception != null)
             {
-                ExceptionDispatchInfo.Capture(scope.Exception).Throw();
+                ExceptionDispatchInfo.Capture(serviceProviderPoolScope.Exception).Throw();
             }
 
-            var testInstance = this.TryCreateTestInstance(testMethod, scope.ServiceProvider);
+            var testInstance = this.TryCreateTestInstance(testMethod, serviceProviderPoolScope?.ServiceProvider);
 
-            if (testInstance is IAsyncLifetime asyncInit)
+            await using var __ = await (testInstance as IAsyncLifetime).TryCreateScopeAsync(ct);
+
+            var returnValue =
+                accessor(testInstance)
+                ?? throw new ArgumentException(
+                    string.Format(
+                        CultureInfo.CurrentCulture,
+                        "Member '{0}' on '{1}' returned null when queried for test data", this.MemberName,
+                        this.MemberType.SafeName()
+                    ));
+
+            if (returnValue is IEnumerable dataItems)
             {
-                await asyncInit.InitializeAsync();
+                var result = new List<ITheoryDataRow>();
+
+                foreach (var dataItem in dataItems)
+                    if (dataItem is not null)
+                        result.Add(this.ConvertDataRow(dataItem));
+
+                return result.CastOrToReadOnlyCollection();
             }
 
-            try
-            {
-                var returnValue =
-                    accessor(testInstance)
-                    ?? throw new ArgumentException(
-                        string.Format(
-                            CultureInfo.CurrentCulture,
-                            "Member '{0}' on '{1}' returned null when queried for test data", this.MemberName,
-                            this.MemberType.SafeName()
-                        ));
-
-                if (returnValue is IEnumerable dataItems)
-                {
-                    var result = new List<ITheoryDataRow>();
-
-                    foreach (var dataItem in dataItems)
-                        if (dataItem is not null)
-                            result.Add(this.ConvertDataRow(dataItem));
-
-                    return result.CastOrToReadOnlyCollection();
-                }
-
-                return await this.GetDataAsync(returnValue, this.MemberType);
-            }
-            finally
-            {
-                if (testInstance is IAsyncLifetime asyncDispose)
-                {
-                    await asyncDispose.DisposeAsync();
-                }
-            }
+            return await this.GetDataAsync(returnValue, this.MemberType);
         });
 
     async ValueTask<IReadOnlyCollection<ITheoryDataRow>> GetDataAsync(

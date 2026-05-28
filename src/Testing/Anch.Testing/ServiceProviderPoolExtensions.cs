@@ -2,11 +2,11 @@
 
 public static class ServiceProviderPoolExtensions
 {
-    public static async ValueTask<ServiceProviderPoolScope> CreateScopeAsync(this IServiceProviderPool? serviceProviderPool, CancellationToken ct)
+    public static async ValueTask<ServiceProviderPoolScope?> TryCreateScopeAsync(this IServiceProviderPool? serviceProviderPool, CancellationToken ct)
     {
         if (serviceProviderPool == null)
         {
-            return new ServiceProviderPoolScope(null, null, null, ct);
+            return null;
         }
         else
         {
@@ -20,13 +20,13 @@ public static class ServiceProviderPoolExtensions
             }
             catch (Exception ex)
             {
-                return new ServiceProviderPoolScope(null, null, ex, ct);
+                return new ServiceProviderPoolScope(serviceProviderPool, null, ex, ct);
             }
         }
     }
 
     public class ServiceProviderPoolScope(
-        IServiceProviderPool? serviceProviderPool,
+        IServiceProviderPool serviceProviderPool,
         IServiceProvider? serviceProvider,
         Exception? exception,
         CancellationToken ct) : IAsyncDisposable
@@ -37,7 +37,7 @@ public static class ServiceProviderPoolExtensions
 
         public async ValueTask DisposeAsync()
         {
-            if (serviceProviderPool != null && this.ServiceProvider != null)
+            if (this.ServiceProvider != null)
             {
                 await this.ServiceProvider.RunEnvironmentHooks(EnvironmentHookType.After, ct);
 
