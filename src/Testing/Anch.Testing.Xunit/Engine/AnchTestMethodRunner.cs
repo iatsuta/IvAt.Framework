@@ -1,4 +1,6 @@
-﻿using Xunit.Internal;
+﻿using System.Diagnostics;
+
+using Xunit.Internal;
 using Xunit.Sdk;
 using Xunit.v3;
 
@@ -12,31 +14,24 @@ public class AnchTestMethodRunner(IServiceProviderPool? serviceProviderPool)
         Guard.ArgumentNotNull(ctxt);
         Guard.ArgumentNotNull(testCase);
 
-        await using var scope = await serviceProviderPool.CreateScopeAsync(ctxt.CancellationTokenSource.Token);
-
-        if (scope.Exception != null)
-        {
-            return XunitRunnerHelper.FailTestCases(
-                ctxt.MessageBus,
-                ctxt.CancellationTokenSource,
-                [testCase],
-                scope.Exception,
-                sendTestClassMessages: true
-            );
-        }
-
         if (testCase is ISelfExecutingXunitTestCase selfExecutingTestCase)
+        {
             return await selfExecutingTestCase.Run(ctxt.ExplicitOption, ctxt.MessageBus, ctxt.ConstructorArguments, ctxt.Aggregator.Clone(),
                 ctxt.CancellationTokenSource);
+        }
+        else
+        {
+            var actualTestCase = testCase.WithServiceProviderPool(serviceProviderPool);
 
-        return await AnchRunnerHelper.RunXunitTestCase(
-            testCase,
-            ctxt.MessageBus,
-            ctxt.CancellationTokenSource,
-            ctxt.Aggregator.Clone(),
-            ctxt.ExplicitOption,
-            ctxt.ConstructorArguments.Select(arg => arg == HandledServiceProvider.Instance ? scope.ServiceProvider : arg).ToArray()
-        );
+            return await AnchRunnerHelper.RunXunitTestCase(
+                actualTestCase,
+                ctxt.MessageBus,
+                ctxt.CancellationTokenSource,
+                ctxt.Aggregator.Clone(),
+                ctxt.ExplicitOption,
+                ctxt.ConstructorArguments,
+                serviceProviderPool);
+        }
     }
 
     public async ValueTask<RunSummary> Run(

@@ -5,6 +5,12 @@ namespace Anch.Testing.Tests;
 public class TheoryTests(IServiceProvider serviceProvider)
 {
     [Theory]
+    [MemberData(nameof(GetTest2Cases))]
+    public void TestSync(string value)
+    {
+    }
+
+    [Theory]
     [AnchMemberData(nameof(GetTest1Cases))]
     public async Task Test1(ABC abc, CancellationToken ct)
     {

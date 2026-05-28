@@ -18,7 +18,7 @@ namespace Anch.Testing.Xunit;
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
 public class AnchMemberDataAttribute(string memberName, params object?[] arguments)
-    : MemberDataAttributeBase(memberName, arguments), IServiceProviderPoolAttribute
+    : MemberDataAttributeBase(memberName, arguments), IServiceProviderPoolContainer
 {
     private IServiceProviderPool? serviceProviderPool;
 
@@ -51,8 +51,6 @@ public class AnchMemberDataAttribute(string memberName, params object?[] argumen
 
             if (serviceProvider == null)
             {
-                Debugger.Launch();
-
                 return Activator.CreateInstance(testType);
             }
             else
@@ -299,7 +297,7 @@ public class AnchMemberDataAttribute(string memberName, params object?[] argumen
     public override bool SupportsDiscoveryEnumeration() =>
         !this.DisableDiscoveryEnumeration;
 
-    IServiceProviderPool? IServiceProviderPoolAttribute.ServiceProviderPool
+    IServiceProviderPool? IServiceProviderPoolContainer.ServiceProviderPool
     {
         get => this.serviceProviderPool;
         set => this.serviceProviderPool = value;
